@@ -446,6 +446,13 @@ class AetheriaApp {
     if (!this.weatherData) {
       this.dom.dynamicContentHolder.innerHTML = `<div class="glass-panel" style="padding: 24px;">${this.t.status.loading}</div>`;
     }
+    // A place never requested before is read from cold storage on the weather server and can take a while
+    const slowTimer = setTimeout(() => {
+      if (requestId !== this.requestId) return;
+      this.dom.statusBannerHolder.innerHTML = `
+        <div class="alert-banner yellow"><div style="display: flex; align-items: center; gap: 12px;">${getIconSvg("activity", 20)}<span>${this.t.status.slowLoading}</span></div></div>
+      `;
+    }, 4000);
 
     let data = null;
     let offline = false;
@@ -469,8 +476,10 @@ class AetheriaApp {
       }
     }
 
+    clearTimeout(slowTimer);
     // A newer request was started while this one was in flight
     if (requestId !== this.requestId) return;
+    this.dom.statusBannerHolder.innerHTML = "";
 
     this.isOfflineData = offline;
     this.loadError = !data;
