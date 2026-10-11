@@ -912,8 +912,19 @@ body {
   .deep-analytics-grid {
     grid-template-columns: 1fr;
   }
+  /* Phones and tablets: search and place selectors move to a second header row */
+  .app-header {
+    height: auto;
+    flex-wrap: wrap;
+    row-gap: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
   .header-center {
-    display: none;
+    order: 3;
+    flex: 1 1 100%;
+    max-width: none;
+    margin: 0;
   }
 }
 
@@ -990,4 +1001,256 @@ body {
   border-radius: 50%;
   background: #00f0ff;
   box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.35);
+}
+
+/* Content below the status bar / notch and above the home indicator */
+.app-header {
+  padding-top: max(env(safe-area-inset-top), 0px);
+}
+
+@media (max-width: 1080px) {
+  .app-header {
+    padding-top: calc(env(safe-area-inset-top) + 10px);
+  }
+}
+
+.main-wrapper {
+  padding-bottom: calc(32px + env(safe-area-inset-bottom));
+}
+
+/* Pro button and dialog */
+.pro-btn {
+  color: #fbbf24;
+  border-color: rgba(251, 191, 36, 0.45);
+}
+
+.pro-btn.is-pro {
+  background: rgba(251, 191, 36, 0.15);
+}
+
+.pro-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(2, 6, 23, 0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+  padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom));
+}
+
+.pro-modal {
+  width: 100%;
+  max-width: 420px;
+  background: #0f172a;
+  border: 1px solid rgba(251, 191, 36, 0.4);
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+}
+
+.pro-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px;
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), #0f172a);
+}
+
+.pro-modal-header h2 {
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.pro-modal-header p {
+  font-size: 0.8rem;
+  color: #fde68a;
+}
+
+.pro-modal-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: #f59e0b;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.pro-close-btn {
+  margin-inline-start: auto;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 6px;
+}
+
+.pro-modal-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.pro-benefits {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pro-benefits li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+}
+
+.pro-benefits svg {
+  color: #34d399;
+  flex-shrink: 0;
+}
+
+.pro-buy-btn {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(90deg, #fbbf24, #f59e0b);
+  color: #0f172a;
+  font-weight: 800;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.pro-restore-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.pro-buy-btn:disabled,
+.pro-restore-btn:disabled {
+  opacity: 0.6;
+}
+
+.pro-status {
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(30, 41, 59, 0.8);
+  font-size: 0.82rem;
+  text-align: center;
+}
+
+.pro-status-ok {
+  background: rgba(16, 185, 129, 0.15);
+  color: #6ee7b7;
+  font-weight: 700;
+}
+
+.pro-message {
+  font-size: 0.8rem;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.pro-privacy-link {
+  font-size: 0.75rem;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+/* Grid items must be allowed to shrink below their content (the hourly strip scrolls inside its card) */
+.dashboard-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.dashboard-grid > *,
+.deep-analytics-grid > * {
+  min-width: 0;
+}
+
+/* View tabs scroll sideways inside their bar instead of widening the page */
+.view-tabs-container {
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.view-tabs-container::-webkit-scrollbar {
+  display: none;
+}
+
+.view-tab-btn {
+  flex-shrink: 0;
+}
+
+@media (max-width: 1080px) {
+  .view-tabs-container {
+    justify-content: flex-start;
+  }
+  .header-center {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .search-container {
+    width: 100%;
+  }
+  .geo-hierarchy-bar {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    width: 100%;
+  }
+  .geo-hierarchy-bar .geo-select {
+    width: 100%;
+    min-width: 0;
+    text-overflow: ellipsis;
+  }
+  .header-actions {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+}
+
+@media (max-width: 640px) {
+  .view-tabs-container {
+    padding: 12px 14px;
+  }
+  .header-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+  #btnAudioToggle .btn-text {
+    display: none;
+  }
+  .header-actions .geo-select {
+    max-width: 120px;
+  }
+}
+
+@media (max-width: 640px) {
+  .route-planner-box {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .route-input {
+    width: 100%;
+    min-width: 0;
+  }
 }

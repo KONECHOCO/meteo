@@ -8,6 +8,10 @@ import { WeatherAudioEngine } from "./audio/ambientAudio.js";
 import { WindRadarCanvas } from "./components/windRadarCanvas.js";
 import { renderMeteogramSvg } from "./components/meteogramChart.js";
 import { getIconSvg } from "./utils/icons.js";
+import { Capacitor } from "@capacitor/core";
+import { Geolocation } from "@capacitor/geolocation";
+import { initMonetization, trackAdAction, subscribeMonetization, getMonetizationState } from "./services/monetization.js";
+import { openProModal } from "./components/proModal.js";
 
 const LOCALES = { it: "it-IT", en: "en-GB", es: "es-ES", fr: "fr-FR", de: "de-DE", ja: "ja-JP", zh: "zh-CN", ar: "ar", pt: "pt-BR", ru: "ru-RU" };
 const CACHE_PREFIX = "aetheria_wx_";
@@ -132,6 +136,14 @@ class AetheriaApp {
     this.bindDomElements();
     this.bindEventListeners();
 
+    // Ads and Pro: keep the page clear of the bottom banner and show the Pro state in the header
+    subscribeMonetization(({ bannerHeight, isPro }) => {
+      document.body.style.paddingBottom = bannerHeight ? `${bannerHeight}px` : "";
+      const btn = document.getElementById("btnPro");
+      if (btn) btn.classList.toggle("is-pro", isPro);
+    });
+    initMonetization();
+
     if (!this.hasSavedLocation) await this.pickDeviceCountryLocation();
     await Promise.all([this.populateGeoSelectors(), this.loadWeatherForCurrentLocation()]);
   }
@@ -175,6 +187,11 @@ class AetheriaApp {
 
         <!-- Header Actions: GPS, Audio, Unit, Lang -->
         <div class="header-actions">
+          <button id="btnPro" class="action-btn pro-btn ${getMonetizationState().isPro ? "is-pro" : ""}" title="${esc(t.pro.title)}">
+            ${getIconSvg("crown", 16)}
+            <span class="btn-text">${t.pro.button}</span>
+          </button>
+
           <button id="btnGpsLocation" class="action-btn" title="${esc(t.geo.currentLocation)}">
             ${getIconSvg("navigation", 16)}
             <span class="btn-text">GPS</span>
@@ -408,32 +425,35 @@ class AetheriaApp {
     });
 
     // GPS Geolocation
-    this.dom.btnGps.addEventListener("click", () => {
-      if (!navigator.geolocation) {
+    this.dom.btnGps.addEventListener("click", async () => {
+      const native = Capacitor.isNativePlatform();
+      if (!native && !navigator.geolocation) {
         alert(this.t.status.gpsUnsupported);
         return;
       }
       this.dom.btnGps.classList.add("active");
-      navigator.geolocation.getCurrentPosition(
-        async (pos) => {
-          this.dom.btnGps.classList.remove("active");
-          const lat = pos.coords.latitude;
-          const lon = pos.coords.longitude;
-          const place = await findNearestPlace(lat, lon, this.currentLang).catch(() => null);
-          // Weather for the exact GPS point, named after the nearest known place
-          this.selectedCity = { name: place ? place.name : this.t.status.myLocation, lat, lon, timezone: "auto", isGps: true };
-          this.locationLabel = place ? { region: place.region, countryCode: place.countryCode } : null;
-          this.loadWeatherForCurrentLocation();
-          if (place) this.syncSelectorsToPlace(place.countryCode, place.admin1);
-        },
-        (err) => {
-          this.dom.btnGps.classList.remove("active");
-          console.warn("GPS error:", err);
-          alert(this.t.status.gpsError);
-        },
-        { enableHighAccuracy: false, timeout: 15000, maximumAge: 600000 }
-      );
+      try {
+        const options = { enableHighAccuracy: false, timeout: 15000, maximumAge: 600000 };
+        const pos = native
+          ? await Geolocation.getCurrentPosition(options)
+          : await new Promise((resolve, reject) => navigator.geolocation.getCurrentPosition(resolve, reject, options));
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+        const place = await findNearestPlace(lat, lon, this.currentLang).catch(() => null);
+        // Weather for the exact GPS point, named after the nearest known place
+        this.selectedCity = { name: place ? place.name : this.t.status.myLocation, lat, lon, timezone: "auto", isGps: true };
+        this.locationLabel = place ? { region: place.region, countryCode: place.countryCode } : null;
+        this.loadWeatherForCurrentLocation();
+        if (place) this.syncSelectorsToPlace(place.countryCode, place.admin1);
+      } catch (err) {
+        console.warn("GPS error:", err);
+        alert(this.t.status.gpsError);
+      } finally {
+        this.dom.btnGps.classList.remove("active");
+      }
     });
+
+    document.getElementById("btnPro").addEventListener("click", () => openProModal(this.t));
 
     // Audio Engine Toggle
     this.dom.btnAudio.addEventListener("click", () => {
@@ -470,6 +490,7 @@ class AetheriaApp {
         document.querySelectorAll(".view-tab-btn").forEach(b => b.classList.remove("active"));
         btn.classList.add("active");
         this.currentView = btn.dataset.view;
+        trackAdAction();
         this.renderCurrentView();
       });
     });
@@ -529,6 +550,7 @@ class AetheriaApp {
         this.dom.searchInput.value = `${r.name}, ${r.country}`;
         this.loadWeatherForCurrentLocation();
         this.syncSelectorsToPlace(r.countryCode, r.admin1);
+        trackAdAction();
       });
     });
   }

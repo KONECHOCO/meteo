@@ -268,6 +268,24 @@ export const translations = {
       fallback: "Immagini satellitari non disponibili: mostro la mappa salvata nell'app.",
       rainError: "Pioggia satellitare non disponibile al momento."
     },
+    pro: {
+      button: "Pro",
+      title: "Aetheria Pro",
+      subtitle: "Meteo senza pubblicità",
+      noAds: "Nessuna pubblicità: niente banner né video",
+      oneTime: "Un solo pagamento, nessun abbonamento",
+      allDevices: "Vale su tutti i tuoi dispositivi con lo stesso account",
+      support: "Sostieni lo sviluppo e i server meteo",
+      buy: "Passa a Pro – {price}",
+      restore: "Ripristina acquisti",
+      owned: "Pro attivo: grazie! La pubblicità è stata rimossa.",
+      restored: "Acquisto ripristinato: Pro attivo.",
+      notFound: "Nessun acquisto Pro trovato per questo account.",
+      error: "Operazione non riuscita. Riprova più tardi.",
+      webOnly: "La versione Pro si acquista nell'app per iPhone, iPad e Android.",
+      privacy: "Informativa sulla privacy",
+      close: "Chiudi"
+    },
     info: {
       globeTitle: "Globo 3D",
       globeText: "Il giorno e la notte seguono la posizione reale del Sole. Trascina per ruotare, usa + e − (o due dita) per lo zoom. «Satellite di oggi» mostra le nuvole reali fotografate dai satelliti NASA; «Pioggia» la stima satellitare delle precipitazioni più recente.",
@@ -542,6 +560,24 @@ export const translations = {
       source: "Imagery: NASA GIBS / EOSDIS (VIIRS, Blue Marble, Black Marble, IMERG)",
       fallback: "Satellite imagery unavailable: showing the map stored in the app.",
       rainError: "Satellite rain is not available right now."
+    },
+    pro: {
+      button: "Pro",
+      title: "Aetheria Pro",
+      subtitle: "Weather without ads",
+      noAds: "No ads: no banners and no videos",
+      oneTime: "One payment, no subscription",
+      allDevices: "Works on all your devices with the same account",
+      support: "Support development and the weather servers",
+      buy: "Go Pro – {price}",
+      restore: "Restore purchases",
+      owned: "Pro is active: thank you! Ads have been removed.",
+      restored: "Purchase restored: Pro is active.",
+      notFound: "No Pro purchase found for this account.",
+      error: "Something went wrong. Please try again later.",
+      webOnly: "Pro can be purchased in the iPhone, iPad and Android app.",
+      privacy: "Privacy policy",
+      close: "Close"
     },
     info: {
       globeTitle: "3D globe",
@@ -818,6 +854,24 @@ export const translations = {
       fallback: "Imágenes de satélite no disponibles: se muestra el mapa guardado en la app.",
       rainError: "La lluvia por satélite no está disponible ahora."
     },
+    pro: {
+      button: "Pro",
+      title: "Aetheria Pro",
+      subtitle: "El tiempo sin anuncios",
+      noAds: "Sin anuncios: ni banners ni vídeos",
+      oneTime: "Un solo pago, sin suscripción",
+      allDevices: "Válido en todos tus dispositivos con la misma cuenta",
+      support: "Apoya el desarrollo y los servidores meteorológicos",
+      buy: "Hazte Pro – {price}",
+      restore: "Restaurar compras",
+      owned: "Pro activado: ¡gracias! Se han eliminado los anuncios.",
+      restored: "Compra restaurada: Pro activado.",
+      notFound: "No se encontró ninguna compra Pro en esta cuenta.",
+      error: "Algo ha fallado. Inténtalo más tarde.",
+      webOnly: "La versión Pro se compra en la app para iPhone, iPad y Android.",
+      privacy: "Política de privacidad",
+      close: "Cerrar"
+    },
     info: {
       globeTitle: "Globo 3D",
       globeText: "El día y la noche siguen la posición real del Sol. Arrastra para girar y usa + y − (o dos dedos) para hacer zoom. «Satélite de hoy» muestra las nubes reales fotografiadas por los satélites de la NASA; «Lluvia», la estimación satelital de precipitación más reciente.",
@@ -1092,6 +1146,24 @@ export const translations = {
       source: "Images : NASA GIBS / EOSDIS (VIIRS, Blue Marble, Black Marble, IMERG)",
       fallback: "Images satellite indisponibles : affichage de la carte enregistrée dans l’app.",
       rainError: "La pluie satellite n’est pas disponible pour le moment."
+    },
+    pro: {
+      button: "Pro",
+      title: "Aetheria Pro",
+      subtitle: "La météo sans publicité",
+      noAds: "Aucune publicité : ni bannières ni vidéos",
+      oneTime: "Un seul paiement, sans abonnement",
+      allDevices: "Valable sur tous vos appareils avec le même compte",
+      support: "Soutenez le développement et les serveurs météo",
+      buy: "Passer à Pro – {price}",
+      restore: "Restaurer les achats",
+      owned: "Pro activé : merci ! La publicité a été supprimée.",
+      restored: "Achat restauré : Pro activé.",
+      notFound: "Aucun achat Pro trouvé pour ce compte.",
+      error: "Une erreur s’est produite. Réessayez plus tard.",
+      webOnly: "La version Pro s’achète dans l’app pour iPhone, iPad et Android.",
+      privacy: "Politique de confidentialité",
+      close: "Fermer"
     },
     info: {
       globeTitle: "Globe 3D",
@@ -1368,6 +1440,24 @@ export const translations = {
       fallback: "Satellitenbilder nicht verfügbar: Es wird die in der App gespeicherte Karte angezeigt.",
       rainError: "Satellitenregen ist gerade nicht verfügbar."
     },
+    pro: {
+      button: "Pro",
+      title: "Aetheria Pro",
+      subtitle: "Wetter ohne Werbung",
+      noAds: "Keine Werbung: keine Banner, keine Videos",
+      oneTime: "Einmalige Zahlung, kein Abo",
+      allDevices: "Gilt auf all deinen Geräten mit demselben Konto",
+      support: "Unterstütze die Entwicklung und die Wetterserver",
+      buy: "Pro holen – {price}",
+      restore: "Käufe wiederherstellen",
+      owned: "Pro ist aktiv: Danke! Die Werbung wurde entfernt.",
+      restored: "Kauf wiederhergestellt: Pro ist aktiv.",
+      notFound: "Für dieses Konto wurde kein Pro-Kauf gefunden.",
+      error: "Etwas ist schiefgelaufen. Bitte später erneut versuchen.",
+      webOnly: "Pro kann in der App für iPhone, iPad und Android gekauft werden.",
+      privacy: "Datenschutzerklärung",
+      close: "Schließen"
+    },
     info: {
       globeTitle: "3D-Globus",
       globeText: "Tag und Nacht folgen dem tatsächlichen Sonnenstand. Ziehen zum Drehen, + und − (oder zwei Finger) zum Zoomen. „Satellit heute“ zeigt die echten Wolken aus NASA-Satellitenbildern, „Regen“ die neueste satellitengestützte Niederschlagsschätzung.",
@@ -1642,6 +1732,24 @@ export const translations = {
       source: "画像: NASA GIBS / EOSDIS（VIIRS、Blue Marble、Black Marble、IMERG）",
       fallback: "衛星画像を取得できないため、アプリ内の地図を表示しています。",
       rainError: "衛星降水データは現在利用できません。"
+    },
+    pro: {
+      button: "Pro",
+      title: "Aetheria Pro",
+      subtitle: "広告なしの天気予報",
+      noAds: "広告なし：バナーも動画もありません",
+      oneTime: "1回の支払いのみ、サブスクなし",
+      allDevices: "同じアカウントのすべてのデバイスで有効",
+      support: "開発と気象サーバーを応援",
+      buy: "Proにする – {price}",
+      restore: "購入を復元",
+      owned: "Proが有効になりました。ありがとうございます！広告は削除されました。",
+      restored: "購入を復元しました：Proが有効です。",
+      notFound: "このアカウントにPro購入が見つかりません。",
+      error: "問題が発生しました。後でもう一度お試しください。",
+      webOnly: "ProはiPhone、iPad、Androidアプリで購入できます。",
+      privacy: "プライバシーポリシー",
+      close: "閉じる"
     },
     info: {
       globeTitle: "3D地球儀",
@@ -1918,6 +2026,24 @@ export const translations = {
       fallback: "无法获取卫星影像，显示应用内保存的地图。",
       rainError: "暂时无法获取卫星降水数据。"
     },
+    pro: {
+      button: "Pro",
+      title: "Aetheria Pro",
+      subtitle: "无广告的天气预报",
+      noAds: "无广告：没有横幅，也没有视频",
+      oneTime: "一次付费，无需订阅",
+      allDevices: "同一账户的所有设备均可使用",
+      support: "支持开发和气象服务器",
+      buy: "升级Pro – {price}",
+      restore: "恢复购买",
+      owned: "Pro已激活：谢谢！广告已移除。",
+      restored: "购买已恢复：Pro已激活。",
+      notFound: "此账户未找到Pro购买记录。",
+      error: "出现问题，请稍后重试。",
+      webOnly: "Pro版可在iPhone、iPad和Android应用中购买。",
+      privacy: "隐私政策",
+      close: "关闭"
+    },
     info: {
       globeTitle: "3D地球",
       globeText: "昼夜按太阳的真实位置显示。拖动旋转，使用＋/−（或双指）缩放。“今日卫星图”显示NASA卫星拍摄的真实云层，“降雨”显示最新的卫星降水估算。",
@@ -2192,6 +2318,24 @@ export const translations = {
       source: "الصور: NASA GIBS / EOSDIS (VIIRS وBlue Marble وBlack Marble وIMERG)",
       fallback: "صور الأقمار الصناعية غير متاحة: يتم عرض الخريطة المحفوظة في التطبيق.",
       rainError: "بيانات المطر من الأقمار الصناعية غير متاحة حاليًا."
+    },
+    pro: {
+      button: "Pro",
+      title: "Aetheria Pro",
+      subtitle: "الطقس بدون إعلانات",
+      noAds: "بدون إعلانات: لا لافتات ولا فيديوهات",
+      oneTime: "دفعة واحدة، بدون اشتراك",
+      allDevices: "صالح على جميع أجهزتك بنفس الحساب",
+      support: "ادعم التطوير وخوادم الطقس",
+      buy: "الترقية إلى Pro – {price}",
+      restore: "استعادة المشتريات",
+      owned: "تم تفعيل Pro: شكرًا لك! تمت إزالة الإعلانات.",
+      restored: "تمت استعادة الشراء: Pro مفعّل.",
+      notFound: "لم يتم العثور على شراء Pro لهذا الحساب.",
+      error: "حدث خطأ. حاول مرة أخرى لاحقًا.",
+      webOnly: "يمكن شراء Pro داخل التطبيق على iPhone وiPad وAndroid.",
+      privacy: "سياسة الخصوصية",
+      close: "إغلاق"
     },
     info: {
       globeTitle: "الكرة الأرضية ثلاثية الأبعاد",
@@ -2468,6 +2612,24 @@ export const translations = {
       fallback: "Imagens de satélite indisponíveis: mostrando o mapa salvo no app.",
       rainError: "A chuva por satélite não está disponível agora."
     },
+    pro: {
+      button: "Pro",
+      title: "Aetheria Pro",
+      subtitle: "Previsão do tempo sem anúncios",
+      noAds: "Sem anúncios: sem banners nem vídeos",
+      oneTime: "Um único pagamento, sem assinatura",
+      allDevices: "Vale em todos os seus dispositivos com a mesma conta",
+      support: "Apoie o desenvolvimento e os servidores meteorológicos",
+      buy: "Seja Pro – {price}",
+      restore: "Restaurar compras",
+      owned: "Pro ativado: obrigado! Os anúncios foram removidos.",
+      restored: "Compra restaurada: Pro ativado.",
+      notFound: "Nenhuma compra Pro encontrada nesta conta.",
+      error: "Algo deu errado. Tente novamente mais tarde.",
+      webOnly: "A versão Pro é comprada no app para iPhone, iPad e Android.",
+      privacy: "Política de privacidade",
+      close: "Fechar"
+    },
     info: {
       globeTitle: "Globo 3D",
       globeText: "O dia e a noite seguem a posição real do Sol. Arraste para girar e use + e − (ou dois dedos) para ampliar. “Satélite de hoje” mostra as nuvens reais fotografadas pelos satélites da NASA; “Chuva” mostra a estimativa de precipitação por satélite mais recente.",
@@ -2742,6 +2904,24 @@ export const translations = {
       source: "Снимки: NASA GIBS / EOSDIS (VIIRS, Blue Marble, Black Marble, IMERG)",
       fallback: "Спутниковые снимки недоступны: показана карта, сохранённая в приложении.",
       rainError: "Спутниковые данные об осадках сейчас недоступны."
+    },
+    pro: {
+      button: "Pro",
+      title: "Aetheria Pro",
+      subtitle: "Погода без рекламы",
+      noAds: "Без рекламы: ни баннеров, ни видео",
+      oneTime: "Один платёж, без подписки",
+      allDevices: "Действует на всех ваших устройствах с той же учётной записью",
+      support: "Поддержите разработку и метеосерверы",
+      buy: "Перейти на Pro – {price}",
+      restore: "Восстановить покупки",
+      owned: "Pro активирован: спасибо! Реклама удалена.",
+      restored: "Покупка восстановлена: Pro активирован.",
+      notFound: "Для этой учётной записи покупка Pro не найдена.",
+      error: "Что-то пошло не так. Повторите попытку позже.",
+      webOnly: "Pro можно купить в приложении для iPhone, iPad и Android.",
+      privacy: "Политика конфиденциальности",
+      close: "Закрыть"
     },
     info: {
       globeTitle: "3D-глобус",
