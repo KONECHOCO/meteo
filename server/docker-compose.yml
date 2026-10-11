@@ -1,11 +1,10 @@
 # Self-hosted Open-Meteo API for AETHERIA 3D.
 # Weather data is read on demand from the Open-Meteo open-data bucket on AWS S3 (CC BY 4.0,
-# commercial use allowed) and kept in a local LRU cache. Caddy adds HTTPS, CORS and caching headers.
+# commercial use allowed) and kept in a local LRU cache.
+# The host nginx (with certbot) terminates HTTPS and proxies to 127.0.0.1:8097 — see nginx/.
 
 volumes:
   open-meteo-data:
-  caddy-data:
-  caddy-config:
 
 services:
   open-meteo:
@@ -15,21 +14,7 @@ services:
       - open-meteo-data:/app/data
     environment:
       REMOTE_DATA_DIRECTORY: https://openmeteo.s3.amazonaws.com/data/
-      CACHE_SIZE: ${CACHE_SIZE:-50GB}
-    restart: always
-
-  caddy:
-    image: caddy:2
-    container_name: caddy
-    depends_on:
-      - open-meteo
+      CACHE_SIZE: ${CACHE_SIZE:-40GB}
     ports:
-      - "80:80"
-      - "443:443"
-    environment:
-      API_DOMAIN: ${API_DOMAIN}
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - caddy-data:/data
-      - caddy-config:/config
+      - "127.0.0.1:8097:8080"
     restart: always
