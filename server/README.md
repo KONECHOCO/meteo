@@ -64,3 +64,13 @@ docker compose pull && docker compose up -d   # aggiornare Open-Meteo (una volta
 docker compose logs -f open-meteo             # log
 free -h && df -h /                            # RAM e disco (la cache occupa CACHE_SIZE fin dall'avvio)
 ```
+
+## Sito dell'app (privacy, supporto, app-ads.txt)
+
+I file in `site/` sono pubblicati su `https://aetheria.ikonetsolutions.com` dallo stesso server:
+
+```bash
+scp site/* root@169.58.44.38:/var/www/aetheria/
+```
+
+(server nginx: `/etc/nginx/sites-available/aetheria.ikonetsolutions.com`, root `/var/www/aetheria`).

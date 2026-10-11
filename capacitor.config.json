@@ -1,0 +1,7 @@
+{
+  "appId": "com.ikonet.aetheria",
+  "appName": "Aetheria",
+  "webDir": "dist",
+  "ios": { "contentInset": "never", "backgroundColor": "#070913" },
+  "android": { "backgroundColor": "#070913" }
+}

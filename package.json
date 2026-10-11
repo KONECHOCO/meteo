@@ -1,12 +1,13 @@
 {
   "name": "meteo",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "cap:sync": "npm run build && cap sync"
   },
   "devDependencies": {
     "@capacitor/assets": "^3.0.5",
@@ -24,5 +25,8 @@
     "@capgo/native-purchases": "^8.9.2",
     "lucide": "^1.55.0",
     "three": "^0.186.1"
+  },
+  "engines": {
+    "node": ">=22"
   }
 }

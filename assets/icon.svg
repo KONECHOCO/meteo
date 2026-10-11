@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="38%" r="75%">
+      <stop offset="0" stop-color="#123a66"/>
+      <stop offset="0.55" stop-color="#0a1830"/>
+      <stop offset="1" stop-color="#050812"/>
+    </radialGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0.72" stop-color="#38bdf8" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#38bdf8" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="globe" cx="38%" cy="32%" r="75%">
+      <stop offset="0" stop-color="#5ec8ff"/>
+      <stop offset="0.45" stop-color="#1673c9"/>
+      <stop offset="1" stop-color="#062a5c"/>
+    </radialGradient>
+    <radialGradient id="sun" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#fff3b0"/>
+      <stop offset="0.6" stop-color="#fbbf24"/>
+      <stop offset="1" stop-color="#f59e0b"/>
+    </radialGradient>
+    <linearGradient id="cloud" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#d6e4f5"/>
+    </linearGradient>
+    <clipPath id="globeClip"><circle cx="470" cy="520" r="300"/></clipPath>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+  <circle cx="742" cy="282" r="150" fill="url(#sun)"/>
+  <circle cx="470" cy="520" r="350" fill="url(#glow)"/>
+  <circle cx="470" cy="520" r="300" fill="url(#globe)"/>
+  <g clip-path="url(#globeClip)" fill="#3fb37f" opacity="0.9">
+    <path d="M330 300c60-30 150-20 190 30 30 40 10 90-40 100-40 8-60 50-100 60-50 12-110-20-120-80-8-50 20-90 70-110z"/>
+    <path d="M560 470c50-20 120 0 140 50 20 55-10 120-60 150-40 25-60 80-110 70-40-8-50-60-30-100 15-30 0-60 10-100 8-35 20-60 50-70z"/>
+    <path d="M250 560c30-10 70 10 80 40 10 35-20 60-50 55-35-6-60-30-55-60 2-15 10-30 25-35z"/>
+  </g>
+  <circle cx="470" cy="520" r="300" fill="none" stroke="#bfe9ff" stroke-opacity="0.35" stroke-width="6"/>
+  <path d="M430 860h330a120 120 0 0 0 10-239 170 170 0 0 0-320-40 140 140 0 0 0-20 279z" fill="url(#cloud)"/>
+</svg>
