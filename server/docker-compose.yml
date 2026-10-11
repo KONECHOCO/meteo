@@ -14,7 +14,7 @@ services:
       - open-meteo-data:/app/data
     environment:
       REMOTE_DATA_DIRECTORY: https://openmeteo.s3.amazonaws.com/data/
-      CACHE_SIZE: ${CACHE_SIZE:-40GB}
+      CACHE_SIZE: ${CACHE_SIZE:-60GB}
     ports:
       - "127.0.0.1:8097:8080"
     restart: always

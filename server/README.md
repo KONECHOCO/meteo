@@ -4,72 +4,63 @@ Sostituisce il piano commerciale di Open-Meteo (29 €/mese). L'uso commerciale 
 **CC BY 4.0** (basta citare Open-Meteo, l'app lo fa già in fondo alla pagina) e il software è AGPL-3.0
 (lo usiamo senza modifiche).
 
-Il server non scarica tutti i modelli: legge solo i pezzi di dati che servono dall'archivio pubblico
-di Open-Meteo su AWS e li tiene in cache. Le prime richieste per una zona richiedono qualche secondo,
-poi sono veloci; nginx tiene in cache le risposte per 10 minuti.
+Il server non scarica tutti i modelli: legge dall'archivio pubblico di Open-Meteo su AWS solo i dati che
+servono e li tiene in una cache locale da 60 GB. Una zona mai richiesta risponde in 5–30 s, poi è immediata;
+nginx tiene in cache le risposte per 10 minuti e `warmup.sh` (cron ogni 2 ore) tiene calde le 500 città più
+popolose (`warmup-cities.txt`).
 
-Gira sul VPS Ikonet esistente (`23.88.32.156`, Hetzner fsn1), accanto alle altre app, dietro
-l'nginx di sistema con certbot.
+## Server attuale
 
-## 0. Prima: aumentare il VPS
+| | |
+|---|---|
+| Fornitore | Contabo Cloud VPS 6 NVMe (6 vCPU, 12 GB RAM, 100 GB), Hub Europe |
+| IP | `169.58.44.38` (accesso: `ssh root@169.58.44.38`, solo chiave SSH, password disattivata) |
+| Dominio | `meteo-api.ikonetsolutions.com` (DNS su Namecheap: record A → IP) |
+| Cartella | `/opt/meteo-api` |
+| Sicurezza | ufw (22, 80, 443), fail2ban, aggiornamenti automatici |
 
-Open-Meteo richiede **almeno 8 GB di RAM liberi**; il VPS ha 7,6 GB totali già usati per metà dalle altre app.
-In Hetzner Console → server → **Rescale** → **CX43** (8 vCPU, 16 GB RAM, 160 GB disco), spuntando
-"aumenta anche il disco". Il server si spegne per 1–2 minuti (anche le altre app). L'aumento del disco
-non si può più annullare.
-
-## 1. Collega il dominio
-
-Nel DNS di `ikonetsolutions.com`: record **A** `meteo-api` → `23.88.32.156`.
-
-## 2. Installa (una volta sola)
-
-Dal tuo PC:
+## Reinstallazione da zero (Ubuntu 24.04)
 
 ```bash
-scp -r server choco@23.88.32.156:~/meteo-api
+scp -r server root@IP:/opt/meteo-api
+ssh root@IP
+apt-get update && apt-get install -y ufw fail2ban unattended-upgrades nginx certbot python3-certbot-nginx
+ufw allow OpenSSH && ufw allow 80/tcp && ufw allow 443/tcp && ufw --force enable
+curl -fsSL https://get.docker.com | sh
+cd /opt/meteo-api && cp .env.example .env && docker compose up -d
+
+mkdir -p /var/cache/nginx/meteo-api
+cp nginx/meteo-api.ikonetsolutions.com /etc/nginx/sites-available/
+ln -s /etc/nginx/sites-available/meteo-api.ikonetsolutions.com /etc/nginx/sites-enabled/
+rm -f /etc/nginx/sites-enabled/default
+nginx -t && systemctl reload nginx
+certbot --nginx -d meteo-api.ikonetsolutions.com
+
+chmod +x warmup.sh
+echo "15 */2 * * * root flock -n /tmp/meteo-warmup.lock /opt/meteo-api/warmup.sh" > /etc/cron.d/meteo-warmup
 ```
 
-Sul server:
-
-```bash
-ssh choco@23.88.32.156
-cd ~/meteo-api
-cp .env.example .env
-docker compose up -d
-curl "http://127.0.0.1:8097/v1/forecast?latitude=45.46&longitude=9.19&current=temperature_2m"
-
-sudo mkdir -p /var/cache/nginx/meteo-api
-sudo cp nginx/meteo-api.ikonetsolutions.com /etc/nginx/sites-available/
-sudo ln -s /etc/nginx/sites-available/meteo-api.ikonetsolutions.com /etc/nginx/sites-enabled/
-sudo nginx -t && sudo systemctl reload nginx
-sudo certbot --nginx -d meteo-api.ikonetsolutions.com
-```
-
-## 3. Verifica
+## Verifica
 
 ```bash
 curl -i "https://meteo-api.ikonetsolutions.com/v1/forecast?latitude=45.46&longitude=9.19&current=temperature_2m"
 ```
 
-Deve rispondere `200` con `temperature_2m`. Ripetendo la stessa richiesta, `X-Cache-Status` diventa `HIT`.
-Controlla anche `/v1/air-quality` e `/v1/marine`.
+Deve rispondere `200` con `temperature_2m`; ripetendo la richiesta `X-Cache-Status` diventa `HIT`.
 
-## 4. Collega l'app
+## Collegare l'app
 
-Nel progetto crea `.env.production` (vedi `.env.example` nella cartella principale) con:
+In `.env.production` (vedi `.env.example` nella cartella principale):
 
 ```
 VITE_WEATHER_API_BASE=https://meteo-api.ikonetsolutions.com
 ```
 
-e ricompila (`npm run build`).
-
 ## Manutenzione
 
 ```bash
-cd ~/meteo-api
+cd /opt/meteo-api
 docker compose pull && docker compose up -d   # aggiornare Open-Meteo (una volta al mese)
 docker compose logs -f open-meteo             # log
-free -h && df -h /                            # RAM e disco (la cache usa al massimo CACHE_SIZE)
+free -h && df -h /                            # RAM e disco (la cache occupa CACHE_SIZE fin dall'avvio)
 ```
