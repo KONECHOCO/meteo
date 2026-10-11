@@ -29,12 +29,12 @@ Switch istantaneo senza ricaricamento pagina tra:
 - 🇷🇺 **Русский**
 
 ### 3. 🎮 Grafica 3D Realistica (WebGL & Three.js a 60 FPS)
-- **Globo Terrestre 3D Interattivo**:
-  - Shader atmosferico con scattering di **Rayleigh** (bagliore celeste/ambra).
-  - Ciclo giorno/notte dinamico con mappe delle luci notturne delle città.
-  - Nuvole volumetriche 3D rotanti.
-  - *(In arrivo: texture NASA Blue Marble, radar e satellite reali — i vecchi layer simulati sono stati rimossi.)*
-  - Transizioni di volo camera (*Fly-To*) morbide con puntatore radar pulsante sulla città selezionata.
+- **Globo Terrestre 3D con immagini NASA** (pubblico dominio, NASA GIBS / EOSDIS):
+  - **Satellite di oggi**: le nuvole reali del mosaico VIIRS del giorno prima (completo).
+  - **Senza nuvole**: Blue Marble con rilievi e fondali; luci delle città (Black Marble) sul lato notturno.
+  - Giorno e notte calcolati sulla **posizione reale del Sole**, aggiornata ogni minuto.
+  - **Pioggia**: ultima stima satellitare delle precipitazioni (IMERG, ogni 30 minuti, ~8 h di ritardo).
+  - Senza connessione usa le immagini incluse nell'app (`public/textures`).
 - **Simulatore Cielo & Atmosfera 3D**:
   - Volta celeste con scattering solare e skyline montuoso all'orizzonte.
   - Simulazione orbita del Sole e della Luna con fasi lunari realistiche.

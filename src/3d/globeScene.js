@@ -1,476 +1,392 @@
-// 3D Realistic Interactive Globe Scene using Three.js
-// Features: Day/Night terminator with city lights, Rayleigh atmospheric rim scattering,
-// rotating cloud sphere, dynamic weather overlay (Satellite, Temp Heatmap, Jet Stream, Radar),
-// interactive pins with pulsing radar, and smooth camera fly-to transitions.
+// 3D globe built from NASA imagery (public domain, via NASA GIBS / EOSDIS):
+// - day side: today's VIIRS true-colour satellite mosaic (real clouds), or the Blue Marble relief
+// - night side: Black Marble city lights, with the day/night terminator at the real sun position
+// - optional overlay: IMERG satellite precipitation estimate (latest 30-minute frame)
+// Bundled textures in public/textures are used when the network is unavailable.
 
 import * as THREE from "three";
 
+const GIBS_WMS = "https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi";
+const GIBS_WMTS = "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/wmts.cgi";
+const TEXTURES = `${import.meta.env.BASE_URL}textures/`;
+
+function gibsMapUrl(layer, { time, width, height, format = "image/jpeg", transparent = false }) {
+  const params = new URLSearchParams({
+    SERVICE: "WMS",
+    REQUEST: "GetMap",
+    VERSION: "1.3.0",
+    LAYERS: layer,
+    CRS: "EPSG:4326",
+    BBOX: "-90,-180,90,180",
+    WIDTH: String(width),
+    HEIGHT: String(height),
+    FORMAT: format
+  });
+  if (transparent) params.set("TRANSPARENT", "TRUE");
+  if (time) params.set("TIME", time);
+  return `${GIBS_WMS}?${params}`;
+}
+
+// Latest available time of a GIBS layer (e.g. "2026-10-11T10:30:00Z"), or null
+async function latestGibsTime(layer, tileMatrixSet) {
+  const now = new Date();
+  const from = new Date(now.getTime() - 3 * 86400000).toISOString().slice(0, 10);
+  const to = new Date(now.getTime() + 86400000).toISOString().slice(0, 10);
+  const url = `${GIBS_WMTS}?SERVICE=WMTS&REQUEST=DescribeDomains&LAYER=${layer}&TILEMATRIXSET=${tileMatrixSet}&TIME=${from}/${to}`;
+  const res = await fetch(url);
+  if (!res.ok) return null;
+  const xml = await res.text();
+  const domain = (xml.match(/<Domain>([^<]+)<\/Domain>/) || [])[1];
+  if (!domain) return null;
+  // "start/end/period" or a comma-separated list of those: the last end is the newest time
+  const last = domain.split(",").pop().split("/");
+  return last.length >= 2 ? last[1] : last[0];
+}
+
+// Sub-solar point for a given time (accurate to well under a degree)
+export function subSolarPoint(date = new Date()) {
+  const dayMs = 86400000;
+  const n = (date.getTime() - Date.UTC(2000, 0, 1, 12)) / dayMs; // days since J2000
+  const L = (280.46 + 0.9856474 * n) % 360;
+  const g = ((357.528 + 0.9856003 * n) % 360) * Math.PI / 180;
+  const lambda = (L + 1.915 * Math.sin(g) + 0.02 * Math.sin(2 * g)) * Math.PI / 180;
+  const epsilon = (23.439 - 0.0000004 * n) * Math.PI / 180;
+  const decl = Math.asin(Math.sin(epsilon) * Math.sin(lambda));
+  const ra = Math.atan2(Math.cos(epsilon) * Math.sin(lambda), Math.cos(lambda));
+  // Equation of time (minutes) from mean longitude and right ascension
+  let eot = (L * Math.PI / 180 - ra) * 180 / Math.PI;
+  eot = ((eot + 540) % 360 - 180) * 4;
+  const utcMinutes = date.getUTCHours() * 60 + date.getUTCMinutes() + date.getUTCSeconds() / 60;
+  const lon = -((utcMinutes + eot) / 4 - 180);
+  return { lat: decl * 180 / Math.PI, lon: ((lon + 540) % 360) - 180 };
+}
+
 export class GlobeScene {
-  constructor(container) {
+  constructor(container, { onInfo } = {}) {
     this.container = container;
     this.width = container.clientWidth || 800;
     this.height = container.clientHeight || 600;
+    this.onInfo = onInfo || (() => {});
 
-    this.scene = null;
-    this.camera = null;
-    this.renderer = null;
-    this.globeGroup = null;
-    this.earthMesh = null;
-    this.cloudMesh = null;
-    this.atmosphereMesh = null;
-    this.markerGroup = null;
-    this.activeMarker = null;
-    this.streamlinesMesh = null;
+    this.baseLayer = "today"; // "today" (real clouds) | "relief" (Blue Marble, no clouds)
+    this.rainVisible = false;
+    this.info = { cloudsDate: null, rainTime: null, usingFallback: false };
 
-    this.currentMode = "satellite"; // "satellite" | "temperature" | "wind" | "radar"
     this.autoRotate = true;
     this.isDragging = false;
-    this.previousMousePosition = { x: 0, y: 0 };
+    this.previousPointer = { x: 0, y: 0 };
+    this.pinchDistance = null;
     this.targetRotation = { x: 0.2, y: 0 };
     this.currentRotation = { x: 0.2, y: 0 };
-
     this.animationFrameId = null;
+    this.events = new AbortController();
+    this.loader = new THREE.TextureLoader();
+    this.loader.setCrossOrigin("anonymous");
+    this.disposed = false;
 
     this.init();
   }
 
   init() {
-    // 1. Scene setup
     this.scene = new THREE.Scene();
-
-    // 2. Camera setup
     this.camera = new THREE.PerspectiveCamera(45, this.width / this.height, 0.1, 1000);
     this.camera.position.z = 2.8;
 
-    // 3. Renderer setup
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
     this.renderer.setSize(this.width, this.height);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.container.appendChild(this.renderer.domElement);
 
-    // 4. Lights
-    const ambientLight = new THREE.AmbientLight(0x223344, 1.2);
-    this.scene.add(ambientLight);
-
-    const sunLight = new THREE.DirectionalLight(0xffffff, 2.5);
-    sunLight.position.set(5, 3, 4);
-    this.scene.add(sunLight);
-
-    // 5. Globe Group
     this.globeGroup = new THREE.Group();
     this.scene.add(this.globeGroup);
 
-    // 6. Build Earth with procedural textures
     this.buildEarth();
-
-    // 7. Build Cloud Layer
-    this.buildClouds();
-
-    // 8. Build Atmospheric Rayleigh Halo
+    this.buildRainLayer();
     this.buildAtmosphere();
 
-    // 9. Build Markers Group
     this.markerGroup = new THREE.Group();
     this.globeGroup.add(this.markerGroup);
 
-    // 10. Build Wind Streamlines Layer
-    this.buildWindStreamlines();
+    this.updateSun();
+    this.sunTimer = setInterval(() => this.updateSun(), 60000);
 
-    // 11. Event Listeners
     this.bindEvents();
-
-    // 12. Start Render Loop
     this.animate();
+
+    this.loadBaseTexture();
+  }
+
+  // Texture size: full detail on large screens, lighter on phones
+  get textureWidth() {
+    return Math.min(window.innerWidth, window.innerHeight) < 700 ? 2048 : 4096;
   }
 
   buildEarth() {
-    const geometry = new THREE.SphereGeometry(1, 64, 64);
+    const placeholder = new THREE.DataTexture(new Uint8Array([10, 30, 60, 255]), 1, 1);
+    placeholder.needsUpdate = true;
 
-    // Generate procedural Earth Texture
-    const earthCanvas = this.generateEarthCanvas();
-    const earthTexture = new THREE.CanvasTexture(earthCanvas);
-    earthTexture.wrapS = THREE.RepeatWrapping;
-    earthTexture.wrapT = THREE.ClampToEdgeWrapping;
+    this.earthUniforms = {
+      dayMap: { value: placeholder },
+      nightMap: { value: placeholder },
+      sunDirection: { value: new THREE.Vector3(1, 0, 0) }
+    };
 
-    // Generate Bump / Elevation Texture
-    const bumpCanvas = this.generateBumpCanvas();
-    const bumpTexture = new THREE.CanvasTexture(bumpCanvas);
-
-    const material = new THREE.MeshStandardMaterial({
-      map: earthTexture,
-      bumpMap: bumpTexture,
-      bumpScale: 0.03,
-      roughness: 0.65,
-      metalness: 0.1
+    const material = new THREE.ShaderMaterial({
+      uniforms: this.earthUniforms,
+      vertexShader: `
+        varying vec2 vUv;
+        varying vec3 vNormalObj;
+        void main() {
+          vUv = uv;
+          vNormalObj = normalize(position);
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        uniform sampler2D dayMap;
+        uniform sampler2D nightMap;
+        uniform vec3 sunDirection;
+        varying vec2 vUv;
+        varying vec3 vNormalObj;
+        void main() {
+          float sun = dot(normalize(vNormalObj), normalize(sunDirection));
+          float daylight = smoothstep(-0.08, 0.18, sun);
+          vec3 day = texture2D(dayMap, vUv).rgb * (0.25 + 0.95 * clamp(sun * 1.2 + 0.2, 0.0, 1.0));
+          vec3 night = texture2D(nightMap, vUv).rgb * 1.6;
+          gl_FragColor = vec4(mix(night, day, daylight), 1.0);
+        }
+      `
     });
 
-    this.earthMesh = new THREE.Mesh(geometry, material);
+    this.earthMesh = new THREE.Mesh(new THREE.SphereGeometry(1, 96, 96), material);
     this.globeGroup.add(this.earthMesh);
+
+    this.loader.load(`${TEXTURES}earth-night.jpg`, (tex) => this.setTexture("nightMap", tex));
   }
 
-  generateEarthCanvas() {
-    const canvas = document.createElement("canvas");
-    canvas.width = 2048;
-    canvas.height = 1024;
-    const ctx = canvas.getContext("2d");
-
-    // Deep Ocean background
-    const oceanGrad = ctx.createLinearGradient(0, 0, 0, 1024);
-    oceanGrad.addColorStop(0, "#081b33");
-    oceanGrad.addColorStop(0.5, "#0b2545");
-    oceanGrad.addColorStop(1, "#081b33");
-    ctx.fillStyle = oceanGrad;
-    ctx.fillRect(0, 0, 2048, 1024);
-
-    // Procedural continents & landmasses
-    ctx.fillStyle = "#1b4332";
-    // Eurasia / Africa
-    this.drawContinent(ctx, 1100, 380, 480, 260, "#2d6a4f", "#40916c");
-    this.drawContinent(ctx, 1080, 620, 260, 300, "#52b788", "#74c69d");
-    // Americas
-    this.drawContinent(ctx, 450, 340, 320, 250, "#2d6a4f", "#40916c");
-    this.drawContinent(ctx, 580, 680, 240, 320, "#1b4332", "#2d6a4f");
-    // Australia
-    this.drawContinent(ctx, 1680, 720, 180, 150, "#74c69d", "#52b788");
-    // Antarctica
-    ctx.fillStyle = "#e9ecef";
-    ctx.fillRect(0, 960, 2048, 64);
-    // Greenland & Arctic
-    this.drawContinent(ctx, 720, 120, 160, 90, "#e9ecef", "#f8f9fa");
-
-    // Add city night light clusters (simulated golden microdots)
-    ctx.fillStyle = "rgba(255, 214, 10, 0.75)";
-    for (let i = 0; i < 450; i++) {
-      const cx = 350 + Math.random() * 1400;
-      const cy = 250 + Math.random() * 500;
-      const r = 1 + Math.random() * 2;
-      ctx.beginPath();
-      ctx.arc(cx, cy, r, 0, Math.PI * 2);
-      ctx.fill();
+  setTexture(uniform, texture) {
+    if (this.disposed) {
+      texture.dispose();
+      return;
     }
-
-    return canvas;
+    texture.colorSpace = THREE.SRGBColorSpace;
+    texture.anisotropy = Math.min(8, this.renderer.capabilities.getMaxAnisotropy());
+    const old = this.earthUniforms[uniform].value;
+    this.earthUniforms[uniform].value = texture;
+    if (old && old !== texture && old.image && old.image.width > 1) old.dispose();
   }
 
-  drawContinent(ctx, x, y, w, h, col1, col2) {
-    ctx.save();
-    ctx.fillStyle = col1;
-    ctx.beginPath();
-    ctx.ellipse(x, y, w / 2, h / 2, 0, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Internal topography accents
-    ctx.fillStyle = col2;
-    ctx.beginPath();
-    ctx.ellipse(x + w * 0.1, y - h * 0.1, w * 0.3, h * 0.3, 0.2, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-  }
-
-  generateBumpCanvas() {
-    const canvas = document.createElement("canvas");
-    canvas.width = 1024;
-    canvas.height = 512;
-    const ctx = canvas.getContext("2d");
-    ctx.fillStyle = "#000000";
-    ctx.fillRect(0, 0, 1024, 512);
-
-    ctx.fillStyle = "#ffffff";
-    for (let i = 0; i < 300; i++) {
-      const bx = Math.random() * 1024;
-      const by = Math.random() * 512;
-      const rad = 5 + Math.random() * 25;
-      const grad = ctx.createRadialGradient(bx, by, 0, bx, by, rad);
-      grad.addColorStop(0, "rgba(255, 255, 255, 0.4)");
-      grad.addColorStop(1, "rgba(0, 0, 0, 0)");
-      ctx.fillStyle = grad;
-      ctx.beginPath();
-      ctx.arc(bx, by, rad, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    return canvas;
-  }
-
-  buildClouds() {
-    const geometry = new THREE.SphereGeometry(1.02, 64, 64);
-    const cloudCanvas = this.generateCloudCanvas();
-    const cloudTexture = new THREE.CanvasTexture(cloudCanvas);
-    cloudTexture.wrapS = THREE.RepeatWrapping;
-
-    const material = new THREE.MeshStandardMaterial({
-      map: cloudTexture,
-      transparent: true,
-      opacity: 0.65,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false
-    });
-
-    this.cloudMesh = new THREE.Mesh(geometry, material);
-    this.globeGroup.add(this.cloudMesh);
-  }
-
-  generateCloudCanvas() {
-    const canvas = document.createElement("canvas");
-    canvas.width = 2048;
-    canvas.height = 1024;
-    const ctx = canvas.getContext("2d");
-    ctx.fillStyle = "rgba(0, 0, 0, 0)";
-    ctx.fillRect(0, 0, 2048, 1024);
-
-    // Generate swirling cloud bands and cyclone swirls
-    for (let i = 0; i < 180; i++) {
-      const cx = Math.random() * 2048;
-      const cy = 100 + Math.random() * 824;
-      const rx = 40 + Math.random() * 120;
-      const ry = 15 + Math.random() * 40;
-      const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, rx);
-      grad.addColorStop(0, "rgba(255, 255, 255, 0.7)");
-      grad.addColorStop(0.6, "rgba(255, 255, 255, 0.3)");
-      grad.addColorStop(1, "rgba(255, 255, 255, 0)");
-      ctx.fillStyle = grad;
-      ctx.beginPath();
-      ctx.ellipse(cx, cy, rx, ry, Math.random() * 0.4 - 0.2, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    return canvas;
+  buildRainLayer() {
+    this.rainMesh = new THREE.Mesh(
+      new THREE.SphereGeometry(1.004, 96, 96),
+      new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.9, depthWrite: false })
+    );
+    this.rainMesh.visible = false;
+    this.globeGroup.add(this.rainMesh);
   }
 
   buildAtmosphere() {
-    // Custom Shader for Rayleigh Scattering Glow Rim
-    const geometry = new THREE.SphereGeometry(1.15, 64, 64);
-    const vertexShader = `
-      varying vec3 vNormal;
-      void main() {
-        vNormal = normalize(normalMatrix * normal);
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-      }
-    `;
-
-    const fragmentShader = `
-      varying vec3 vNormal;
-      void main() {
-        float intensity = pow(0.65 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.2);
-        gl_FragColor = vec4(0.3, 0.65, 1.0, 1.0) * intensity;
-      }
-    `;
-
     const material = new THREE.ShaderMaterial({
-      vertexShader,
-      fragmentShader,
+      vertexShader: `
+        varying vec3 vNormal;
+        void main() {
+          vNormal = normalize(normalMatrix * normal);
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        varying vec3 vNormal;
+        void main() {
+          float intensity = pow(0.65 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.2);
+          gl_FragColor = vec4(0.3, 0.65, 1.0, 1.0) * intensity;
+        }
+      `,
       blending: THREE.AdditiveBlending,
       side: THREE.BackSide,
       transparent: true
     });
-
-    this.atmosphereMesh = new THREE.Mesh(geometry, material);
+    this.atmosphereMesh = new THREE.Mesh(new THREE.SphereGeometry(1.15, 64, 64), material);
     this.scene.add(this.atmosphereMesh);
   }
 
-  buildWindStreamlines() {
-    // Animated Jet Stream & Wind vectors layer on sphere
-    const linesCount = 200;
-    const geometry = new THREE.BufferGeometry();
-    const positions = [];
-    const colors = [];
-
-    for (let i = 0; i < linesCount; i++) {
-      const lat = (Math.random() - 0.5) * 140;
-      const lon = Math.random() * 360 - 180;
-      const length = 5 + Math.random() * 10;
-
-      for (let s = 0; s < 4; s++) {
-        const curLon = lon + s * (length / 4);
-        const pos = this.latLonToVector3(lat, curLon, 1.035);
-        positions.push(pos.x, pos.y, pos.z);
-
-        // Cyan-green wind velocity colors
-        colors.push(0.1, 0.8 + s * 0.05, 0.9, 0.7);
-      }
-    }
-
-    geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
-    geometry.setAttribute("color", new THREE.Float32BufferAttribute(colors, 4));
-
-    const material = new THREE.LineBasicMaterial({
-      vertexColors: true,
-      transparent: true,
-      opacity: 0.0, // hidden by default, visible in 'wind' mode
-      blending: THREE.AdditiveBlending
-    });
-
-    this.streamlinesMesh = new THREE.LineSegments(geometry, material);
-    this.globeGroup.add(this.streamlinesMesh);
+  updateSun() {
+    const { lat, lon } = subSolarPoint(new Date());
+    this.earthUniforms.sunDirection.value.copy(this.latLonToVector3(lat, lon, 1));
   }
 
-  // Convert Latitude & Longitude to 3D Cartesian coordinates
+  async loadBaseTexture() {
+    const layer = this.baseLayer;
+    const fallback = () => new Promise(resolve => this.loader.load(`${TEXTURES}earth-day.jpg`, resolve, undefined, () => resolve(null)));
+
+    let texture = null;
+    let cloudsDate = null;
+    if (layer === "today") {
+      // Yesterday's mosaic (UTC) is complete; today's still has gaps between satellite passes
+      cloudsDate = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+      const url = gibsMapUrl("VIIRS_NOAA20_CorrectedReflectance_TrueColor", { time: cloudsDate, width: this.textureWidth, height: this.textureWidth / 2 });
+      texture = await new Promise(resolve => this.loader.load(url, resolve, undefined, () => resolve(null)));
+    }
+    const usingFallback = layer === "today" && !texture;
+    if (!texture) {
+      texture = await fallback();
+      cloudsDate = null;
+    }
+    // The user may have switched layer while this one was loading
+    if (this.baseLayer !== layer || !texture) return;
+    this.setTexture("dayMap", texture);
+    this.info = { ...this.info, cloudsDate, usingFallback };
+    this.onInfo(this.info);
+  }
+
+  async loadRain() {
+    try {
+      const time = await latestGibsTime("IMERG_Precipitation_Rate_30min", "2km");
+      const url = gibsMapUrl("IMERG_Precipitation_Rate_30min", { time, width: 2048, height: 1024, format: "image/png", transparent: true });
+      const texture = await new Promise((resolve, reject) => this.loader.load(url, resolve, undefined, reject));
+      if (this.disposed) {
+        texture.dispose();
+        return;
+      }
+      texture.colorSpace = THREE.SRGBColorSpace;
+      if (this.rainMesh.material.map) this.rainMesh.material.map.dispose();
+      this.rainMesh.material.map = texture;
+      this.rainMesh.material.needsUpdate = true;
+      this.rainLoaded = true;
+      this.info = { ...this.info, rainTime: time };
+    } catch (err) {
+      console.warn("Precipitation layer unavailable:", err);
+      this.info = { ...this.info, rainTime: null, rainError: true };
+    }
+    this.onInfo(this.info);
+  }
+
+  setBaseLayer(layer) {
+    if (layer === this.baseLayer) return;
+    this.baseLayer = layer;
+    this.loadBaseTexture();
+  }
+
+  setRainVisible(visible) {
+    this.rainVisible = visible;
+    this.rainMesh.visible = visible;
+    if (visible && !this.rainLoaded) this.loadRain();
+  }
+
   latLonToVector3(lat, lon, radius = 1) {
     const phi = (90 - lat) * (Math.PI / 180);
     const theta = (lon + 180) * (Math.PI / 180);
-
-    const x = -(radius * Math.sin(phi) * Math.cos(theta));
-    const z = radius * Math.sin(phi) * Math.sin(theta);
-    const y = radius * Math.cos(phi);
-
-    return new THREE.Vector3(x, y, z);
+    return new THREE.Vector3(
+      -(radius * Math.sin(phi) * Math.cos(theta)),
+      radius * Math.cos(phi),
+      radius * Math.sin(phi) * Math.sin(theta)
+    );
   }
 
-  // Set selected location and add 3D Pin with pulsing radar ring
-  setLocation(lat, lon, name = "Target") {
-    // Clear previous active marker
+  // Pin with a pulsing ring on the selected place, then rotate the globe to it
+  setLocation(lat, lon) {
     if (this.activeMarker) {
       this.markerGroup.remove(this.activeMarker);
+      this.activeMarker.traverse(o => {
+        if (o.geometry) o.geometry.dispose();
+        if (o.material) o.material.dispose();
+      });
       this.activeMarker = null;
     }
 
-    const pos = this.latLonToVector3(lat, lon, 1.02);
-
     const marker = new THREE.Group();
-    marker.position.copy(pos);
+    marker.position.copy(this.latLonToVector3(lat, lon, 1.012));
     marker.lookAt(new THREE.Vector3(0, 0, 0));
 
-    // Pin sphere
-    const pinGeom = new THREE.SphereGeometry(0.025, 16, 16);
-    const pinMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff });
-    const pinMesh = new THREE.Mesh(pinGeom, pinMat);
-    marker.add(pinMesh);
-
-    // Pulsing Radar Ring
-    const ringGeom = new THREE.RingGeometry(0.03, 0.045, 32);
-    const ringMat = new THREE.MeshBasicMaterial({
-      color: 0x00f0ff,
-      side: THREE.DoubleSide,
-      transparent: true,
-      opacity: 0.9
-    });
-    const ringMesh = new THREE.Mesh(ringGeom, ringMat);
-    ringMesh.name = "radarRing";
-    marker.add(ringMesh);
+    marker.add(new THREE.Mesh(new THREE.SphereGeometry(0.018, 16, 16), new THREE.MeshBasicMaterial({ color: 0x00f0ff })));
+    const ring = new THREE.Mesh(
+      new THREE.RingGeometry(0.03, 0.045, 32),
+      new THREE.MeshBasicMaterial({ color: 0x00f0ff, side: THREE.DoubleSide, transparent: true, opacity: 0.9 })
+    );
+    ring.name = "radarRing";
+    marker.add(ring);
 
     this.activeMarker = marker;
     this.markerGroup.add(marker);
-
-    // Fly camera smoothly to target coordinates
     this.flyTo(lat, lon);
   }
 
   flyTo(lat, lon) {
     this.autoRotate = false;
-    // Calculate target Y & X rotation for the globe
-    const targetY = -((lon + 90) * (Math.PI / 180));
-    const targetX = (lat * (Math.PI / 180)) * 0.6;
-
-    // Smooth tween target
-    this.targetRotation.x = targetX;
-    this.targetRotation.y = targetY;
-  }
-
-  setLayerMode(mode) {
-    this.currentMode = mode;
-    if (!this.earthMesh) return;
-
-    if (mode === "satellite") {
-      this.earthMesh.material.color.setHex(0xffffff);
-      if (this.streamlinesMesh) this.streamlinesMesh.material.opacity = 0.0;
-      if (this.cloudMesh) this.cloudMesh.visible = true;
-    } else if (mode === "temperature") {
-      // Warm thermal heatmap tint
-      this.earthMesh.material.color.setHex(0xff8844);
-      if (this.streamlinesMesh) this.streamlinesMesh.material.opacity = 0.0;
-      if (this.cloudMesh) this.cloudMesh.visible = true;
-    } else if (mode === "wind") {
-      // Wind streamline display
-      this.earthMesh.material.color.setHex(0x336699);
-      if (this.streamlinesMesh) this.streamlinesMesh.material.opacity = 0.85;
-      if (this.cloudMesh) this.cloudMesh.visible = false;
-    } else if (mode === "radar") {
-      // Dark radar view
-      this.earthMesh.material.color.setHex(0x1a3320);
-      if (this.streamlinesMesh) this.streamlinesMesh.material.opacity = 0.0;
-      if (this.cloudMesh) this.cloudMesh.visible = true;
-    }
+    this.targetRotation.x = (lat * Math.PI / 180) * 0.6;
+    this.targetRotation.y = -((lon + 90) * Math.PI / 180);
   }
 
   bindEvents() {
     const el = this.renderer.domElement;
+    const opts = { signal: this.events.signal };
+    const rotateBy = (dx, dy, speed) => {
+      this.targetRotation.y += dx * speed;
+      this.targetRotation.x = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, this.targetRotation.x + dy * speed));
+    };
 
     el.addEventListener("mousedown", (e) => {
       this.isDragging = true;
       this.autoRotate = false;
-      this.previousMousePosition = { x: e.clientX, y: e.clientY };
-    });
-
+      this.previousPointer = { x: e.clientX, y: e.clientY };
+    }, opts);
     window.addEventListener("mousemove", (e) => {
       if (!this.isDragging) return;
-      const deltaX = e.clientX - this.previousMousePosition.x;
-      const deltaY = e.clientY - this.previousMousePosition.y;
+      rotateBy(e.clientX - this.previousPointer.x, e.clientY - this.previousPointer.y, 0.005);
+      this.previousPointer = { x: e.clientX, y: e.clientY };
+    }, opts);
+    window.addEventListener("mouseup", () => { this.isDragging = false; }, opts);
 
-      this.targetRotation.y += deltaX * 0.005;
-      this.targetRotation.x += deltaY * 0.005;
-
-      // Clamp X rotation so it doesn't flip over
-      this.targetRotation.x = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, this.targetRotation.x));
-
-      this.previousMousePosition = { x: e.clientX, y: e.clientY };
-    });
-
-    window.addEventListener("mouseup", () => {
-      this.isDragging = false;
-    });
-
-    // Touch support for mobile / tablets
     el.addEventListener("touchstart", (e) => {
+      this.autoRotate = false;
       if (e.touches.length === 1) {
         this.isDragging = true;
-        this.autoRotate = false;
-        this.previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        this.previousPointer = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      } else if (e.touches.length === 2) {
+        this.isDragging = false;
+        this.pinchDistance = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
       }
-    });
-
-    window.addEventListener("touchmove", (e) => {
-      if (!this.isDragging || e.touches.length !== 1) return;
-      const deltaX = e.touches[0].clientX - this.previousMousePosition.x;
-      const deltaY = e.touches[0].clientY - this.previousMousePosition.y;
-
-      this.targetRotation.y += deltaX * 0.006;
-      this.targetRotation.x += deltaY * 0.006;
-      this.targetRotation.x = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, this.targetRotation.x));
-
-      this.previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-    });
-
-    window.addEventListener("touchend", () => {
+    }, { ...opts, passive: true });
+    el.addEventListener("touchmove", (e) => {
+      if (e.touches.length === 2 && this.pinchDistance) {
+        // Pinch to zoom
+        const d = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+        this.camera.position.z = Math.max(1.5, Math.min(4.5, this.camera.position.z * (this.pinchDistance / d)));
+        this.pinchDistance = d;
+        e.preventDefault();
+      } else if (this.isDragging && e.touches.length === 1) {
+        rotateBy(e.touches[0].clientX - this.previousPointer.x, e.touches[0].clientY - this.previousPointer.y, 0.006);
+        this.previousPointer = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        e.preventDefault();
+      }
+    }, { ...opts, passive: false });
+    el.addEventListener("touchend", () => {
       this.isDragging = false;
-    });
+      this.pinchDistance = null;
+    }, opts);
 
-    // Wheel zoom: only preventDefault if ctrlKey is pressed so normal scrolling works
+    // Wheel zoom only with Ctrl/Cmd so normal page scrolling still works
     el.addEventListener("wheel", (e) => {
       if (e.ctrlKey || e.metaKey) {
         e.preventDefault();
-        this.camera.position.z += e.deltaY * 0.0015;
-        this.camera.position.z = Math.max(1.5, Math.min(4.5, this.camera.position.z));
+        this.camera.position.z = Math.max(1.5, Math.min(4.5, this.camera.position.z + e.deltaY * 0.0015));
       }
-    }, { passive: false });
+    }, { ...opts, passive: false });
 
-    // Resize
-    window.addEventListener("resize", () => this.onResize());
+    window.addEventListener("resize", () => this.onResize(), opts);
   }
 
   zoomIn() {
-    if (this.camera) {
-      this.camera.position.z = Math.max(1.5, this.camera.position.z - 0.35);
-    }
+    this.camera.position.z = Math.max(1.5, this.camera.position.z - 0.35);
   }
 
   zoomOut() {
-    if (this.camera) {
-      this.camera.position.z = Math.min(4.5, this.camera.position.z + 0.35);
-    }
+    this.camera.position.z = Math.min(4.5, this.camera.position.z + 0.35);
   }
 
   onResize() {
-    if (!this.container) return;
     this.width = this.container.clientWidth;
     this.height = this.container.clientHeight;
+    if (!this.width || !this.height) return;
     this.camera.aspect = this.width / this.height;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(this.width, this.height);
@@ -479,43 +395,36 @@ export class GlobeScene {
   animate() {
     this.animationFrameId = requestAnimationFrame(() => this.animate());
 
-    // Auto-rotate if enabled
-    if (this.autoRotate) {
-      this.targetRotation.y += 0.0012;
-    }
-
-    // Smooth lerp rotation
+    if (this.autoRotate) this.targetRotation.y += 0.0012;
     this.currentRotation.x += (this.targetRotation.x - this.currentRotation.x) * 0.08;
     this.currentRotation.y += (this.targetRotation.y - this.currentRotation.y) * 0.08;
-
     this.globeGroup.rotation.x = this.currentRotation.x;
     this.globeGroup.rotation.y = this.currentRotation.y;
 
-    // Slowly rotate clouds independent of earth
-    if (this.cloudMesh) {
-      this.cloudMesh.rotation.y += 0.0004;
-    }
-
-    // Animate radar ring pulse on active marker
     if (this.activeMarker) {
       const ring = this.activeMarker.getObjectByName("radarRing");
-      if (ring) {
-        const time = performance.now() * 0.003;
-        const scale = 1 + (Math.sin(time) * 0.5 + 0.5) * 0.8;
-        ring.scale.set(scale, scale, scale);
-        ring.material.opacity = 1 - (scale - 1) / 0.8;
-      }
+      const scale = 1 + (Math.sin(performance.now() * 0.003) * 0.5 + 0.5) * 0.8;
+      ring.scale.set(scale, scale, scale);
+      ring.material.opacity = 1 - (scale - 1) / 0.8;
     }
 
     this.renderer.render(this.scene, this.camera);
   }
 
   destroy() {
-    if (this.animationFrameId) {
-      cancelAnimationFrame(this.animationFrameId);
-    }
-    if (this.renderer && this.renderer.domElement) {
-      this.container.removeChild(this.renderer.domElement);
-    }
+    this.disposed = true;
+    cancelAnimationFrame(this.animationFrameId);
+    clearInterval(this.sunTimer);
+    this.events.abort();
+    this.scene.traverse(o => {
+      if (o.geometry) o.geometry.dispose();
+      if (o.material) {
+        if (o.material.map) o.material.map.dispose();
+        o.material.dispose();
+      }
+    });
+    Object.values(this.earthUniforms).forEach(u => u.value && u.value.dispose && u.value.dispose());
+    this.renderer.dispose();
+    if (this.renderer.domElement.parentNode) this.renderer.domElement.parentNode.removeChild(this.renderer.domElement);
   }
 }

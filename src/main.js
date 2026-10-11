@@ -64,6 +64,9 @@ class AetheriaApp {
     this.hasSavedLocation = this.restoreLocation();
 
     this.weatherData = null;
+    this.globeBase = "today";
+    this.globeRain = false;
+    this.globeInfo = null;
     this.isOfflineData = false;
     this.loadError = false;
     this.globeScene = null;
@@ -227,9 +230,14 @@ class AetheriaApp {
           <div id="sceneCanvasHolder" class="scene-canvas-holder"></div>
 
           <div id="globeLayerControls" class="scene-overlay-controls">
+            <button class="scene-overlay-btn ${this.globeBase === "today" ? "active" : ""}" data-globe-base="today">${t.globe.today}</button>
+            <button class="scene-overlay-btn ${this.globeBase === "relief" ? "active" : ""}" data-globe-base="relief">${t.globe.relief}</button>
+            <button class="scene-overlay-btn ${this.globeRain ? "active" : ""}" id="btnGlobeRain">${t.globe.rain}</button>
             <button class="scene-overlay-btn" id="btnGlobeZoomIn" title="Zoom +" style="font-size: 1rem; padding: 2px 10px;">+</button>
             <button class="scene-overlay-btn" id="btnGlobeZoomOut" title="Zoom −" style="font-size: 1rem; padding: 2px 10px;">−</button>
           </div>
+
+          <div id="globeInfo" class="globe-info-label"></div>
 
           <!-- Sky 24h Time Scrubber -->
           <div id="skyScrubberWrap" class="scene-scrubber-bar" style="display: none;">
@@ -466,6 +474,20 @@ class AetheriaApp {
       });
     });
 
+    document.querySelectorAll("[data-globe-base]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        this.globeBase = btn.dataset.globeBase;
+        document.querySelectorAll("[data-globe-base]").forEach(b => b.classList.toggle("active", b === btn));
+        if (this.globeScene) this.globeScene.setBaseLayer(this.globeBase);
+      });
+    });
+    document.getElementById("btnGlobeRain").addEventListener("click", (e) => {
+      this.globeRain = !this.globeRain;
+      e.currentTarget.classList.toggle("active", this.globeRain);
+      if (this.globeScene) this.globeScene.setRainVisible(this.globeRain);
+      this.renderGlobeInfo();
+    });
+
     document.getElementById("btnGlobeZoomIn").addEventListener("click", () => {
       if (this.globeScene) this.globeScene.zoomIn();
     });
@@ -615,6 +637,7 @@ class AetheriaApp {
     if (this.currentView === "sky") {
       this.dom.sceneSection.style.display = "block";
       this.dom.globeLayerControls.style.display = "none";
+      document.getElementById("globeInfo").style.display = "none";
       this.dom.skyScrubberWrap.style.display = "flex";
       this.initOrShowSky();
     } else if (this.currentView === "radar" || this.currentView === "route") {
@@ -623,6 +646,7 @@ class AetheriaApp {
       // Dashboard and globe views show the 3D globe
       this.dom.sceneSection.style.display = "block";
       this.dom.globeLayerControls.style.display = "flex";
+      document.getElementById("globeInfo").style.display = "block";
       this.dom.skyScrubberWrap.style.display = "none";
       this.initOrShowGlobe();
     }
@@ -664,9 +688,35 @@ class AetheriaApp {
     }
     if (!this.globeScene) {
       this.dom.sceneCanvasHolder.innerHTML = "";
-      this.globeScene = new GlobeScene(this.dom.sceneCanvasHolder);
+      this.globeScene = new GlobeScene(this.dom.sceneCanvasHolder, {
+        onInfo: (info) => {
+          this.globeInfo = info;
+          this.renderGlobeInfo();
+        }
+      });
+      this.globeScene.setBaseLayer(this.globeBase);
+      this.globeScene.setRainVisible(this.globeRain);
     }
     this.globeScene.setLocation(this.selectedCity.lat, this.selectedCity.lon, this.selectedCity.name);
+  }
+
+  // Source and freshness of the satellite imagery shown on the globe
+  renderGlobeInfo() {
+    const el = document.getElementById("globeInfo");
+    if (!el) return;
+    const t = this.t;
+    const info = this.globeInfo || {};
+    const parts = [];
+    if (info.usingFallback) parts.push(t.globe.fallback);
+    else if (this.globeBase === "today" && info.cloudsDate) {
+      parts.push(`${t.globe.cloudsDate} ${new Date(`${info.cloudsDate}T12:00:00Z`).toLocaleDateString(this.locale, { day: "numeric", month: "short" })}`);
+    }
+    if (this.globeRain) {
+      if (info.rainTime) parts.push(`${t.globe.rainTime} ${new Date(info.rainTime).toLocaleString(this.locale, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}`);
+      else if (info.rainError) parts.push(t.globe.rainError);
+    }
+    parts.push(t.globe.source);
+    el.textContent = parts.join(" · ");
   }
 
   initOrShowSky() {

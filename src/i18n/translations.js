@@ -256,9 +256,19 @@ export const translations = {
         fog: "Visibilità ridotta per nebbia in alcuni tratti."
       }
     },
+    globe: {
+      today: "Satellite di oggi",
+      relief: "Senza nuvole",
+      rain: "Pioggia",
+      cloudsDate: "Nuvole del",
+      rainTime: "Pioggia stimata dai satelliti alle",
+      source: "Immagini: NASA GIBS / EOSDIS (VIIRS, Blue Marble, Black Marble, IMERG)",
+      fallback: "Immagini satellitari non disponibili: mostro la mappa salvata nell'app.",
+      rainError: "Pioggia satellitare non disponibile al momento."
+    },
     info: {
       globeTitle: "Globo 3D",
-      globeText: "Trascina per ruotare il globo e usa la rotella o i pulsanti + e − per lo zoom. Il segnaposto indica la località selezionata.",
+      globeText: "Il giorno e la notte seguono la posizione reale del Sole. Trascina per ruotare, usa + e − (o due dita) per lo zoom. «Satellite di oggi» mostra le nuvole reali fotografate dai satelliti NASA; «Pioggia» la stima satellitare delle precipitazioni più recente.",
       skyTitle: "Simulatore del cielo",
       skyText: "Usa il cursore per vedere il cielo nelle diverse ore del giorno, con le condizioni meteo attuali della località."
     }
@@ -519,9 +529,19 @@ export const translations = {
         fog: "Reduced visibility due to fog on some stretches."
       }
     },
+    globe: {
+      today: "Today's satellite",
+      relief: "No clouds",
+      rain: "Rain",
+      cloudsDate: "Clouds of",
+      rainTime: "Satellite rain estimate at",
+      source: "Imagery: NASA GIBS / EOSDIS (VIIRS, Blue Marble, Black Marble, IMERG)",
+      fallback: "Satellite imagery unavailable: showing the map stored in the app.",
+      rainError: "Satellite rain is not available right now."
+    },
     info: {
       globeTitle: "3D globe",
-      globeText: "Drag to rotate the globe and use the mouse wheel or the + and − buttons to zoom. The pin marks the selected location.",
+      globeText: "Day and night follow the real position of the Sun. Drag to rotate, use + and − (or two fingers) to zoom. “Today's satellite” shows the real clouds photographed by NASA satellites; “Rain” shows the latest satellite precipitation estimate.",
       skyTitle: "Sky simulator",
       skyText: "Use the slider to see the sky at different times of day, with the current weather at this location."
     }
@@ -782,9 +802,19 @@ export const translations = {
         fog: "Visibilidad reducida por niebla en algunos tramos."
       }
     },
+    globe: {
+      today: "Satélite de hoy",
+      relief: "Sin nubes",
+      rain: "Lluvia",
+      cloudsDate: "Nubes del",
+      rainTime: "Lluvia estimada por satélite a las",
+      source: "Imágenes: NASA GIBS / EOSDIS (VIIRS, Blue Marble, Black Marble, IMERG)",
+      fallback: "Imágenes de satélite no disponibles: se muestra el mapa guardado en la app.",
+      rainError: "La lluvia por satélite no está disponible ahora."
+    },
     info: {
       globeTitle: "Globo 3D",
-      globeText: "Arrastra para girar el globo y usa la rueda del ratón o los botones + y − para hacer zoom. El marcador indica la ubicación seleccionada.",
+      globeText: "El día y la noche siguen la posición real del Sol. Arrastra para girar y usa + y − (o dos dedos) para hacer zoom. «Satélite de hoy» muestra las nubes reales fotografiadas por los satélites de la NASA; «Lluvia», la estimación satelital de precipitación más reciente.",
       skyTitle: "Simulador del cielo",
       skyText: "Usa el control deslizante para ver el cielo a distintas horas del día, con el tiempo actual de esta ubicación."
     }
@@ -1045,9 +1075,19 @@ export const translations = {
         fog: "Visibilité réduite par le brouillard sur certains tronçons."
       }
     },
+    globe: {
+      today: "Satellite du jour",
+      relief: "Sans nuages",
+      rain: "Pluie",
+      cloudsDate: "Nuages du",
+      rainTime: "Pluie estimée par satellite à",
+      source: "Images : NASA GIBS / EOSDIS (VIIRS, Blue Marble, Black Marble, IMERG)",
+      fallback: "Images satellite indisponibles : affichage de la carte enregistrée dans l’app.",
+      rainError: "La pluie satellite n’est pas disponible pour le moment."
+    },
     info: {
       globeTitle: "Globe 3D",
-      globeText: "Faites glisser pour tourner le globe et utilisez la molette ou les boutons + et − pour zoomer. Le repère indique le lieu sélectionné.",
+      globeText: "Le jour et la nuit suivent la position réelle du Soleil. Faites glisser pour tourner, utilisez + et − (ou deux doigts) pour zoomer. « Satellite du jour » montre les vrais nuages photographiés par les satellites de la NASA ; « Pluie » la dernière estimation satellite des précipitations.",
       skyTitle: "Simulateur de ciel",
       skyText: "Utilisez le curseur pour voir le ciel à différentes heures, avec la météo actuelle de ce lieu."
     }
@@ -1308,9 +1348,19 @@ export const translations = {
         fog: "Eingeschränkte Sicht durch Nebel auf einigen Abschnitten."
       }
     },
+    globe: {
+      today: "Satellit heute",
+      relief: "Ohne Wolken",
+      rain: "Regen",
+      cloudsDate: "Wolken vom",
+      rainTime: "Satellitengestützte Regenschätzung um",
+      source: "Bilder: NASA GIBS / EOSDIS (VIIRS, Blue Marble, Black Marble, IMERG)",
+      fallback: "Satellitenbilder nicht verfügbar: Es wird die in der App gespeicherte Karte angezeigt.",
+      rainError: "Satellitenregen ist gerade nicht verfügbar."
+    },
     info: {
       globeTitle: "3D-Globus",
-      globeText: "Ziehen, um den Globus zu drehen; Mausrad oder + und − zum Zoomen. Die Markierung zeigt den gewählten Ort.",
+      globeText: "Tag und Nacht folgen dem tatsächlichen Sonnenstand. Ziehen zum Drehen, + und − (oder zwei Finger) zum Zoomen. „Satellit heute“ zeigt die echten Wolken aus NASA-Satellitenbildern, „Regen“ die neueste satellitengestützte Niederschlagsschätzung.",
       skyTitle: "Himmelssimulator",
       skyText: "Mit dem Regler den Himmel zu verschiedenen Tageszeiten sehen, mit dem aktuellen Wetter an diesem Ort."
     }
@@ -1571,9 +1621,19 @@ export const translations = {
         fog: "一部で霧による視界不良があります。"
       }
     },
+    globe: {
+      today: "今日の衛星画像",
+      relief: "雲なし",
+      rain: "雨",
+      cloudsDate: "雲の撮影日",
+      rainTime: "衛星による降水推定",
+      source: "画像: NASA GIBS / EOSDIS（VIIRS、Blue Marble、Black Marble、IMERG）",
+      fallback: "衛星画像を取得できないため、アプリ内の地図を表示しています。",
+      rainError: "衛星降水データは現在利用できません。"
+    },
     info: {
       globeTitle: "3D地球儀",
-      globeText: "ドラッグで地球儀を回転、ホイールまたは＋/−ボタンで拡大縮小できます。ピンは選択中の地点です。",
+      globeText: "昼と夜は太陽の実際の位置に合わせて表示されます。ドラッグで回転、＋/−（または2本指）でズーム。「今日の衛星画像」はNASA衛星が撮影した実際の雲、「雨」は最新の衛星降水推定です。",
       skyTitle: "空のシミュレーター",
       skyText: "スライダーで時間帯ごとの空を表示します。この地点の現在の天気を反映しています。"
     }
@@ -1834,9 +1894,19 @@ export const translations = {
         fog: "部分路段有雾，能见度较低。"
       }
     },
+    globe: {
+      today: "今日卫星图",
+      relief: "无云",
+      rain: "降雨",
+      cloudsDate: "云图日期",
+      rainTime: "卫星降水估算时间",
+      source: "影像：NASA GIBS / EOSDIS（VIIRS、Blue Marble、Black Marble、IMERG）",
+      fallback: "无法获取卫星影像，显示应用内保存的地图。",
+      rainError: "暂时无法获取卫星降水数据。"
+    },
     info: {
       globeTitle: "3D地球",
-      globeText: "拖动旋转地球，使用滚轮或＋/−按钮缩放。标记显示所选地点。",
+      globeText: "昼夜按太阳的真实位置显示。拖动旋转，使用＋/−（或双指）缩放。“今日卫星图”显示NASA卫星拍摄的真实云层，“降雨”显示最新的卫星降水估算。",
       skyTitle: "天空模拟器",
       skyText: "拖动滑块查看一天中不同时间的天空，并反映该地点的当前天气。"
     }
@@ -2097,9 +2167,19 @@ export const translations = {
         fog: "رؤية منخفضة بسبب الضباب في بعض المقاطع."
       }
     },
+    globe: {
+      today: "صورة الأقمار الصناعية اليوم",
+      relief: "بدون غيوم",
+      rain: "المطر",
+      cloudsDate: "غيوم يوم",
+      rainTime: "تقدير المطر بالأقمار الصناعية الساعة",
+      source: "الصور: NASA GIBS / EOSDIS (VIIRS وBlue Marble وBlack Marble وIMERG)",
+      fallback: "صور الأقمار الصناعية غير متاحة: يتم عرض الخريطة المحفوظة في التطبيق.",
+      rainError: "بيانات المطر من الأقمار الصناعية غير متاحة حاليًا."
+    },
     info: {
       globeTitle: "الكرة الأرضية ثلاثية الأبعاد",
-      globeText: "اسحب لتدوير الكرة واستخدم عجلة الفأرة أو زرّي + و − للتكبير. يشير الدبوس إلى الموقع المحدد.",
+      globeText: "يتبع الليل والنهار الموقع الحقيقي للشمس. اسحب للتدوير واستخدم + و− (أو إصبعين) للتكبير. «صورة الأقمار الصناعية اليوم» تعرض الغيوم الحقيقية التي صورتها أقمار ناسا، و«المطر» أحدث تقدير للأمطار بالأقمار الصناعية.",
       skyTitle: "محاكي السماء",
       skyText: "استخدم شريط التمرير لرؤية السماء في أوقات مختلفة من اليوم، مع الطقس الحالي لهذا الموقع."
     }
@@ -2360,9 +2440,19 @@ export const translations = {
         fog: "Visibilidade reduzida por nevoeiro em alguns trechos."
       }
     },
+    globe: {
+      today: "Satélite de hoje",
+      relief: "Sem nuvens",
+      rain: "Chuva",
+      cloudsDate: "Nuvens de",
+      rainTime: "Chuva estimada por satélite às",
+      source: "Imagens: NASA GIBS / EOSDIS (VIIRS, Blue Marble, Black Marble, IMERG)",
+      fallback: "Imagens de satélite indisponíveis: mostrando o mapa salvo no app.",
+      rainError: "A chuva por satélite não está disponível agora."
+    },
     info: {
       globeTitle: "Globo 3D",
-      globeText: "Arraste para girar o globo e use a roda do mouse ou os botões + e − para ampliar. O marcador indica o local selecionado.",
+      globeText: "O dia e a noite seguem a posição real do Sol. Arraste para girar e use + e − (ou dois dedos) para ampliar. “Satélite de hoje” mostra as nuvens reais fotografadas pelos satélites da NASA; “Chuva” mostra a estimativa de precipitação por satélite mais recente.",
       skyTitle: "Simulador do céu",
       skyText: "Use o controle deslizante para ver o céu em diferentes horas do dia, com o tempo atual deste local."
     }
@@ -2623,9 +2713,19 @@ export const translations = {
         fog: "Ухудшение видимости из-за тумана на отдельных участках."
       }
     },
+    globe: {
+      today: "Спутник сегодня",
+      relief: "Без облаков",
+      rain: "Осадки",
+      cloudsDate: "Облака за",
+      rainTime: "Спутниковая оценка осадков на",
+      source: "Снимки: NASA GIBS / EOSDIS (VIIRS, Blue Marble, Black Marble, IMERG)",
+      fallback: "Спутниковые снимки недоступны: показана карта, сохранённая в приложении.",
+      rainError: "Спутниковые данные об осадках сейчас недоступны."
+    },
     info: {
       globeTitle: "3D-глобус",
-      globeText: "Перетаскивайте, чтобы вращать глобус; колесо мыши или кнопки + и − для масштаба. Метка показывает выбранное место.",
+      globeText: "День и ночь соответствуют реальному положению Солнца. Перетаскивайте для вращения, используйте + и − (или два пальца) для масштаба. «Спутник сегодня» показывает реальные облака со спутников NASA, «Осадки» — последнюю спутниковую оценку осадков.",
       skyTitle: "Симулятор неба",
       skyText: "Используйте ползунок, чтобы увидеть небо в разное время суток с текущей погодой в этом месте."
     }
