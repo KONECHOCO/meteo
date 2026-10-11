@@ -1,3 +1,5 @@
+import { apiUrl } from "../services/weatherService.js";
+
 // Geographic Hierarchy: Countries -> Regions/States -> Cities
 // Covers major global countries with realistic micro-coordinates, elevations & timezones.
 // Also provides global dynamic geocoding for any location on Earth.
@@ -567,24 +569,29 @@ export const geoHierarchy = [
   }
 ];
 
-// Dynamic Global Geocoding Query
-export async function searchGlobalLocations(query) {
+// Dynamic Global Geocoding Query (GeoNames data via Open-Meteo, localized names)
+export async function searchGlobalLocations(query, lang = "en") {
   if (!query || query.trim().length < 2) return [];
-  const cleanQ = encodeURIComponent(query.trim());
   try {
-    const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${cleanQ}&count=8&language=en&format=json`);
+    const res = await fetch(apiUrl("geocoding-api", "/v1/search", {
+      name: query.trim(),
+      count: 20,
+      language: lang,
+      format: "json"
+    }));
     if (!res.ok) throw new Error("Network geocoding error");
     const data = await res.json();
     if (!data.results || !data.results.length) return [];
-    
+
     return data.results.map(r => ({
       name: r.name,
       country: r.country || "",
       countryCode: r.country_code || "",
-      region: r.admin1 || r.admin2 || r.country || "",
+      region: [r.admin2 && r.admin2 !== r.name ? r.admin2 : null, r.admin1].filter(Boolean).join(", "),
+      population: r.population || null,
       lat: r.latitude,
       lon: r.longitude,
-      elevation: r.elevation || 50,
+      elevation: r.elevation ?? null,
       timezone: r.timezone || "auto"
     }));
   } catch (err) {

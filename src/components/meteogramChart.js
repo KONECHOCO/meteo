@@ -1,4 +1,4 @@
-// High-Definition Meteogram Chart Component (Yr.no / ECMWF Style)
+// High-Definition Meteogram Chart Component 
 // Generates an interactive SVG meteogram combining Temperature, Dew Point, Pressure, and Precipitation.
 
 export function renderMeteogramSvg(hourlyData, isFahrenheit = false) {

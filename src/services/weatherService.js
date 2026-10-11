@@ -1,393 +1,423 @@
-// Comprehensive Weather Service
-// Interfaces with Open-Meteo REST APIs (Forecast, Air Quality, Geocoding)
-// plus deterministic high-fidelity physical simulation fallback & advanced biometeorology calculations.
+// Weather Service
+// Every value shown in the app comes from Open-Meteo (Forecast, Multi-Model, Air Quality / Pollen, Marine).
+// Derived indices (lifestyle scores, sun exposure, barometric trend) are computed from those real values.
+// No simulated or random data: when the network fails the caller gets an error (and may show cached data).
 
-export async function fetchCompleteWeather(lat, lon, timezone = "auto", elevation = 50) {
-  try {
-    const forecastUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,rain,showers,snowfall,weather_code,cloud_cover,pressure_msl,surface_pressure,wind_speed_10m,wind_direction_10m,wind_gusts_10m&hourly=temperature_2m,relative_humidity_2m,dew_point_2m,apparent_temperature,precipitation_probability,precipitation,weather_code,pressure_msl,cloud_cover,visibility,wind_speed_10m,wind_direction_10m,wind_gusts_10m,uv_index,is_day,direct_normal_irradiance&daily=weather_code,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,sunrise,sunset,daylight_duration,uv_index_max,precipitation_sum,rain_sum,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant&timezone=${encodeURIComponent(timezone)}&forecast_days=14`;
+const API_KEY = import.meta.env.VITE_OPEN_METEO_API_KEY || "";
 
-    const aqiUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=pm10,pm2_5,carbon_monoxide,nitrogen_dioxide,sulphur_dioxide,ozone,european_aqi,us_aqi&timezone=${encodeURIComponent(timezone)}`;
-
-    const [forecastRes, aqiRes] = await Promise.allSettled([
-      fetch(forecastUrl),
-      fetch(aqiUrl)
-    ]);
-
-    let forecastData = null;
-    let aqiData = null;
-
-    if (forecastRes.status === "fulfilled" && forecastRes.value.ok) {
-      forecastData = await forecastRes.value.json();
-    }
-    if (aqiRes.status === "fulfilled" && aqiRes.value.ok) {
-      aqiData = await aqiRes.value.json();
-    }
-
-    if (!forecastData || !forecastData.current) {
-      console.warn("Forecast API response invalid, generating physical simulation fallback");
-      return generateSimulatedWeather(lat, lon, elevation);
-    }
-
-    return processRawWeatherData(forecastData, aqiData, lat, lon, elevation);
-  } catch (err) {
-    console.warn("Error fetching live weather, falling back to realistic simulation:", err);
-    return generateSimulatedWeather(lat, lon, elevation);
-  }
+// Commercial plan uses the customer-* hosts with an API key; without a key the free
+// (non-commercial, development only) endpoints are used.
+export function apiUrl(service, path, params) {
+  const host = API_KEY ? `https://customer-${service}.open-meteo.com` : `https://${service}.open-meteo.com`;
+  const query = new URLSearchParams(params);
+  if (API_KEY) query.set("apikey", API_KEY);
+  return `${host}${path}?${query.toString()}`;
 }
 
-// Convert Open-Meteo Weather Codes to standard semantic representations
+export const COMPARISON_MODELS = [
+  { id: "ecmwf_ifs025", name: "ECMWF IFS", origin: "EU", resolution: "25 km" },
+  { id: "gfs_seamless", name: "NOAA GFS", origin: "US", resolution: "13–25 km" },
+  { id: "icon_seamless", name: "DWD ICON", origin: "DE", resolution: "2–11 km" },
+  { id: "meteofrance_seamless", name: "Météo-France ARPEGE/AROME", origin: "FR", resolution: "1.5–25 km" },
+  { id: "ukmo_seamless", name: "UK Met Office", origin: "GB", resolution: "2–10 km" }
+];
+
+const POLLEN_TYPES = ["alder", "birch", "grass", "mugwort", "olive", "ragweed"];
+
+async function getJson(url) {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
+export async function fetchCompleteWeather(lat, lon, timezone = "auto") {
+  const tz = timezone || "auto";
+
+  const forecastUrl = apiUrl("api", "/v1/forecast", {
+    latitude: lat,
+    longitude: lon,
+    timezone: tz,
+    current: "temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,cloud_cover,pressure_msl,wind_speed_10m,wind_direction_10m,wind_gusts_10m",
+    minutely_15: "precipitation",
+    forecast_minutely_15: 8,
+    hourly: "temperature_2m,relative_humidity_2m,dew_point_2m,apparent_temperature,precipitation_probability,precipitation,weather_code,pressure_msl,cloud_cover,visibility,wind_speed_10m,wind_direction_10m,wind_gusts_10m,uv_index,is_day",
+    past_hours: 24,
+    forecast_hours: 168,
+    daily: "weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,daylight_duration,uv_index_max,precipitation_sum,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant",
+    forecast_days: 14
+  });
+
+  const modelsUrl = apiUrl("api", "/v1/forecast", {
+    latitude: lat,
+    longitude: lon,
+    timezone: tz,
+    daily: "temperature_2m_max,temperature_2m_min,precipitation_sum,wind_speed_10m_max",
+    models: COMPARISON_MODELS.map(m => m.id).join(","),
+    forecast_days: 2
+  });
+
+  const aqiUrl = apiUrl("air-quality-api", "/v1/air-quality", {
+    latitude: lat,
+    longitude: lon,
+    timezone: tz,
+    current: "pm10,pm2_5,carbon_monoxide,nitrogen_dioxide,sulphur_dioxide,ozone,european_aqi,us_aqi," + POLLEN_TYPES.map(p => `${p}_pollen`).join(",")
+  });
+
+  const marineUrl = apiUrl("marine-api", "/v1/marine", {
+    latitude: lat,
+    longitude: lon,
+    timezone: tz,
+    current: "wave_height,wave_direction,wave_period,sea_surface_temperature"
+  });
+
+  // The forecast is mandatory; the other sources are optional and their sections are hidden when missing.
+  const [forecast, modelsRes, aqiRes, marineRes] = await Promise.allSettled([
+    getJson(forecastUrl),
+    getJson(modelsUrl),
+    getJson(aqiUrl),
+    getJson(marineUrl)
+  ]);
+
+  if (forecast.status !== "fulfilled" || !forecast.value.current) {
+    throw new Error("Forecast unavailable");
+  }
+
+  return processRawWeatherData(
+    forecast.value,
+    modelsRes.status === "fulfilled" ? modelsRes.value : null,
+    aqiRes.status === "fulfilled" ? aqiRes.value : null,
+    marineRes.status === "fulfilled" ? marineRes.value : null,
+    lat,
+    lon
+  );
+}
+
+// Lightweight current conditions for several points in a single request (route weather).
+export async function fetchPointsWeather(points) {
+  const url = apiUrl("api", "/v1/forecast", {
+    latitude: points.map(p => p.lat.toFixed(4)).join(","),
+    longitude: points.map(p => p.lon.toFixed(4)).join(","),
+    timezone: "auto",
+    current: "temperature_2m,weather_code,is_day,precipitation,wind_speed_10m,wind_gusts_10m,visibility",
+    hourly: "visibility",
+    forecast_hours: 1
+  });
+  const data = await getJson(url);
+  const list = Array.isArray(data) ? data : [data];
+  return list.map(d => ({
+    temp: d.current.temperature_2m,
+    code: d.current.weather_code,
+    meta: getWeatherCodeMeta(d.current.weather_code, d.current.is_day),
+    precipitation: d.current.precipitation,
+    windSpeed: Math.round(d.current.wind_speed_10m),
+    windGusts: Math.round(d.current.wind_gusts_10m),
+    visibilityKm: d.hourly && d.hourly.visibility ? Math.round(d.hourly.visibility[0] / 1000) : null
+  }));
+}
+
+// Convert WMO weather codes to semantic representations
 export function getWeatherCodeMeta(code, isDay = 1) {
-  // WMO Weather interpretation codes
-  // 0: Clear sky
-  // 1, 2, 3: Mainly clear, partly cloudy, overcast
-  // 45, 48: Fog
-  // 51, 53, 55: Drizzle
-  // 61, 63, 65: Rain
-  // 71, 73, 75: Snow
-  // 80, 81, 82: Rain showers
-  // 95, 96, 99: Thunderstorm
   switch (code) {
     case 0:
-      return {
-        key: "clearSky",
-        icon: isDay ? "sun" : "moon",
-        skyType: isDay ? "sunny" : "clear_night",
-        precipitationIntensity: 0
-      };
+      return { key: "clearSky", icon: isDay ? "sun" : "moon", skyType: isDay ? "sunny" : "clear_night", precipitationIntensity: 0 };
     case 1:
-      return {
-        key: "mainlyClear",
-        icon: isDay ? "sun" : "moon",
-        skyType: isDay ? "mostly_sunny" : "clear_night",
-        precipitationIntensity: 0
-      };
+      return { key: "mainlyClear", icon: isDay ? "sun" : "moon", skyType: isDay ? "mostly_sunny" : "clear_night", precipitationIntensity: 0 };
     case 2:
-      return {
-        key: "partlyCloudy",
-        icon: isDay ? "cloud-sun" : "cloud-moon",
-        skyType: "partly_cloudy",
-        precipitationIntensity: 0
-      };
+      return { key: "partlyCloudy", icon: isDay ? "cloud-sun" : "cloud-moon", skyType: "partly_cloudy", precipitationIntensity: 0 };
     case 3:
-      return {
-        key: "overcast",
-        icon: "cloud",
-        skyType: "overcast",
-        precipitationIntensity: 0
-      };
+      return { key: "overcast", icon: "cloud", skyType: "overcast", precipitationIntensity: 0 };
     case 45:
     case 48:
-      return {
-        key: code === 48 ? "rimeFog" : "fog",
-        icon: "cloud-fog",
-        skyType: "fog",
-        precipitationIntensity: 0
-      };
+      return { key: code === 48 ? "rimeFog" : "fog", icon: "cloud-fog", skyType: "fog", precipitationIntensity: 0 };
     case 51:
     case 53:
     case 55:
-      return {
-        key: code === 51 ? "drizzleLight" : code === 53 ? "drizzleMod" : "drizzleDense",
-        icon: "cloud-drizzle",
-        skyType: "rain",
-        precipitationIntensity: 0.15
-      };
+    case 56:
+    case 57:
+      return { key: code === 51 || code === 56 ? "drizzleLight" : code === 53 ? "drizzleMod" : "drizzleDense", icon: "cloud-drizzle", skyType: "rain", precipitationIntensity: 0.15 };
     case 61:
     case 63:
     case 65:
-      return {
-        key: code === 61 ? "rainSlight" : code === 63 ? "rainMod" : "rainHeavy",
-        icon: "cloud-rain",
-        skyType: "rain",
-        precipitationIntensity: code === 61 ? 0.3 : code === 63 ? 0.6 : 0.95
-      };
+    case 66:
+    case 67:
+      return { key: code === 61 || code === 66 ? "rainSlight" : code === 63 ? "rainMod" : "rainHeavy", icon: "cloud-rain", skyType: "rain", precipitationIntensity: code === 61 || code === 66 ? 0.3 : code === 63 ? 0.6 : 0.95 };
     case 71:
     case 73:
     case 75:
-      return {
-        key: code === 71 ? "snowSlight" : code === 73 ? "snowMod" : "snowHeavy",
-        icon: "snowflake",
-        skyType: "snow",
-        precipitationIntensity: code === 71 ? 0.3 : 0.8
-      };
+    case 77:
+    case 85:
+    case 86:
+      return { key: code === 71 || code === 77 || code === 85 ? "snowSlight" : code === 73 ? "snowMod" : "snowHeavy", icon: "snowflake", skyType: "snow", precipitationIntensity: code === 71 || code === 77 || code === 85 ? 0.3 : 0.8 };
     case 80:
     case 81:
     case 82:
-      return {
-        key: code === 80 ? "rainSlight" : code === 81 ? "rainMod" : "rainHeavy",
-        icon: "cloud-rain",
-        skyType: "rain",
-        precipitationIntensity: 0.7
-      };
+      return { key: code === 80 ? "rainSlight" : code === 81 ? "rainMod" : "rainHeavy", icon: "cloud-rain", skyType: "rain", precipitationIntensity: code === 80 ? 0.4 : code === 81 ? 0.7 : 0.95 };
     case 95:
     case 96:
     case 99:
-      return {
-        key: code === 95 ? "thunderstorm" : "thunderstormHail",
-        icon: "cloud-lightning",
-        skyType: "thunderstorm",
-        precipitationIntensity: 1.0
-      };
+      return { key: code === 95 ? "thunderstorm" : "thunderstormHail", icon: "cloud-lightning", skyType: "thunderstorm", precipitationIntensity: 1.0 };
     default:
-      return {
-        key: "partlyCloudy",
-        icon: "cloud-sun",
-        skyType: "partly_cloudy",
-        precipitationIntensity: 0
-      };
+      return { key: "partlyCloudy", icon: "cloud-sun", skyType: "partly_cloudy", precipitationIntensity: 0 };
   }
 }
 
-function processRawWeatherData(forecast, aqi, lat, lon, elevation) {
+const round1 = (v) => Math.round(v * 10) / 10;
+
+function processRawWeatherData(forecast, modelsData, aqi, marine, lat, lon) {
   const current = forecast.current;
-  const hourly = forecast.hourly || {};
-  const daily = forecast.daily || {};
+  const hourly = forecast.hourly;
+  const daily = forecast.daily;
 
   const currentMeta = getWeatherCodeMeta(current.weather_code, current.is_day);
 
-  // Parse Hourly (48 hours)
-  const hourlyList = [];
-  const hoursCount = Math.min(48, hourly.time ? hourly.time.length : 0);
-  for (let i = 0; i < hoursCount; i++) {
-    const code = hourly.weather_code ? hourly.weather_code[i] : 0;
-    const isDay = hourly.is_day ? hourly.is_day[i] : 1;
-    hourlyList.push({
+  // Hourly series starts 24h in the past: find the slot of the current hour.
+  const currentHourPrefix = current.time.slice(0, 13);
+  let nowIdx = hourly.time.findIndex(t => t.slice(0, 13) === currentHourPrefix);
+  if (nowIdx < 0) nowIdx = 24;
+
+  const toHour = (i) => {
+    const code = hourly.weather_code[i];
+    const isDay = hourly.is_day[i];
+    return {
       time: hourly.time[i],
-      hour: new Date(hourly.time[i]).getHours(),
-      temp: Math.round(hourly.temperature_2m[i] * 10) / 10,
-      feelsLike: Math.round(hourly.apparent_temperature[i] * 10) / 10,
+      hour: parseInt(hourly.time[i].slice(11, 13), 10),
+      temp: round1(hourly.temperature_2m[i]),
+      feelsLike: round1(hourly.apparent_temperature[i]),
       humidity: hourly.relative_humidity_2m[i],
-      dewPoint: Math.round((hourly.dew_point_2m ? hourly.dew_point_2m[i] : (hourly.temperature_2m[i] - (100 - hourly.relative_humidity_2m[i]) / 5)) * 10) / 10,
-      rainProb: hourly.precipitation_probability ? hourly.precipitation_probability[i] : 0,
-      precipitation: hourly.precipitation ? hourly.precipitation[i] : 0,
-      code: code,
-      isDay: isDay,
+      dewPoint: round1(hourly.dew_point_2m[i]),
+      rainProb: hourly.precipitation_probability[i] ?? 0,
+      precipitation: hourly.precipitation[i] ?? 0,
+      code,
+      isDay,
       meta: getWeatherCodeMeta(code, isDay),
-      pressure: hourly.pressure_msl ? Math.round(hourly.pressure_msl[i]) : 1013,
+      pressure: Math.round(hourly.pressure_msl[i]),
       windSpeed: Math.round(hourly.wind_speed_10m[i]),
       windDirection: hourly.wind_direction_10m[i],
-      windGusts: hourly.wind_gusts_10m ? Math.round(hourly.wind_gusts_10m[i]) : Math.round(hourly.wind_speed_10m[i] * 1.3),
-      uvIndex: hourly.uv_index ? Math.round(hourly.uv_index[i] * 10) / 10 : 0,
-      cloudCover: hourly.cloud_cover ? hourly.cloud_cover[i] : 20,
-      visibility: hourly.visibility ? Math.round(hourly.visibility[i] / 1000) : 10
-    });
-  }
+      windGusts: Math.round(hourly.wind_gusts_10m[i]),
+      uvIndex: round1(hourly.uv_index[i] ?? 0),
+      cloudCover: hourly.cloud_cover[i],
+      visibility: hourly.visibility[i] != null ? Math.round(hourly.visibility[i] / 1000) : null
+    };
+  };
 
-  // Parse Daily (14 days)
-  const dailyList = [];
-  const daysCount = daily.time ? daily.time.length : 0;
-  for (let d = 0; d < daysCount; d++) {
-    const code = daily.weather_code ? daily.weather_code[d] : 0;
-    dailyList.push({
-      date: daily.time[d],
-      dayName: new Date(daily.time[d]).toLocaleDateString("en-US", { weekday: "short" }),
-      tempMax: Math.round(daily.temperature_2m_max[d]),
-      tempMin: Math.round(daily.temperature_2m_min[d]),
-      code: code,
-      meta: getWeatherCodeMeta(code, 1),
-      rainProb: daily.precipitation_probability_max ? daily.precipitation_probability_max[d] : 0,
-      precipitationSum: daily.precipitation_sum ? Math.round(daily.precipitation_sum[d] * 10) / 10 : 0,
-      windSpeedMax: daily.wind_speed_10m_max ? Math.round(daily.wind_speed_10m_max[d]) : 15,
-      windGustsMax: daily.wind_gusts_10m_max ? Math.round(daily.wind_gusts_10m_max[d]) : 25,
-      uvIndexMax: daily.uv_index_max ? Math.round(daily.uv_index_max[d] * 10) / 10 : 4,
-      sunrise: daily.sunrise ? daily.sunrise[d] : "06:30",
-      sunset: daily.sunset ? daily.sunset[d] : "19:45"
-    });
-  }
+  const hourlyList = [];
+  for (let i = nowIdx; i < Math.min(hourly.time.length, nowIdx + 48); i++) hourlyList.push(toHour(i));
+  const next7Days = [];
+  for (let i = nowIdx; i < hourly.time.length; i++) next7Days.push(toHour(i));
+  const yesterdaySameHour = nowIdx >= 24 ? toHour(nowIdx - 24) : null;
 
-  // Calculate RealFeel & RealFeel Shade
+  const dailyList = daily.time.map((date, d) => ({
+    date,
+    tempMax: Math.round(daily.temperature_2m_max[d]),
+    tempMin: Math.round(daily.temperature_2m_min[d]),
+    code: daily.weather_code[d],
+    meta: getWeatherCodeMeta(daily.weather_code[d], 1),
+    rainProb: daily.precipitation_probability_max[d] ?? 0,
+    precipitationSum: round1(daily.precipitation_sum[d] ?? 0),
+    windSpeedMax: Math.round(daily.wind_speed_10m_max[d]),
+    windGustsMax: Math.round(daily.wind_gusts_10m_max[d]),
+    uvIndexMax: round1(daily.uv_index_max[d] ?? 0),
+    sunrise: daily.sunrise[d],
+    sunset: daily.sunset[d],
+    daylightHours: daily.daylight_duration ? round1(daily.daylight_duration[d] / 3600) : null
+  }));
+
   const temp = current.temperature_2m;
   const humidity = current.relative_humidity_2m;
   const wind = current.wind_speed_10m;
-  const uv = hourlyList[0] ? hourlyList[0].uvIndex : 3;
-  const feelsLike = current.apparent_temperature;
-  const feelsLikeShade = Math.round((feelsLike - (current.is_day ? uv * 0.45 : 0)) * 10) / 10;
+  const uv = hourlyList[0] ? hourlyList[0].uvIndex : 0;
 
-  // AccuWeather MinuteCast Synthesis
-  const minuteCast = generateMinuteCast(currentMeta.precipitationIntensity, hourlyList.slice(0, 3));
+  const nowcast = buildNowcast(forecast.minutely_15);
+  const models = buildModelComparison(modelsData);
+  const biometeo = calculateBiometeorology(hourlyList, uv);
+  const airQuality = buildAirQuality(aqi);
+  const marineData = buildMarine(marine);
+  const lifestyle = calculateLifestyleIndices(temp, humidity, wind, current.precipitation, currentMeta.precipitationIntensity, uv, hourlyList, current.cloud_cover);
+  const sunMoon = calculateSunAndMoon(dailyList[0]);
 
-  // Multi-Model Supercomputer Simulation (ECMWF, GFS, ICON, MeteoBlue)
-  const models = generateMultiModelData(temp, wind, current.precipitation);
+  const comparison = yesterdaySameHour ? {
+    vsYesterdayTemp: round1(temp - yesterdaySameHour.temp),
+    vsYesterdayHumidity: Math.round(humidity - yesterdaySameHour.humidity)
+  } : null;
 
-  // Biometeorology & Health Indicators
-  const biometeo = calculateBiometeorology(hourlyList, temp, humidity, uv, lat);
-
-  // Air Quality
-  const airQuality = aqi && aqi.current ? {
-    usAqi: aqi.current.us_aqi || Math.min(180, Math.round(30 + Math.random() * 25)),
-    europeanAqi: aqi.current.european_aqi || 25,
-    pm25: aqi.current.pm2_5 ? Math.round(aqi.current.pm2_5 * 10) / 10 : 8.4,
-    pm10: aqi.current.pm10 ? Math.round(aqi.current.pm10 * 10) / 10 : 15.2,
-    o3: aqi.current.ozone ? Math.round(aqi.current.ozone * 10) / 10 : 42.1,
-    no2: aqi.current.nitrogen_dioxide ? Math.round(aqi.current.nitrogen_dioxide * 10) / 10 : 18.5,
-    so2: aqi.current.sulphur_dioxide ? Math.round(aqi.current.sulphur_dioxide * 10) / 10 : 3.2,
-    co: aqi.current.carbon_monoxide ? Math.round(aqi.current.carbon_monoxide * 10) / 10 : 210
-  } : generateSimulatedAQI();
-
-  // Smart Outfit & Activity Indices
-  const lifestyle = calculateLifestyleIndices(temp, humidity, wind, current.precipitation, currentMeta.precipitationIntensity, uv);
-
-  // Solar and Lunar Ephemeris
-  const sunMoon = calculateSunAndMoon(dailyList[0] ? dailyList[0].sunrise : "06:30", dailyList[0] ? dailyList[0].sunset : "19:30");
-
-  // Historical and Personal Weather Station comparison
-  const historyPws = {
-    stationId: `PWS-${Math.abs(Math.round(lat * 100))}-${Math.abs(Math.round(lon * 100))}`,
-    elevation: elevation,
-    vsYesterdayTemp: Math.round(((Math.random() * 4) - 2) * 10) / 10,
-    vsYesterdayHumidity: Math.round((Math.random() * 12) - 6),
-    vsHistoricalNorm: Math.round(((Math.random() * 3) - 0.8) * 10) / 10
-  };
-
-  // Severe Weather Alert assessment
-  const alert = assessSevereWeather(current.wind_speed_10m, current.wind_gusts_10m, current.precipitation, current.weather_code, temp);
+  const alert = assessForecastHazards(hourlyList.slice(0, 24));
 
   return {
-    coordinates: { lat, lon, elevation },
+    updatedAt: Date.now(),
+    observedAt: current.time,
+    coordinates: { lat, lon, elevation: Math.round(forecast.elevation ?? 0) },
     current: {
-      temp: Math.round(temp * 10) / 10,
-      feelsLike: Math.round(feelsLike * 10) / 10,
-      feelsLikeShade: feelsLikeShade,
-      tempMax: dailyList[0] ? dailyList[0].tempMax : Math.round(temp + 3),
-      tempMin: dailyList[0] ? dailyList[0].tempMin : Math.round(temp - 4),
-      humidity: humidity,
-      dewPoint: Math.round((temp - (100 - humidity) / 5) * 10) / 10,
-      pressure: Math.round(current.pressure_msl || 1013),
+      temp: round1(temp),
+      feelsLike: round1(current.apparent_temperature),
+      tempMax: dailyList[0] ? dailyList[0].tempMax : null,
+      tempMin: dailyList[0] ? dailyList[0].tempMin : null,
+      humidity,
+      dewPoint: hourlyList[0] ? hourlyList[0].dewPoint : null,
+      pressure: Math.round(current.pressure_msl),
       windSpeed: Math.round(wind),
-      windDirection: current.wind_direction_10m || 180,
-      windGusts: Math.round(current.wind_gusts_10m || wind * 1.3),
+      windDirection: current.wind_direction_10m,
+      windGusts: Math.round(current.wind_gusts_10m),
       uvIndex: uv,
-      cloudCover: current.cloud_cover || 25,
-      precipitation: current.precipitation || 0,
-      rainProbability: hourlyList[0] ? hourlyList[0].rainProb : 10,
-      visibility: hourlyList[0] ? hourlyList[0].visibility : 10,
-      isDay: current.is_day !== undefined ? current.is_day : 1,
+      cloudCover: current.cloud_cover,
+      precipitation: current.precipitation,
+      rainProbability: hourlyList[0] ? hourlyList[0].rainProb : null,
+      visibility: hourlyList[0] ? hourlyList[0].visibility : null,
+      isDay: current.is_day,
       weatherCode: current.weather_code,
       meta: currentMeta
     },
-    minuteCast,
+    nowcast,
     hourly: hourlyList,
+    hourly7d: next7Days,
     daily: dailyList,
     models,
     biometeo,
     airQuality,
+    marine: marineData,
     lifestyle,
     sunMoon,
-    historyPws,
+    comparison,
     alert
   };
 }
 
-// MinuteCast generation (AccuWeather minute-by-minute precipitation curve)
-function generateMinuteCast(baseIntensity, nextHours) {
-  const minutes = [];
-  const rainProb = nextHours[0] ? nextHours[0].rainProb : (baseIntensity > 0 ? 80 : 5);
-  let willRain = baseIntensity > 0 || rainProb > 45;
-  let rainStartMinute = baseIntensity > 0 ? 0 : Math.round(15 + Math.random() * 40);
-  let rainDuration = Math.round(35 + Math.random() * 50);
-
-  for (let m = 0; m <= 120; m += 2) {
-    let intensity = 0;
-    if (willRain) {
-      if (baseIntensity > 0) {
-        // Already raining, tapering or steady
-        intensity = Math.max(0, baseIntensity * (1 + 0.3 * Math.sin(m / 15)) - (m / 150));
-      } else if (m >= rainStartMinute && m <= rainStartMinute + rainDuration) {
-        // Rising and then fading
-        const progress = (m - rainStartMinute) / rainDuration;
-        intensity = Math.sin(progress * Math.PI) * (rainProb / 100);
-      }
-    }
-    minutes.push({
-      minute: m,
-      intensity: Math.max(0, Math.min(1, Math.round(intensity * 100) / 100))
-    });
-  }
-
+// Precipitation in the next 2 hours from the 15-minute forecast (high resolution in Europe / North America).
+function buildNowcast(minutely) {
+  if (!minutely || !minutely.time || !minutely.precipitation) return null;
+  const slots = minutely.time.map((time, i) => ({
+    time,
+    minute: i * 15,
+    mm: minutely.precipitation[i] ?? 0
+  }));
+  const wet = (s) => s.mm >= 0.1;
+  const rainingNow = slots[0] && wet(slots[0]);
   let statusKey = "noPrecip";
-  let targetMinute = 0;
-  if (baseIntensity > 0) {
-    statusKey = "endingSoon";
-    targetMinute = rainDuration;
-  } else if (willRain && rainStartMinute <= 60) {
-    statusKey = rainProb > 75 ? "heavyRain" : rainProb > 55 ? "moderateRain" : "lightRainSoon";
-    targetMinute = rainStartMinute;
+  let targetMinute = null;
+  if (rainingNow) {
+    const stop = slots.findIndex(s => !wet(s));
+    if (stop > 0) {
+      statusKey = "endingSoon";
+      targetMinute = slots[stop].minute;
+    } else {
+      statusKey = "continuing";
+    }
+  } else {
+    const start = slots.findIndex(wet);
+    if (start > 0) {
+      const peak = Math.max(...slots.map(s => s.mm));
+      statusKey = peak >= 2 ? "heavyRain" : peak >= 0.5 ? "moderateRain" : "lightRainSoon";
+      targetMinute = slots[start].minute;
+    }
   }
+  return { statusKey, targetMinute, timeline: slots };
+}
 
+// Real comparison of today's forecast from several global/regional models.
+function buildModelComparison(data) {
+  if (!data || !data.daily) return null;
+  const d = data.daily;
+  const models = COMPARISON_MODELS.map(m => {
+    const max = d[`temperature_2m_max_${m.id}`];
+    const min = d[`temperature_2m_min_${m.id}`];
+    const rain = d[`precipitation_sum_${m.id}`];
+    const windMax = d[`wind_speed_10m_max_${m.id}`];
+    if (!max || max[0] == null) return null;
+    return {
+      ...m,
+      tempMax: round1(max[0]),
+      tempMin: min && min[0] != null ? round1(min[0]) : null,
+      rainMm: rain && rain[0] != null ? round1(rain[0]) : null,
+      wind: windMax && windMax[0] != null ? Math.round(windMax[0]) : null
+    };
+  }).filter(Boolean);
+
+  if (models.length < 2) return null;
+
+  const maxes = models.map(m => m.tempMax);
+  const consensusTemp = round1(maxes.reduce((a, b) => a + b, 0) / maxes.length);
+  const spread = round1(Math.max(...maxes) - Math.min(...maxes));
+  const rains = models.map(m => m.rainMm).filter(v => v != null);
+  const rainDisagreement = rains.length ? Math.max(...rains) - Math.min(...rains) : 0;
+  // Agreement level: how close the models are on temperature and rain.
+  let agreementKey = "agreementHigh";
+  if (spread > 3 || rainDisagreement > 10) agreementKey = "agreementLow";
+  else if (spread > 1.5 || rainDisagreement > 3) agreementKey = "agreementMedium";
+
+  return { consensusTemp, spread, agreementKey, models };
+}
+
+function buildAirQuality(aqi) {
+  if (!aqi || !aqi.current) return null;
+  const c = aqi.current;
+  const v = (x) => (x == null ? null : round1(x));
+  const pollenValues = {};
+  let hasPollen = false;
+  for (const p of POLLEN_TYPES) {
+    const val = c[`${p}_pollen`];
+    pollenValues[p] = val == null ? null : round1(val);
+    if (val != null) hasPollen = true;
+  }
   return {
-    statusKey,
-    targetMinute,
-    timeline: minutes
+    usAqi: c.us_aqi ?? null,
+    europeanAqi: c.european_aqi ?? null,
+    pm25: v(c.pm2_5),
+    pm10: v(c.pm10),
+    o3: v(c.ozone),
+    no2: v(c.nitrogen_dioxide),
+    so2: v(c.sulphur_dioxide),
+    co: v(c.carbon_monoxide),
+    // Pollen is only modelled for Europe (CAMS); elsewhere the section is hidden.
+    pollen: hasPollen ? pollenValues : null
   };
 }
 
-// Multi-Model comparison simulation (Windy / Ventusky supercomputer consensus)
-function generateMultiModelData(temp, wind, precip) {
-  const varianceEcmwf = (Math.random() * 0.8) - 0.4;
-  const varianceGfs = (Math.random() * 1.6) - 0.8;
-  const varianceIcon = (Math.random() * 1.2) - 0.6;
-  const varianceMeteoBlue = (Math.random() * 1.0) - 0.5;
-
-  const ecmwfTemp = Math.round((temp + varianceEcmwf) * 10) / 10;
-  const gfsTemp = Math.round((temp + varianceGfs) * 10) / 10;
-  const iconTemp = Math.round((temp + varianceIcon) * 10) / 10;
-  const meteoblueTemp = Math.round((temp + varianceMeteoBlue) * 10) / 10;
-
-  const consensusTemp = Math.round(((ecmwfTemp + gfsTemp + iconTemp + meteoblueTemp) / 4) * 10) / 10;
-  const spread = Math.round((Math.max(ecmwfTemp, gfsTemp, iconTemp, meteoblueTemp) - Math.min(ecmwfTemp, gfsTemp, iconTemp, meteoblueTemp)) * 10) / 10;
-
+function buildMarine(marine) {
+  if (!marine || !marine.current || marine.current.wave_height == null) return null;
+  const c = marine.current;
   return {
-    consensusTemp,
-    spread,
-    confidence: spread < 1.0 ? 94 : spread < 2.0 ? 86 : 74,
-    models: [
-      {
-        id: "ecmwf",
-        name: "ECMWF IFS (Europa)",
-        resolution: "9 km",
-        temp: ecmwfTemp,
-        wind: Math.round(wind * 0.98),
-        rainMm: Math.round(precip * 10) / 10,
-        runTime: "00z / 12z"
-      },
-      {
-        id: "gfs",
-        name: "GFS NOAA (USA)",
-        resolution: "13 km",
-        temp: gfsTemp,
-        wind: Math.round(wind * 1.05),
-        rainMm: Math.round((precip + 0.3) * 10) / 10,
-        runTime: "06z / 18z"
-      },
-      {
-        id: "icon",
-        name: "ICON DWD (Germania)",
-        resolution: "7 km",
-        temp: iconTemp,
-        wind: Math.round(wind * 1.02),
-        rainMm: Math.round(precip * 10) / 10,
-        runTime: "00z / 06z / 12z"
-      },
-      {
-        id: "meteoblue",
-        name: "MeteoBlue NEMS (Svizzera)",
-        resolution: "4 km",
-        temp: meteoblueTemp,
-        wind: Math.round(wind * 0.95),
-        rainMm: Math.round(precip * 10) / 10,
-        runTime: "Ensemble Multi-Run"
-      }
-    ]
+    waveHeight: round1(c.wave_height),
+    waveDirection: c.wave_direction,
+    wavePeriod: c.wave_period != null ? round1(c.wave_period) : null,
+    seaTemp: c.sea_surface_temperature != null ? round1(c.sea_surface_temperature) : null
   };
 }
 
-// Biometeorology and Health Index computation
-function calculateBiometeorology(hourly, temp, humidity, uv, lat) {
-  // Pressure gradient over 3 hours (detect barometric headache / migraine triggers)
-  let deltaPressure = 0;
-  if (hourly.length >= 4) {
-    deltaPressure = Math.abs(hourly[3].pressure - hourly[0].pressure);
+// Pollen level per CAMS/EAN thresholds (grains/m³)
+export function pollenLevel(type, value) {
+  if (value == null) return null;
+  const thresholds = {
+    alder: [10, 50, 100], birch: [10, 50, 100], olive: [10, 50, 200],
+    grass: [5, 25, 50], mugwort: [5, 25, 50], ragweed: [5, 15, 30]
+  }[type] || [10, 50, 100];
+  if (value < thresholds[0]) return "low";
+  if (value < thresholds[1]) return "medium";
+  if (value < thresholds[2]) return "high";
+  return "veryHigh";
+}
+
+// European AQI bands → advice key
+export function aqiBand(europeanAqi, usAqi) {
+  if (europeanAqi != null) {
+    if (europeanAqi <= 20) return "good";
+    if (europeanAqi <= 40) return "fair";
+    if (europeanAqi <= 60) return "moderate";
+    if (europeanAqi <= 80) return "poor";
+    if (europeanAqi <= 100) return "veryPoor";
+    return "hazardous";
   }
+  if (usAqi != null) {
+    if (usAqi <= 50) return "good";
+    if (usAqi <= 100) return "moderate";
+    if (usAqi <= 150) return "poor";
+    if (usAqi <= 200) return "veryPoor";
+    return "hazardous";
+  }
+  return null;
+}
+
+function calculateBiometeorology(hourly, uv) {
+  // Barometric trend over the next 3 hours (known migraine trigger for weather-sensitive people)
+  const deltaPressure = hourly.length >= 4 ? Math.abs(hourly[3].pressure - hourly[0].pressure) : 0;
 
   let headacheRisk = "headacheLow";
   let headacheLevel = 1;
@@ -399,49 +429,24 @@ function calculateBiometeorology(hourly, temp, humidity, uv, lat) {
     headacheLevel = 2;
   }
 
-  // Safe sun exposure time based on UV Index and Fitzpatrick Skin Types I - VI
+  // Indicative time to sunburn by Fitzpatrick skin type (minimal erythema dose / UV index)
+  const safe = (med) => (uv > 0 ? Math.round(med / uv) : null);
   const safeSunTimes = {
-    typeI: uv > 0 ? Math.max(10, Math.round(67 / uv)) : 180, // Very fair, pale
-    typeII: uv > 0 ? Math.max(15, Math.round(100 / uv)) : 240, // Fair
-    typeIII: uv > 0 ? Math.max(20, Math.round(135 / uv)) : 300, // Medium
-    typeIV: uv > 0 ? Math.max(30, Math.round(200 / uv)) : 360, // Olive / Mediterranean
-    typeV: uv > 0 ? Math.max(45, Math.round(300 / uv)) : 480 // Dark brown
+    typeI: safe(67),
+    typeII: safe(100),
+    typeIII: safe(135),
+    typeIV: safe(200),
+    typeV: safe(300)
   };
 
-  // Arthritis / Joint pain score (driven by cold, high humidity and low/dropping pressure)
-  let arthritisIndex = 25;
-  if (humidity > 75) arthritisIndex += 25;
-  if (temp < 12) arthritisIndex += 20;
-  if (deltaPressure > 1.8) arthritisIndex += 20;
-  arthritisIndex = Math.min(100, arthritisIndex);
-
-  // Pollen tracker (realistic seasonal and meteorological factors)
-  // Wind disperses pollen, rain washes it out
-  const rainFactor = hourly[0] && hourly[0].precipitation > 0.5 ? 0.2 : 1.0;
-  const graminacee = Math.round(Math.min(100, (40 + (temp > 15 ? 30 : 10)) * rainFactor));
-  const betulla = Math.round(Math.min(100, (30 + (temp > 12 ? 25 : 5)) * rainFactor));
-  const ambrosia = Math.round(Math.min(100, (20 + (temp > 20 ? 35 : 0)) * rainFactor));
-  const olivo = Math.round(Math.min(100, (35 + (temp > 18 ? 30 : 5)) * rainFactor));
-
-  return {
-    deltaPressure: Math.round(deltaPressure * 10) / 10,
-    headacheRisk,
-    headacheLevel,
-    safeSunTimes,
-    arthritisIndex,
-    thermalStress: temp > 32 ? "Elevato (Caldo)" : temp < 2 ? "Elevato (Freddo)" : "Normale",
-    pollen: {
-      graminacee,
-      betulla,
-      ambrosia,
-      olivo
-    }
-  };
+  return { deltaPressure: round1(deltaPressure), headacheRisk, headacheLevel, safeSunTimes };
 }
 
-// Smart AI Outfit and Lifestyle Activity indices
-function calculateLifestyleIndices(temp, humidity, wind, precip, precipIntensity, uv) {
-  // Laundry drying score: hot, dry, breezy, zero rain
+function calculateLifestyleIndices(temp, humidity, wind, precip, precipIntensity, uv, hourly, cloudCover) {
+  const next = (h) => hourly.slice(0, h);
+  const maxRainProb = (h) => Math.max(0, ...next(h).map(x => x.rainProb));
+
+  // Laundry drying: warm, dry, breezy, no rain in the next 6 hours
   let laundry = 90;
   if (precip > 0 || precipIntensity > 0) laundry = 5;
   else {
@@ -449,82 +454,59 @@ function calculateLifestyleIndices(temp, humidity, wind, precip, precipIntensity
     if (temp < 15) laundry -= (15 - temp) * 2;
     if (wind < 5) laundry -= 10;
     else if (wind > 35) laundry -= 15;
+    laundry -= maxRainProb(6) * 0.6;
   }
-  laundry = Math.max(5, Math.min(100, Math.round(laundry)));
+  laundry = clampScore(laundry);
 
-  // Running & Outdoor fitness: 12-22°C ideal, dry, calm wind
+  // Running: 8-20°C ideal, dry, calm
   let running = 95;
   if (precip > 0.5) running -= 40;
   if (temp < 5) running -= (5 - temp) * 3;
-  if (temp > 26) running -= (temp - 26) * 4;
+  if (temp > 24) running -= (temp - 24) * 4;
   if (humidity > 80) running -= 15;
   if (wind > 30) running -= 20;
-  running = Math.max(10, Math.min(100, Math.round(running)));
+  running = clampScore(running);
 
-  // Car wash: no rain next 48h, dry
-  let carWash = precip > 0 ? 10 : 85;
-  if (rainProbabilityTomorrow(precip)) carWash = 25;
+  // Car wash: driven by rain probability over the next 48 hours
+  const carWash = clampScore(precip > 0 ? 5 : 100 - maxRainProb(48));
 
-  // Stargazing / Astronomy: clear skies, low humidity
-  let stargazing = Math.round(Math.max(10, 100 - (precip > 0 ? 90 : 25) - humidity * 0.2));
+  // Stargazing: cloud cover tonight (next 12 hours, night slots only)
+  const nightSlots = next(12).filter(h => !h.isDay);
+  const nightCloud = nightSlots.length ? nightSlots.reduce((a, h) => a + h.cloudCover, 0) / nightSlots.length : cloudCover;
+  const stargazing = clampScore(100 - nightCloud - (humidity > 85 ? 10 : 0));
 
-  // BBQ & Picnic: warm, sunny, gentle breeze, dry
+  // BBQ & picnic
   let bbq = 90;
   if (precip > 0) bbq = 5;
   if (temp < 18) bbq -= (18 - temp) * 4;
   if (wind > 25) bbq -= 25;
-  bbq = Math.max(5, Math.min(100, Math.round(bbq)));
+  bbq -= maxRainProb(6) * 0.5;
+  bbq = clampScore(bbq);
 
-  // AI Outfit Recommendation
-  const outfit = generateOutfitAdvice(temp, wind, precip, uv);
-
-  return {
-    laundry,
-    running,
-    carWash,
-    stargazing,
-    bbq,
-    outfit
-  };
+  return { laundry, running, carWash, stargazing, bbq, outfit: generateOutfitAdvice(temp, wind, precip, uv, maxRainProb(12)) };
 }
 
-function rainProbabilityTomorrow(precip) {
-  return precip > 1.0;
+function clampScore(v) {
+  return Math.max(0, Math.min(100, Math.round(v)));
 }
 
-function generateOutfitAdvice(temp, wind, precip, uv) {
+function generateOutfitAdvice(temp, wind, precip, uv, rainProb12h) {
   const items = [];
-  if (precip > 0.2) {
-    items.push({ icon: "umbrella", textKey: "umbrellaNeeded", fallback: "Ombrello o impermeabile indispensabile" });
-  }
-  if (temp < 5) {
-    items.push({ icon: "shirt", textKey: "heavyCoat", fallback: "Cappotto pesante, sciarpa e guanti termici" });
-  } else if (temp < 14) {
-    items.push({ icon: "shirt", textKey: "jacketSweater", fallback: "Giacca di mezza stagione e maglione leggero" });
-  } else if (temp < 23) {
-    items.push({ icon: "shirt", textKey: "lightLayers", fallback: "Abbigliamento a strati leggeri e camicia o felpa" });
-  } else {
-    items.push({ icon: "shirt", textKey: "summerClothes", fallback: "T-shirt traspirante e abiti estivi leggeri" });
-  }
-
-  if (wind > 28) {
-    items.push({ icon: "wind", textKey: "windbreaker", fallback: "Giacca a vento protettiva antivento" });
-  }
-
-  if (uv >= 5) {
-    items.push({ icon: "glasses", textKey: "sunglassesUv", fallback: "Occhiali da sole UV400 e crema protettiva solare" });
-  }
-
+  if (precip > 0.2 || rainProb12h >= 50) items.push({ icon: "umbrella", textKey: "umbrellaNeeded" });
+  if (temp < 5) items.push({ icon: "shirt", textKey: "heavyCoat" });
+  else if (temp < 14) items.push({ icon: "shirt", textKey: "jacketSweater" });
+  else if (temp < 23) items.push({ icon: "shirt", textKey: "lightLayers" });
+  else items.push({ icon: "shirt", textKey: "summerClothes" });
+  if (wind > 28) items.push({ icon: "wind", textKey: "windbreaker" });
+  if (uv >= 5) items.push({ icon: "glasses", textKey: "sunglassesUv" });
   return items;
 }
 
-// Sun ephemeris & Lunar Phase calculation
-function calculateSunAndMoon(sunriseStr, sunsetStr) {
+// Moon phase from the synodic cycle (astronomical approximation, ±1 day)
+function calculateSunAndMoon(today) {
   const now = new Date();
-  // Moon age in days (synodic cycle is approx 29.5305877 days)
-  // Known new moon reference: Jan 11, 2024
-  const refDate = new Date("2024-01-11T11:57:00Z");
-  const diffDays = (now.getTime() - refDate.getTime()) / (1000 * 60 * 60 * 24);
+  const refDate = new Date("2024-01-11T11:57:00Z"); // known new moon
+  const diffDays = (now.getTime() - refDate.getTime()) / 86400000;
   const moonAge = (diffDays % 29.530588 + 29.530588) % 29.530588;
 
   let phaseKey = "new";
@@ -536,125 +518,48 @@ function calculateSunAndMoon(sunriseStr, sunsetStr) {
   else if (moonAge < 20.30) phaseKey = "waningGibbous";
   else if (moonAge < 23.99) phaseKey = "lastQuarter";
   else if (moonAge < 27.68) phaseKey = "waningCrescent";
-  else phaseKey = "new";
 
-  const illumination = Math.round((1 - Math.cos((moonAge / 29.530588) * 2 * Math.PI)) / 2 * 100);
-
+  const hhmm = (s) => (s && s.includes("T") ? s.split("T")[1].slice(0, 5) : null);
   return {
-    sunrise: sunriseStr.includes("T") ? sunriseStr.split("T")[1].slice(0, 5) : sunriseStr,
-    sunset: sunsetStr.includes("T") ? sunsetStr.split("T")[1].slice(0, 5) : sunsetStr,
+    sunrise: today ? hhmm(today.sunrise) : null,
+    sunset: today ? hhmm(today.sunset) : null,
+    daylightHours: today ? today.daylightHours : null,
     moonPhase: phaseKey,
-    illumination,
-    moonAge: Math.round(moonAge * 10) / 10
+    illumination: Math.round((1 - Math.cos((moonAge / 29.530588) * 2 * Math.PI)) / 2 * 100),
+    moonAge: round1(moonAge)
   };
 }
 
-function assessSevereWeather(wind, gusts, precip, code, temp) {
-  if (code >= 95 || gusts > 85 || precip > 40) {
-    return {
-      severity: "red",
-      titleKey: "redWarning",
-      description: "Condizioni estreme: forti temporali, raffiche di tempesta o piogge alluvionali."
-    };
-  }
-  if (gusts > 60 || precip > 20 || code === 65 || code === 75) {
-    return {
-      severity: "orange",
-      titleKey: "orangeWarning",
-      description: "Attenzione: vento molto sostenuto o precipitazioni intense persistenti."
-    };
-  }
-  if (gusts > 45 || precip > 8 || code === 45) {
-    return {
-      severity: "yellow",
-      titleKey: "yellowWarning",
-      description: "Avviso ordinario per raffiche di vento, nebbia o rovesci sparsi."
-    };
-  }
-  return null;
-}
+// Hazard notice derived from the next 24 hours of forecast. This is NOT an official
+// warning from a national weather service and the UI labels it accordingly.
+function assessForecastHazards(next24) {
+  if (!next24.length) return null;
+  const maxGust = Math.max(...next24.map(h => h.windGusts));
+  const maxHourlyRain = Math.max(...next24.map(h => h.precipitation));
+  const totalRain = next24.reduce((a, h) => a + h.precipitation, 0);
+  const codes = next24.map(h => h.code);
+  const hasThunder = codes.some(c => c >= 95);
+  const hasHeavySnow = codes.some(c => c === 75 || c === 86);
+  const hasFog = codes.some(c => c === 45 || c === 48);
 
-function generateSimulatedAQI() {
+  const reasons = [];
+  if (hasThunder) reasons.push("thunder");
+  if (maxGust > 60) reasons.push("gusts");
+  if (totalRain > 30 || maxHourlyRain > 10) reasons.push("heavyRain");
+  if (hasHeavySnow) reasons.push("heavySnow");
+  if (hasFog) reasons.push("fog");
+
+  let severity = null;
+  if ((hasThunder && maxGust > 85) || maxGust > 100 || totalRain > 80) severity = "red";
+  else if (maxGust > 75 || totalRain > 40 || maxHourlyRain > 20 || hasHeavySnow || (hasThunder && maxHourlyRain > 10)) severity = "orange";
+  else if (reasons.length) severity = "yellow";
+
+  if (!severity) return null;
   return {
-    usAqi: 38,
-    europeanAqi: 22,
-    pm25: 7.2,
-    pm10: 14.1,
-    o3: 45.0,
-    no2: 16.8,
-    so2: 2.9,
-    co: 195
+    severity,
+    titleKey: severity === "red" ? "redWarning" : severity === "orange" ? "orangeWarning" : "yellowWarning",
+    reasons,
+    maxGust,
+    totalRain: round1(totalRain)
   };
-}
-
-// Deterministic physical simulator when offline
-export function generateSimulatedWeather(lat, lon, elevation = 50) {
-  const now = new Date();
-  const hour = now.getHours();
-  const isDay = hour >= 6 && hour < 20 ? 1 : 0;
-
-  // Base temperature based on latitude and hour
-  const latFactor = Math.cos((lat * Math.PI) / 180);
-  const diurnalCycle = Math.sin(((hour - 9) / 24) * 2 * Math.PI);
-  const baseTemp = 16 * latFactor + 7 * diurnalCycle;
-  const temp = Math.round(baseTemp * 10) / 10;
-  const humidity = Math.round(55 - diurnalCycle * 18);
-  const wind = Math.round(12 + Math.sin(lat * 0.1) * 6);
-
-  const fakeForecast = {
-    current: {
-      temperature_2m: temp,
-      relative_humidity_2m: humidity,
-      apparent_temperature: temp + 0.5,
-      is_day: isDay,
-      precipitation: 0,
-      weather_code: isDay ? 1 : 0,
-      cloud_cover: 25,
-      pressure_msl: 1016,
-      surface_pressure: 1010,
-      wind_speed_10m: wind,
-      wind_direction_10m: 190,
-      wind_gusts_10m: Math.round(wind * 1.35)
-    },
-    hourly: {
-      time: Array.from({ length: 48 }, (_, i) => new Date(now.getTime() + i * 3600000).toISOString()),
-      temperature_2m: Array.from({ length: 48 }, (_, i) => Math.round((temp + Math.sin(i / 4) * 4) * 10) / 10),
-      relative_humidity_2m: Array.from({ length: 48 }, () => humidity),
-      apparent_temperature: Array.from({ length: 48 }, (_, i) => Math.round((temp + Math.sin(i / 4) * 4 + 0.5) * 10) / 10),
-      precipitation_probability: Array.from({ length: 48 }, (_, i) => Math.max(0, Math.round(15 + Math.sin(i / 5) * 15))),
-      precipitation: Array.from({ length: 48 }, () => 0),
-      weather_code: Array.from({ length: 48 }, () => (isDay ? 1 : 0)),
-      pressure_msl: Array.from({ length: 48 }, (_, i) => Math.round(1016 - i * 0.05)),
-      cloud_cover: Array.from({ length: 48 }, () => 20),
-      visibility: Array.from({ length: 48 }, () => 10000),
-      wind_speed_10m: Array.from({ length: 48 }, () => wind),
-      wind_direction_10m: Array.from({ length: 48 }, () => 190),
-      wind_gusts_10m: Array.from({ length: 48 }, () => Math.round(wind * 1.35)),
-      uv_index: Array.from({ length: 48 }, (_, i) => {
-        const h = (hour + i) % 24;
-        return h >= 7 && h <= 18 ? Math.round(Math.sin(((h - 7) / 11) * Math.PI) * 6 * 10) / 10 : 0;
-      }),
-      is_day: Array.from({ length: 48 }, (_, i) => {
-        const h = (hour + i) % 24;
-        return h >= 6 && h < 20 ? 1 : 0;
-      })
-    },
-    daily: {
-      time: Array.from({ length: 14 }, (_, i) => new Date(now.getTime() + i * 86400000).toISOString().split("T")[0]),
-      weather_code: Array.from({ length: 14 }, (_, i) => (i % 3 === 0 ? 2 : 1)),
-      temperature_2m_max: Array.from({ length: 14 }, () => Math.round(temp + 4)),
-      temperature_2m_min: Array.from({ length: 14 }, () => Math.round(temp - 3)),
-      apparent_temperature_max: Array.from({ length: 14 }, () => Math.round(temp + 4.5)),
-      apparent_temperature_min: Array.from({ length: 14 }, () => Math.round(temp - 3.5)),
-      sunrise: Array.from({ length: 14 }, () => "06:45"),
-      sunset: Array.from({ length: 14 }, () => "19:30"),
-      uv_index_max: Array.from({ length: 14 }, () => 5.2),
-      precipitation_sum: Array.from({ length: 14 }, () => 0),
-      precipitation_probability_max: Array.from({ length: 14 }, () => 20),
-      wind_speed_10m_max: Array.from({ length: 14 }, () => wind + 5),
-      wind_gusts_10m_max: Array.from({ length: 14 }, () => Math.round((wind + 5) * 1.4))
-    }
-  };
-
-  return processRawWeatherData(fakeForecast, null, lat, lon, elevation);
 }

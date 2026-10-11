@@ -1,4 +1,6 @@
 // Multilingual Dictionary for AetherSphere 3D Weather
+import { applyDataStrings } from "./dataStrings.js";
+
 export const translations = {
   it: {
     appName: "AETHERIA 3D",
@@ -39,11 +41,9 @@ export const translations = {
       solarRadiation: "Radiazione Solare",
       precipitation: "Precipitazioni",
       rainProbability: "Probabilità Pioggia",
-      airQuality: "Qualità dell'Aria",
-      pwsStation: "Stazione PWS"
+      airQuality: "Qualità dell'Aria"
     },
     minuteCast: {
-      title: "AccuWeather MinuteCast®",
       subtitle: "Precipitazioni minuto per minuto nei prossimi 120 min",
       noPrecip: "Nessuna precipitazione prevista nelle prossime 2 ore",
       lightRainSoon: "Pioggia leggera prevista tra",
@@ -74,10 +74,6 @@ export const translations = {
     models: {
       title: "Confronto Multi-Modello Meteorologico",
       subtitle: "Analisi comparativa dei supercomputer meteorologici globali",
-      ecmwf: "ECMWF IFS (Europa)",
-      gfs: "GFS NOAA (USA)",
-      icon: "ICON DWD (Germania)",
-      meteoblue: "MeteoBlue NEMS (Svizzera)",
       consensus: "Consenso Multi-Modello",
       confidence: "Affidabilità Previsionale",
       spread: "Dispersione Termica"
@@ -149,15 +145,6 @@ export const translations = {
         lastQuarter: "Ultimo Quarto",
         waningCrescent: "Luna Calante"
       }
-    },
-    historyPws: {
-      title: "Confronto Storico & Microclima PWS",
-      vsYesterday: "Rispetto a ieri",
-      vsHistorical: "Rispetto alla media trentennale (1991-2020)",
-      warmer: "più caldo",
-      colder: "più freddo",
-      moreHumid: "più umido",
-      pwsNetwork: "Rete Stazioni Meteo Personali (PWS Network)"
     },
     routeWeather: {
       title: "Meteo Percorso di Viaggio",
@@ -244,11 +231,9 @@ export const translations = {
       solarRadiation: "Solar Radiation",
       precipitation: "Precipitation",
       rainProbability: "Rain Probability",
-      airQuality: "Air Quality",
-      pwsStation: "PWS Station"
+      airQuality: "Air Quality"
     },
     minuteCast: {
-      title: "AccuWeather MinuteCast®",
       subtitle: "Minute-by-minute precipitation for the next 120 min",
       noPrecip: "No precipitation expected for at least 120 minutes",
       lightRainSoon: "Light rain expected in",
@@ -279,10 +264,6 @@ export const translations = {
     models: {
       title: "Multi-Model Forecast Comparison",
       subtitle: "Direct side-by-side analysis of global weather supercomputers",
-      ecmwf: "ECMWF IFS (Europe)",
-      gfs: "GFS NOAA (USA)",
-      icon: "ICON DWD (Germany)",
-      meteoblue: "MeteoBlue NEMS (Switzerland)",
       consensus: "Multi-Model Consensus",
       confidence: "Forecast Confidence",
       spread: "Temperature Spread"
@@ -354,15 +335,6 @@ export const translations = {
         lastQuarter: "Last Quarter",
         waningCrescent: "Waning Crescent"
       }
-    },
-    historyPws: {
-      title: "Historical Comparison & Micro-PWS",
-      vsYesterday: "Compared to yesterday",
-      vsHistorical: "Compared to 30-year climatology (1991-2020)",
-      warmer: "warmer",
-      colder: "cooler",
-      moreHumid: "more humid",
-      pwsNetwork: "Personal Weather Stations Network"
     },
     routeWeather: {
       title: "Trip & Route Weather Planner",
@@ -449,11 +421,9 @@ export const translations = {
       solarRadiation: "Radiación Solar",
       precipitation: "Precipitación",
       rainProbability: "Probabilidad de Lluvia",
-      airQuality: "Calidad del Aire",
-      pwsStation: "Estación PWS"
+      airQuality: "Calidad del Aire"
     },
     minuteCast: {
-      title: "AccuWeather MinuteCast®",
       subtitle: "Precipitación minuto a minuto en los próximos 120 min",
       noPrecip: "Sin precipitaciones en las próximas 2 horas",
       lightRainSoon: "Lluvia ligera esperada en",
@@ -484,10 +454,6 @@ export const translations = {
     models: {
       title: "Comparación Multi-Modelo Meteorológico",
       subtitle: "Análisis comparativo de los superordenadores climáticos globales",
-      ecmwf: "ECMWF IFS (Europa)",
-      gfs: "GFS NOAA (EE.UU.)",
-      icon: "ICON DWD (Alemania)",
-      meteoblue: "MeteoBlue NEMS (Suiza)",
       consensus: "Consenso Multi-Modelo",
       confidence: "Confianza del Pronóstico",
       spread: "Dispersión Térmica"
@@ -559,15 +525,6 @@ export const translations = {
         lastQuarter: "Cuarto Menguante",
         waningCrescent: "Luna Menguante"
       }
-    },
-    historyPws: {
-      title: "Comparación Histórica y Microclima PWS",
-      vsYesterday: "En comparación con ayer",
-      vsHistorical: "Comparado con la media de 30 años (1991-2020)",
-      warmer: "más cálido",
-      colder: "más frío",
-      moreHumid: "más húmedo",
-      pwsNetwork: "Red de Estaciones Personales (PWS)"
     },
     routeWeather: {
       title: "Clima para Rutas y Viajes",
@@ -654,11 +611,9 @@ export const translations = {
       solarRadiation: "Rayonnement Solaire",
       precipitation: "Précipitations",
       rainProbability: "Probabilité de Pluie",
-      airQuality: "Qualité de l'Air",
-      pwsStation: "Station PWS"
+      airQuality: "Qualité de l'Air"
     },
     minuteCast: {
-      title: "AccuWeather MinuteCast®",
       subtitle: "Précipitations minute par minute sur 120 min",
       noPrecip: "Aucune précipitation prévue pendant les 2 prochaines heures",
       lightRainSoon: "Pluie légère attendue dans",
@@ -689,10 +644,6 @@ export const translations = {
     models: {
       title: "Comparateur Multi-Modèles Météo",
       subtitle: "Analyse croisée des supercalculateurs mondiaux",
-      ecmwf: "ECMWF IFS (Europe)",
-      gfs: "GFS NOAA (USA)",
-      icon: "ICON DWD (Allemagne)",
-      meteoblue: "MeteoBlue NEMS (Suisse)",
       consensus: "Consensus Multi-Modèles",
       confidence: "Indice de Confiance",
       spread: "Écart de Température"
@@ -764,15 +715,6 @@ export const translations = {
         lastQuarter: "Dernier Quartier",
         waningCrescent: "Dernier Croissant"
       }
-    },
-    historyPws: {
-      title: "Comparaison Historique & Microclimat PWS",
-      vsYesterday: "Par rapport à hier",
-      vsHistorical: "Par rapport à la moyenne trentenaire (1991-2020)",
-      warmer: "plus chaud",
-      colder: "plus frais",
-      moreHumid: "plus humide",
-      pwsNetwork: "Réseau de Stations Météo Privées (PWS)"
     },
     routeWeather: {
       title: "Météo d'Itinéraire & Voyage",
@@ -859,11 +801,9 @@ export const translations = {
       solarRadiation: "Solarstrahlung",
       precipitation: "Niederschlag",
       rainProbability: "Regenwahrscheinlichkeit",
-      airQuality: "Luftqualität",
-      pwsStation: "PWS-Station"
+      airQuality: "Luftqualität"
     },
     minuteCast: {
-      title: "AccuWeather MinuteCast®",
       subtitle: "Minutengenauer Niederschlag für die nächsten 120 Min",
       noPrecip: "Kein Niederschlag in den nächsten 2 Stunden erwartet",
       lightRainSoon: "Leichter Regen erwartet in",
@@ -894,10 +834,6 @@ export const translations = {
     models: {
       title: "Wettermodell-Vergleich",
       subtitle: "Direkter Vergleich globaler meteorologischer Supercomputer",
-      ecmwf: "ECMWF IFS (Europa)",
-      gfs: "GFS NOAA (USA)",
-      icon: "ICON DWD (Deutschland)",
-      meteoblue: "MeteoBlue NEMS (Schweiz)",
       consensus: "Modell-Konsens",
       confidence: "Vorhersage-Sicherheit",
       spread: "Temperatur-Streuung"
@@ -969,15 +905,6 @@ export const translations = {
         lastQuarter: "Letztes Viertel",
         waningCrescent: "Abnehmende Sichel"
       }
-    },
-    historyPws: {
-      title: "Historischer Vergleich & Lokale Wetterstation",
-      vsYesterday: "Im Vergleich zu gestern",
-      vsHistorical: "Im Vergleich zum 30-Jahre-Klimamittel (1991-2020)",
-      warmer: "wärmer",
-      colder: "kühler",
-      moreHumid: "feuchter",
-      pwsNetwork: "Netzwerk privater Wetterstationen (PWS)"
     },
     routeWeather: {
       title: "Routen- & Reisewetter-Planer",
@@ -1064,8 +991,7 @@ export const translations = {
       solarRadiation: "日射量",
       precipitation: "降水量",
       rainProbability: "降水確率",
-      airQuality: "大気質",
-      pwsStation: "PWS気象観測点"
+      airQuality: "大気質"
     },
     minuteCast: {
       title: "MinuteCast® 分単位降水予測",
@@ -1099,10 +1025,6 @@ export const translations = {
     models: {
       title: "グローバル気象モデル比較",
       subtitle: "世界最高峰スーパーコンピューターの予測比較",
-      ecmwf: "ECMWF IFS (欧州)",
-      gfs: "GFS NOAA (米国)",
-      icon: "ICON DWD (ドイツ)",
-      meteoblue: "MeteoBlue NEMS (スイス)",
       consensus: "アンサンブル平均",
       confidence: "予測信頼度",
       spread: "気温予測ブレ幅"
@@ -1174,15 +1096,6 @@ export const translations = {
         lastQuarter: "下弦の月",
         waningCrescent: "有明月"
       }
-    },
-    historyPws: {
-      title: "過去比較＆個人気象ステーション (PWS)",
-      vsYesterday: "前日比",
-      vsHistorical: "平年値比 (1991-2020年基準)",
-      warmer: "高い",
-      colder: "低い",
-      moreHumid: "多湿",
-      pwsNetwork: "PWS観測ネットワーク"
     },
     routeWeather: {
       title: "移動ルート・旅先ウェザー",
@@ -1269,8 +1182,7 @@ export const translations = {
       solarRadiation: "太阳辐射",
       precipitation: "降水量",
       rainProbability: "降水概率",
-      airQuality: "空气质量",
-      pwsStation: "微气象台"
+      airQuality: "空气质量"
     },
     minuteCast: {
       title: "MinuteCast® 分钟级降水雷达",
@@ -1304,10 +1216,6 @@ export const translations = {
     models: {
       title: "多数值天气预报模型对比",
       subtitle: "全球顶尖超级计算机气象模型同台对比",
-      ecmwf: "ECMWF IFS (欧洲)",
-      gfs: "GFS NOAA (美国)",
-      icon: "ICON DWD (德国)",
-      meteoblue: "MeteoBlue NEMS (瑞士)",
       consensus: "多模型综合共识",
       confidence: "预报置信度",
       spread: "温度离散度"
@@ -1379,15 +1287,6 @@ export const translations = {
         lastQuarter: "下弦月",
         waningCrescent: "残月"
       }
-    },
-    historyPws: {
-      title: "历史气候对比与本地微气象站 (PWS)",
-      vsYesterday: "较昨日对比",
-      vsHistorical: "较30年气候常年基准值 (1991-2020)",
-      warmer: "偏暖",
-      colder: "偏冷",
-      moreHumid: "更潮湿",
-      pwsNetwork: "个人气象站物联网网络"
     },
     routeWeather: {
       title: "行程路线气象研判",
@@ -1474,8 +1373,7 @@ export const translations = {
       solarRadiation: "الإشعاع الشمسي",
       precipitation: "الهطول",
       rainProbability: "فرصة هطول المطر",
-      airQuality: "جودة الهواء",
-      pwsStation: "محطة الطقس"
+      airQuality: "جودة الهواء"
     },
     minuteCast: {
       title: "توقعات الدقيقة MinuteCast®",
@@ -1509,10 +1407,6 @@ export const translations = {
     models: {
       title: "مقارنة النماذج المناخية المتعددة",
       subtitle: "تحليل مقارن لأقوى الحواسيب الخارقة العالمية للتنبؤ بالطقس",
-      ecmwf: "ECMWF IFS (أوروبا)",
-      gfs: "GFS NOAA (أمريكا)",
-      icon: "ICON DWD (ألمانيا)",
-      meteoblue: "MeteoBlue NEMS (سويسرا)",
       consensus: "الإجماع المناخي",
       confidence: "نسبة الثقة",
       spread: "تفاوت درجات الحرارة"
@@ -1584,15 +1478,6 @@ export const translations = {
         lastQuarter: "تربيع ثان",
         waningCrescent: "هلال متناقص"
       }
-    },
-    historyPws: {
-      title: "المقارنة التاريخية ومحطة الطقس الدقيقة",
-      vsYesterday: "مقارنة بالأمس",
-      vsHistorical: "مقارنة بالمتوسط المناخي لـ 30 عاماً (1991-2020)",
-      warmer: "أدفأ",
-      colder: "أبرد",
-      moreHumid: "أكثر رطوبة",
-      pwsNetwork: "شبكة محطات الطقس الشخصية"
     },
     routeWeather: {
       title: "طقس مسار الرحلة والسفر",
@@ -1679,11 +1564,9 @@ export const translations = {
       solarRadiation: "Radiação Solar",
       precipitation: "Precipitação",
       rainProbability: "Probabilidade de Chuva",
-      airQuality: "Qualidade do Ar",
-      pwsStation: "Estação PWS"
+      airQuality: "Qualidade do Ar"
     },
     minuteCast: {
-      title: "AccuWeather MinuteCast®",
       subtitle: "Precipitação minuto a minuto nos próximos 120 min",
       noPrecip: "Sem chuvas previstas para as próximas 2 horas",
       lightRainSoon: "Chuva fraca prevista em",
@@ -1714,10 +1597,6 @@ export const translations = {
     models: {
       title: "Comparação de Modelos Meteorológicos",
       subtitle: "Análise comparativa direta dos supercomputadores globais",
-      ecmwf: "ECMWF IFS (Europa)",
-      gfs: "GFS NOAA (EUA)",
-      icon: "ICON DWD (Alemanha)",
-      meteoblue: "MeteoBlue NEMS (Suíça)",
       consensus: "Consenso Multi-Modelo",
       confidence: "Confiabilidade",
       spread: "Dispersão Térmica"
@@ -1789,15 +1668,6 @@ export const translations = {
         lastQuarter: "Quarto Minguante",
         waningCrescent: "Lua Minguante"
       }
-    },
-    historyPws: {
-      title: "Comparação Histórica e Microclima PWS",
-      vsYesterday: "Em relação a ontem",
-      vsHistorical: "Comparado à média climatológica de 30 anos (1991-2020)",
-      warmer: "mais quente",
-      colder: "mais frio",
-      moreHumid: "mais úmido",
-      pwsNetwork: "Rede de Estações Meteorológicas Privadas"
     },
     routeWeather: {
       title: "Clima na Rota de Viagem",
@@ -1884,11 +1754,9 @@ export const translations = {
       solarRadiation: "Солнечная радиация",
       precipitation: "Осадки",
       rainProbability: "Вероятность дождя",
-      airQuality: "Качество воздуха",
-      pwsStation: "Метеостанция PWS"
+      airQuality: "Качество воздуха"
     },
     minuteCast: {
-      title: "AccuWeather MinuteCast®",
       subtitle: "Поминутный прогноз осадков на ближайшие 120 мин",
       noPrecip: "Осадков в ближайшие 2 часа не ожидается",
       lightRainSoon: "Небольшой дождь начнется через",
@@ -1919,10 +1787,6 @@ export const translations = {
     models: {
       title: "Сравнение глобальных моделей погоды",
       subtitle: "Сравнительный анализ ведущих мировых суперкомпьютеров",
-      ecmwf: "ECMWF IFS (Европа)",
-      gfs: "GFS NOAA (США)",
-      icon: "ICON DWD (Германия)",
-      meteoblue: "MeteoBlue NEMS (Швейцария)",
       consensus: "Консенсус моделей",
       confidence: "Надежность прогноза",
       spread: "Разброс температур"
@@ -1995,15 +1859,6 @@ export const translations = {
         waningCrescent: "Старая луна"
       }
     },
-    historyPws: {
-      title: "Сравнение с историей и локальная станция PWS",
-      vsYesterday: "По сравнению со вчера",
-      vsHistorical: "По сравнению с нормой за 30 лет (1991-2020)",
-      warmer: "теплее",
-      colder: "холоднее",
-      moreHumid: "влажнее",
-      pwsNetwork: "Сеть любительских метеостанций"
-    },
     routeWeather: {
       title: "Погода в пути и маршруте",
       subtitle: "Анализ погодных условий на протяжении вашей поездки или полета",
@@ -2050,3 +1905,5 @@ export const translations = {
     }
   }
 };
+
+applyDataStrings(translations);

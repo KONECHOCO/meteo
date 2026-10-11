@@ -1,6 +1,6 @@
 # AETHERIA 3D 🌍⛅
 
-> **Piattaforma meteorologica globale di nuova generazione con globo 3D interattivo, simulatore atmosferico cielo, MinuteCast, confronto supercomputer ECMWF/GFS, qualità dell'aria e bio-meteo.**
+> **Piattaforma meteorologica globale di nuova generazione con globo 3D interattivo, simulatore atmosferico del cielo, pioggia a 15 minuti, confronto reale tra modelli ECMWF/GFS/ICON, qualità dell'aria e bio-meteo.**
 
 [![Vite](https://img.shields.io/badge/Vite-8.3-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
 [![Three.js](https://img.shields.io/badge/Three.js-0.186-black?logo=threedotjs&logoColor=white)](https://threejs.org/)
@@ -33,7 +33,7 @@ Switch istantaneo senza ricaricamento pagina tra:
   - Shader atmosferico con scattering di **Rayleigh** (bagliore celeste/ambra).
   - Ciclo giorno/notte dinamico con mappe delle luci notturne delle città.
   - Nuvole volumetriche 3D rotanti.
-  - Layer selezionabili: **Satellite**, **Heatmap** termica, **Jet Stream** (corrente a getto) e **Radar**.
+  - *(In arrivo: texture NASA Blue Marble, radar e satellite reali — i vecchi layer simulati sono stati rimossi.)*
   - Transizioni di volo camera (*Fly-To*) morbide con puntatore radar pulsante sulla città selezionata.
 - **Simulatore Cielo & Atmosfera 3D**:
   - Volta celeste con scattering solare e skyline montuoso all'orizzonte.
@@ -41,22 +41,14 @@ Switch istantaneo senza ricaricamento pagina tra:
   - Slider orario 24h interattivo (dall'alba al tramonto Golden Hour fino alla notte stellata).
   - Sistemi particellari dinamici per **pioggia** (con angolo del vento e riflessi sull'asfalto), **neve**, **nebbia** e **lampi temporaleschi**.
 
-### 4. 🏆 Integrazione Funzioni Top-Tier Weather App
-- **AccuWeather MinuteCast®**: Precipitazioni minuto per minuto sui 120 minuti con barre di intensità e stima inizio/cessazione.
-- **RealFeel® & RealFeel Shade**: Temperatura percepita al sole e all'ombra.
-- **Windy & Ventusky Streamlines**: Flussi vettoriali del vento animati, nodi, scala Beaufort e moto ondoso marino.
-- **Confronto Multi-Modello Supercomputer**: Analisi comparativa tra **ECMWF IFS (Europa)**, **GFS NOAA (USA)**, **ICON DWD (Germania)** e **MeteoBlue NEMS (Svizzera)** con indice di consenso e dispersione termica.
-- **Yr.no Meteogramma HD**: Curve continue di temperatura, punto di rugiada, pressione e precipitazioni.
-- **Weather Underground PWS**: Rete stazioni meteo personali, altitudine e confronto climatico con la media trentennale.
-
-### 5. 💡 Bio-Meteo & Bisogni Reali degli Utenti
-- **"Cosa mi metto oggi?" (Smart AI Outfit Advisor)**: Consigli su abbigliamento, accessori e protezione termica/pioggia.
-- **Allarme Emicrania Barometrica**: Monitoraggio rapido del calo di pressione ($\Delta P > 3\text{ hPa}/3\text{h}$) per soggetti meteopatici.
-- **Tempo Massimo Sicuro al Sole**: Calcolato per fototipo cutaneo di Fitzpatrick (I–V) e indice UV attuale.
-- **Monitoraggio Pollini & Allergeni**: Graminacee, Betulla, Ambrosia e Olivo.
-- **Lifestyle Scores (0–100%)**: Stendere il bucato, Running/Sport, Lavaggio auto, Fotografia Golden Hour, Astronomia, Barbecue.
-- **Meteo Percorso / Viaggio**: Analisi delle condizioni climatiche lungo l'itinerario tra partenza, tappe e arrivo.
-- **Audio Atmosferico 3D**: Sintesi procedurale tramite Web Audio API per suoni di pioggia, vento e tuoni.
+### 4. 📡 Dati Meteo Reali (nessun valore simulato)
+- **Pioggia nelle prossime 2 ore**: previsione a intervalli di 15 minuti (Open-Meteo `minutely_15`).
+- **Confronto tra modelli reali**: ECMWF IFS, NOAA GFS, DWD ICON, Météo-France, UK Met Office, con media e grado di accordo.
+- **Meteogramma 24 ore**: temperatura, punto di rugiada, pressione e pioggia.
+- **Pollini reali** (Europa, dati CAMS): ontano, betulla, graminacee, artemisia, olivo, ambrosia.
+- **Vento & Mare**: scala Beaufort, altezza/periodo onde e temperatura del mare (Open-Meteo Marine).
+- **Meteo sul percorso**: condizioni attuali in 5 punti tra partenza e arrivo.
+- **Confronto con ieri** alla stessa ora e **cache offline** con indicazione dell'ultimo aggiornamento.
 
 ---
 
@@ -82,4 +74,10 @@ npm run build
 - **Icons**: [Lucide](https://lucide.dev/).
 - **CSS Styling**: Vanilla CSS con architettura Dark Glassmorphism, CSS Custom Properties e animazioni responsive.
 - **Audio**: Web Audio API (procedural synthesis).
-- **APIs**: [Open-Meteo](https://open-meteo.com/) (Forecast, Air Quality, Geocoding).
+- **APIs**: [Open-Meteo](https://open-meteo.com/) (Forecast, Multi-Model, Air Quality/Pollen, Marine, Geocoding). Dati CC BY 4.0, località GeoNames.
+
+## 🔑 Chiave API (obbligatoria in produzione)
+
+L'API gratuita di Open-Meteo è solo per uso **non commerciale**. Con pubblicità e versione Pro serve un
+[piano commerciale](https://open-meteo.com/en/pricing): copia `.env.example` in `.env.production` e imposta
+`VITE_OPEN_METEO_API_KEY`. Con la chiave l'app usa automaticamente gli endpoint `customer-*.open-meteo.com`.
