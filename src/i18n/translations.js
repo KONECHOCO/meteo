@@ -1,6 +1,4 @@
-// Multilingual Dictionary for AetherSphere 3D Weather
-import { applyDataStrings } from "./dataStrings.js";
-
+// UI strings for the 10 app languages. Every key here is read by src/main.js.
 export const translations = {
   it: {
     appName: "AETHERIA 3D",
@@ -10,25 +8,19 @@ export const translations = {
       globe: "Globo 3D",
       sky: "Simulatore Cielo 3D",
       dashboard: "Dashboard Dettagliata",
-      radar: "Radar & Vento Live",
+      radar: "Vento & Mare",
       route: "Meteo Percorso / Viaggio"
     },
     geo: {
       country: "Paese",
       region: "Regione / Stato",
       city: "Città / Località",
-      allCountries: "Tutti i Paesi",
-      selectCountry: "Seleziona Paese...",
-      selectRegion: "Seleziona Regione...",
-      selectCity: "Seleziona Città...",
       currentLocation: "Posizione Corrente (GPS)",
-      favorites: "Città Preferite",
       elevation: "Altitudine",
-      coordinates: "Coordinate"
+      otherPlaces: "Altre località"
     },
     current: {
       feelsLike: "Percepita",
-      feelsLikeShade: "Percepita all'Ombra",
       highLow: "Max / Min",
       humidity: "Umidità",
       dewPoint: "Punto di Rugiada",
@@ -37,27 +29,19 @@ export const translations = {
       windGusts: "Raffiche fino a",
       visibility: "Visibilità",
       uvIndex: "Indice UV",
-      cloudCover: "Copertura Nuvolosa",
-      solarRadiation: "Radiazione Solare",
-      precipitation: "Precipitazioni",
-      rainProbability: "Probabilità Pioggia",
-      airQuality: "Qualità dell'Aria"
+      cloudCover: "Copertura Nuvolosa"
     },
     minuteCast: {
-      subtitle: "Precipitazioni minuto per minuto nei prossimi 120 min",
+      subtitle: "Previsione a intervalli di 15 minuti",
       noPrecip: "Nessuna precipitazione prevista nelle prossime 2 ore",
       lightRainSoon: "Pioggia leggera prevista tra",
       moderateRain: "Pioggia moderata in arrivo tra",
       heavyRain: "Rovesci intensi attesi tra",
       endingSoon: "Precipitazioni in attenuazione entro",
       minutes: "minuti",
-      intensity: {
-        none: "Asciutto",
-        light: "Leggera",
-        moderate: "Moderata",
-        heavy: "Forte",
-        extreme: "Nubifragio"
-      }
+      title: "Pioggia nelle prossime 2 ore",
+      continuing: "Precipitazioni per almeno 2 ore",
+      unavailable: "Previsione a breve termine non disponibile per questa località"
     },
     hourly: {
       title: "Previsioni Orarie Dettagliate (48 Ore)",
@@ -67,39 +51,54 @@ export const translations = {
     daily: {
       title: "Previsioni a 14 Giorni",
       today: "Oggi",
-      tomorrow: "Domani",
-      rainAmount: "Accumulo pioggia",
-      windMax: "Vento max"
+      tomorrow: "Domani"
     },
     models: {
-      title: "Confronto Multi-Modello Meteorologico",
-      subtitle: "Analisi comparativa dei supercomputer meteorologici globali",
-      consensus: "Consenso Multi-Modello",
+      title: "Confronto tra modelli meteo",
+      subtitle: "Previsione di oggi secondo i principali centri meteorologici",
+      consensus: "Media dei modelli",
       confidence: "Affidabilità Previsionale",
-      spread: "Dispersione Termica"
+      spread: "Differenza tra modelli",
+      agreement: "Accordo tra modelli",
+      agreementHigh: "Alto",
+      agreementMedium: "Medio",
+      agreementLow: "Basso",
+      colModel: "Modello",
+      colResolution: "Risoluzione",
+      colMaxMin: "Max / Min",
+      colRain: "Pioggia",
+      colWind: "Vento max"
     },
     biometeo: {
-      title: "Bio-Meteo, Salute & Benessere",
-      headacheAlert: "Allarme Emicrania Barometrica",
+      title: "Salute e benessere",
+      headacheAlert: "Sensibilità barometrica",
       headacheLow: "Rischio Basso - Pressione stabile",
       headacheModerate: "Rischio Moderato - Calo pressorio in corso",
-      headacheHigh: "Allerta Elevata - Rapida variazione barometrica (>3 hPa/3h)",
-      skinType: "Fototipo Cutaneo (Fitzpatrick)",
-      maxSunExposure: "Tempo massimo sicuro al sole",
+      headacheHigh: "Variazione rapida di pressione (>3 hPa in 3 ore)",
+      maxSunExposure: "Tempo indicativo prima di scottarsi",
       sunMinutes: "minuti",
-      arthritisIndex: "Indice Reumatico / Articolare",
-      thermalStress: "Stress Termico Corporeo",
-      pollenTitle: "Monitor Pollini & Allergeni",
-      pollenGraminacee: "Graminacee",
-      pollenBetulla: "Betulla / Nocciolo",
-      pollenAmbrosia: "Ambrosia",
-      pollenOlivo: "Olivo / Frassino",
-      pollenLow: "Basso",
-      pollenMedium: "Moderato",
-      pollenHigh: "Molto Alto"
+      pollenTitle: "Pollini (granuli/m³)",
+      subtitle: "Variazione di pressione, esposizione al sole e pollini",
+      skinTypeIII: "Pelle chiara-media (fototipo III)",
+      noUv: "UV assente: nessun rischio di scottature",
+      pollenNames: {
+        alder: "Ontano",
+        birch: "Betulla",
+        grass: "Graminacee",
+        mugwort: "Artemisia",
+        olive: "Olivo",
+        ragweed: "Ambrosia"
+      },
+      pollenLevels: {
+        low: "Basso",
+        medium: "Moderato",
+        high: "Alto",
+        veryHigh: "Molto alto"
+      },
+      pollenUnavailable: "Dati sui pollini disponibili solo per l'Europa"
     },
     aqi: {
-      title: "Analisi Avanzata Qualità dell'Aria (AQI)",
+      title: "Qualità dell'aria",
       good: "Ottima",
       fair: "Buona",
       moderate: "Moderata",
@@ -107,34 +106,45 @@ export const translations = {
       veryPoor: "Molto Scadente",
       hazardous: "Pericolosa",
       healthAdvice: "Consiglio Salute",
-      advisoryGood: "Aria limpida e salubre. Ideale per tutte le attività outdoor.",
-      advisoryModerate: "Soggetti asmatici o sensibili dovrebbero ridurre sforzi prolungati all'aperto.",
-      advisoryPoor: "Evitare attività sportive intense all'aperto nelle ore di punta."
+      noData: "Dati sulla qualità dell'aria non disponibili",
+      pollutants: {
+        o3: "Ozono (O₃)",
+        no2: "Biossido di azoto (NO₂)",
+        so2: "Biossido di zolfo (SO₂)",
+        co: "Monossido di carbonio (CO)"
+      },
+      advice: {
+        good: "Aria pulita: ideale per tutte le attività all'aperto.",
+        fair: "Qualità buona: nessuna precauzione particolare.",
+        moderate: "Le persone sensibili dovrebbero limitare gli sforzi prolungati all'aperto.",
+        poor: "Evita attività sportive intense all'aperto.",
+        veryPoor: "Limita il tempo all'aperto, soprattutto bambini, anziani e asmatici.",
+        hazardous: "Resta al chiuso il più possibile e tieni le finestre chiuse."
+      }
     },
     lifestyle: {
-      title: "Pianificatore Attività & Smart Outfit",
-      outfitTitle: "Cosa mi Metto Oggi? (AI Advisor)",
+      title: "Attività e abbigliamento",
+      outfitTitle: "Cosa mi metto oggi?",
       laundry: "Stendere Bucato",
       running: "Running & Sport",
       carWash: "Lavaggio Auto",
-      photography: "Fotografia & Golden Hour",
       stargazing: "Astronomia & Cielo Notturno",
       bbq: "Barbecue & Picnic",
-      gardening: "Irrigazione Giardino",
-      scoreExcellent: "Perfetto",
-      scoreGood: "Favorevole",
-      scoreModerate: "Accettabile",
-      scorePoor: "Sconsigliato"
+      outfit: {
+        umbrellaNeeded: "Porta l'ombrello o un impermeabile",
+        heavyCoat: "Cappotto pesante, sciarpa e guanti",
+        jacketSweater: "Giacca di mezza stagione e maglione",
+        lightLayers: "Strati leggeri: camicia o felpa",
+        summerClothes: "Abiti estivi leggeri e traspiranti",
+        windbreaker: "Giacca antivento",
+        sunglassesUv: "Occhiali da sole e crema solare"
+      }
     },
     sunMoon: {
-      title: "Ciclo Solare & Lunare",
       sunrise: "Alba",
       sunset: "Tramonto",
       daylight: "Ore di Luce",
-      solarNoon: "Mezzogiorno Solare",
-      goldenHour: "Golden Hour",
       moonPhase: "Fase Lunare",
-      illumination: "Illuminazione",
       moonPhases: {
         new: "Luna Nuova",
         waxingCrescent: "Luna Crescente",
@@ -149,26 +159,28 @@ export const translations = {
     routeWeather: {
       title: "Meteo Percorso di Viaggio",
       subtitle: "Visualizza le condizioni meteorologiche lungo il tuo itinerario di guida o volo",
-      origin: "Città di Partenza",
-      destination: "Città di Destinazione",
       calcRoute: "Calcola Meteo Itinerario",
       checkPoints: "Tappe Intermedie",
       routeAdvice: "Consiglio di Viaggio"
     },
     audio: {
       ambientSounds: "Audio Atmosferico 3D",
-      rainSound: "Pioggia",
-      windSound: "Vento",
-      thunderSound: "Tuono",
-      mute: "Disattiva Audio",
-      unmute: "Attiva Audio Realistico"
+      rainSound: "Pioggia"
     },
     alerts: {
-      severeWeather: "Allerte Meteo Ufficiali",
-      noAlerts: "Nessun avviso meteorologico grave in corso",
-      yellowWarning: "Avviso Giallo - Fenomeni localmente intensi",
-      orangeWarning: "Allerta Arancione - Rischio idrogeologico o temporali violenti",
-      redWarning: "Allerta Rossa - Eventi estremi, prestare massima cautela"
+      yellowWarning: "Attenzione: fenomeni localmente intensi",
+      orangeWarning: "Fenomeni intensi previsti",
+      redWarning: "Fenomeni estremi previsti",
+      notOfficial: "Avviso calcolato dalla previsione delle prossime 24 ore, non è un'allerta ufficiale. Consulta il servizio meteo nazionale.",
+      reasons: {
+        thunder: "temporali",
+        gusts: "raffiche forti",
+        heavyRain: "piogge abbondanti",
+        heavySnow: "nevicate intense",
+        fog: "nebbia"
+      },
+      maxGust: "Raffica max",
+      totalRain: "Pioggia 24 h"
     },
     conditions: {
       clearSky: "Cielo Sereno",
@@ -189,9 +201,68 @@ export const translations = {
       thunderstorm: "Temporale con Fulmini",
       thunderstormHail: "Temporale con Grandine",
       windy: "Vento Forte"
+    },
+    status: {
+      updatedAt: "Aggiornato alle",
+      offlineCached: "Connessione assente: stai vedendo i dati dell'ultimo aggiornamento.",
+      loadError: "Impossibile caricare il meteo. Controlla la connessione.",
+      retry: "Riprova",
+      loading: "Caricamento del meteo…",
+      slowLoading: "Prima volta per questa zona: il caricamento può richiedere fino a 30 secondi.",
+      myLocation: "La mia posizione",
+      gpsUnsupported: "La geolocalizzazione non è supportata da questo dispositivo.",
+      gpsError: "Impossibile rilevare la posizione. Cerca una città manualmente.",
+      dataSource: "Dati meteo: Open-Meteo.com (CC BY 4.0) · Città: GeoNames"
+    },
+    comparison: {
+      vsYesterday: "Rispetto a ieri alla stessa ora",
+      warmer: "più caldo",
+      colder: "più freddo",
+      same: "come ieri"
+    },
+    meteogram: {
+      title: "Meteogramma 24 ore",
+      subtitle: "Temperatura, punto di rugiada, pressione e pioggia"
+    },
+    windSea: {
+      title: "Vento e mare",
+      currentWind: "Vento attuale",
+      direction: "Direzione",
+      beaufort: "Scala Beaufort",
+      force: "Forza",
+      waveHeight: "Altezza onde",
+      wavePeriod: "Periodo onde",
+      seaTemp: "Temperatura del mare",
+      noMarine: "Nessun dato marino: località lontana dal mare.",
+      animationNote: "Animazione basata su velocità e direzione del vento attuali in questa località."
+    },
+    route: {
+      originPlaceholder: "Città di partenza",
+      destPlaceholder: "Città di arrivo",
+      start: "Partenza",
+      end: "Arrivo",
+      waypoint: "Punto intermedio",
+      calculating: "Calcolo in corso…",
+      notFound: "Località non trovata:",
+      error: "Impossibile calcolare il meteo del percorso.",
+      straightLineNote: "Condizioni attuali in 5 punti lungo la linea diretta tra le due città (non il percorso stradale).",
+      visibility: "Visibilità",
+      advice: {
+        good: "Nessun fenomeno significativo lungo il tragitto.",
+        rain: "Pioggia in alcuni tratti: riduci la velocità e aumenta la distanza di sicurezza.",
+        snow: "Neve lungo il tragitto: verifica gli obblighi di catene o pneumatici invernali.",
+        storm: "Temporali lungo il tragitto: valuta di rimandare la partenza.",
+        wind: "Raffiche forti: attenzione con veicoli alti e sui viadotti.",
+        fog: "Visibilità ridotta per nebbia in alcuni tratti."
+      }
+    },
+    info: {
+      globeTitle: "Globo 3D",
+      globeText: "Trascina per ruotare il globo e usa la rotella o i pulsanti + e − per lo zoom. Il segnaposto indica la località selezionata.",
+      skyTitle: "Simulatore del cielo",
+      skyText: "Usa il cursore per vedere il cielo nelle diverse ore del giorno, con le condizioni meteo attuali della località."
     }
   },
-
   en: {
     appName: "AETHERIA 3D",
     tagline: "Ultra-Detailed Weather Forecasts & Photorealistic 3D Globe",
@@ -200,25 +271,19 @@ export const translations = {
       globe: "3D Globe",
       sky: "3D Sky Simulator",
       dashboard: "Detailed Dashboard",
-      radar: "Live Radar & Wind",
+      radar: "Wind & Sea",
       route: "Trip & Route Weather"
     },
     geo: {
       country: "Country",
       region: "Region / State",
       city: "City / District",
-      allCountries: "All Countries",
-      selectCountry: "Select Country...",
-      selectRegion: "Select Region...",
-      selectCity: "Select City...",
       currentLocation: "Current Location (GPS)",
-      favorites: "Favorite Cities",
       elevation: "Elevation",
-      coordinates: "Coordinates"
+      otherPlaces: "Other places"
     },
     current: {
       feelsLike: "Feels Like",
-      feelsLikeShade: "Feels Like (Shade)",
       highLow: "High / Low",
       humidity: "Humidity",
       dewPoint: "Dew Point",
@@ -227,27 +292,19 @@ export const translations = {
       windGusts: "Gusts up to",
       visibility: "Visibility",
       uvIndex: "UV Index",
-      cloudCover: "Cloud Cover",
-      solarRadiation: "Solar Radiation",
-      precipitation: "Precipitation",
-      rainProbability: "Rain Probability",
-      airQuality: "Air Quality"
+      cloudCover: "Cloud Cover"
     },
     minuteCast: {
-      subtitle: "Minute-by-minute precipitation for the next 120 min",
+      subtitle: "Forecast in 15-minute steps",
       noPrecip: "No precipitation expected for at least 120 minutes",
       lightRainSoon: "Light rain expected in",
       moderateRain: "Moderate rain arriving in",
       heavyRain: "Heavy downpour expected in",
       endingSoon: "Precipitation easing off in",
       minutes: "minutes",
-      intensity: {
-        none: "Dry",
-        light: "Light",
-        moderate: "Moderate",
-        heavy: "Heavy",
-        extreme: "Torrential"
-      }
+      title: "Rain in the next 2 hours",
+      continuing: "Precipitation for at least 2 hours",
+      unavailable: "Short-term forecast not available for this location"
     },
     hourly: {
       title: "Detailed Hourly Forecast (48 Hours)",
@@ -257,39 +314,54 @@ export const translations = {
     daily: {
       title: "14-Day Extended Forecast",
       today: "Today",
-      tomorrow: "Tomorrow",
-      rainAmount: "Rain Accumulation",
-      windMax: "Max Wind"
+      tomorrow: "Tomorrow"
     },
     models: {
-      title: "Multi-Model Forecast Comparison",
-      subtitle: "Direct side-by-side analysis of global weather supercomputers",
-      consensus: "Multi-Model Consensus",
+      title: "Weather model comparison",
+      subtitle: "Today's forecast from the main weather centres",
+      consensus: "Model average",
       confidence: "Forecast Confidence",
-      spread: "Temperature Spread"
+      spread: "Model spread",
+      agreement: "Model agreement",
+      agreementHigh: "High",
+      agreementMedium: "Medium",
+      agreementLow: "Low",
+      colModel: "Model",
+      colResolution: "Resolution",
+      colMaxMin: "High / Low",
+      colRain: "Rain",
+      colWind: "Max wind"
     },
     biometeo: {
-      title: "Biometeorology, Health & Wellness",
-      headacheAlert: "Barometric Migraine Alert",
+      title: "Health & wellbeing",
+      headacheAlert: "Barometric sensitivity",
       headacheLow: "Low Risk - Pressure is stable",
       headacheModerate: "Moderate Risk - Pressure dropping",
-      headacheHigh: "High Alert - Rapid barometric plunge (>3 hPa/3h)",
-      skinType: "Skin Phototype (Fitzpatrick)",
-      maxSunExposure: "Safe Sun Exposure Time",
+      headacheHigh: "Rapid pressure change (>3 hPa in 3 hours)",
+      maxSunExposure: "Approximate time to sunburn",
       sunMinutes: "minutes",
-      arthritisIndex: "Arthritis & Joint Discomfort",
-      thermalStress: "Body Thermal Stress",
-      pollenTitle: "Pollen & Allergens Tracker",
-      pollenGraminacee: "Grass Pollen",
-      pollenBetulla: "Birch / Alder",
-      pollenAmbrosia: "Ragweed",
-      pollenOlivo: "Olive / Ash",
-      pollenLow: "Low",
-      pollenMedium: "Moderate",
-      pollenHigh: "Very High"
+      pollenTitle: "Pollen (grains/m³)",
+      subtitle: "Pressure changes, sun exposure and pollen",
+      skinTypeIII: "Light-medium skin (type III)",
+      noUv: "No UV: no sunburn risk",
+      pollenNames: {
+        alder: "Alder",
+        birch: "Birch",
+        grass: "Grass",
+        mugwort: "Mugwort",
+        olive: "Olive",
+        ragweed: "Ragweed"
+      },
+      pollenLevels: {
+        low: "Low",
+        medium: "Moderate",
+        high: "High",
+        veryHigh: "Very high"
+      },
+      pollenUnavailable: "Pollen data is only available for Europe"
     },
     aqi: {
-      title: "Advanced Air Quality Index (AQI)",
+      title: "Air quality",
       good: "Excellent",
       fair: "Fair",
       moderate: "Moderate",
@@ -297,34 +369,45 @@ export const translations = {
       veryPoor: "Very Poor",
       hazardous: "Hazardous",
       healthAdvice: "Health Advice",
-      advisoryGood: "Clean air. Ideal for outdoor workouts and activities.",
-      advisoryModerate: "Sensitive individuals should limit prolonged heavy outdoor exertion.",
-      advisoryPoor: "Avoid strenuous outdoor cardio during peak smog hours."
+      noData: "Air quality data not available",
+      pollutants: {
+        o3: "Ozone (O₃)",
+        no2: "Nitrogen dioxide (NO₂)",
+        so2: "Sulphur dioxide (SO₂)",
+        co: "Carbon monoxide (CO)"
+      },
+      advice: {
+        good: "Clean air: ideal for all outdoor activities.",
+        fair: "Good air quality: no special precautions.",
+        moderate: "Sensitive people should limit prolonged outdoor exertion.",
+        poor: "Avoid intense outdoor exercise.",
+        veryPoor: "Limit time outdoors, especially children, the elderly and people with asthma.",
+        hazardous: "Stay indoors as much as possible and keep windows closed."
+      }
     },
     lifestyle: {
-      title: "Lifestyle Planner & Smart AI Outfit",
-      outfitTitle: "What to Wear Today (AI Advisor)",
+      title: "Activities & clothing",
+      outfitTitle: "What should I wear today?",
       laundry: "Outdoor Laundry Drying",
       running: "Running & Outdoor Sports",
       carWash: "Car Washing",
-      photography: "Photography & Golden Hour",
       stargazing: "Astronomy & Stargazing",
       bbq: "Barbecue & Picnic",
-      gardening: "Lawn & Garden Watering",
-      scoreExcellent: "Excellent",
-      scoreGood: "Favorable",
-      scoreModerate: "Acceptable",
-      scorePoor: "Unfavorable"
+      outfit: {
+        umbrellaNeeded: "Take an umbrella or a raincoat",
+        heavyCoat: "Heavy coat, scarf and gloves",
+        jacketSweater: "Light jacket and a sweater",
+        lightLayers: "Light layers: shirt or hoodie",
+        summerClothes: "Light, breathable summer clothes",
+        windbreaker: "Windproof jacket",
+        sunglassesUv: "Sunglasses and sunscreen"
+      }
     },
     sunMoon: {
-      title: "Sun & Moon Ephemeris",
       sunrise: "Sunrise",
       sunset: "Sunset",
       daylight: "Daylight Hours",
-      solarNoon: "Solar Noon",
-      goldenHour: "Golden Hour",
       moonPhase: "Moon Phase",
-      illumination: "Illumination",
       moonPhases: {
         new: "New Moon",
         waxingCrescent: "Waxing Crescent",
@@ -339,26 +422,28 @@ export const translations = {
     routeWeather: {
       title: "Trip & Route Weather Planner",
       subtitle: "Inspect meteorological conditions along your driving or flight itinerary",
-      origin: "Origin City",
-      destination: "Destination City",
       calcRoute: "Analyze Route Weather",
       checkPoints: "Waypoints",
       routeAdvice: "Travel Recommendation"
     },
     audio: {
       ambientSounds: "3D Ambient Soundscape",
-      rainSound: "Rainfall",
-      windSound: "Wind Breeze",
-      thunderSound: "Thunder",
-      mute: "Mute Audio",
-      unmute: "Unmute Atmospheric Audio"
+      rainSound: "Rainfall"
     },
     alerts: {
-      severeWeather: "Official Weather Warnings",
-      noAlerts: "No active severe meteorological warnings",
-      yellowWarning: "Yellow Advisory - Locally intense phenomena",
-      orangeWarning: "Orange Warning - Severe thunderstorms or flooding risk",
-      redWarning: "Red Alert - Extreme events, take immediate precautions"
+      yellowWarning: "Caution: locally intense weather",
+      orangeWarning: "Severe weather expected",
+      redWarning: "Extreme weather expected",
+      notOfficial: "Notice computed from the next 24 hours of forecast, not an official warning. Check your national weather service.",
+      reasons: {
+        thunder: "thunderstorms",
+        gusts: "strong gusts",
+        heavyRain: "heavy rain",
+        heavySnow: "heavy snow",
+        fog: "fog"
+      },
+      maxGust: "Max gust",
+      totalRain: "24 h rain"
     },
     conditions: {
       clearSky: "Clear Sky",
@@ -379,9 +464,68 @@ export const translations = {
       thunderstorm: "Thunderstorm with Lightning",
       thunderstormHail: "Severe Thunderstorm with Hail",
       windy: "Strong Winds"
+    },
+    status: {
+      updatedAt: "Updated at",
+      offlineCached: "No connection: showing data from the last update.",
+      loadError: "Could not load the weather. Check your connection.",
+      retry: "Retry",
+      loading: "Loading weather…",
+      slowLoading: "First time for this area: loading can take up to 30 seconds.",
+      myLocation: "My location",
+      gpsUnsupported: "Geolocation is not supported on this device.",
+      gpsError: "Could not get your location. Search for a city instead.",
+      dataSource: "Weather data: Open-Meteo.com (CC BY 4.0) · Places: GeoNames"
+    },
+    comparison: {
+      vsYesterday: "Compared with yesterday at this time",
+      warmer: "warmer",
+      colder: "colder",
+      same: "same as yesterday"
+    },
+    meteogram: {
+      title: "24-hour meteogram",
+      subtitle: "Temperature, dew point, pressure and rain"
+    },
+    windSea: {
+      title: "Wind & sea",
+      currentWind: "Current wind",
+      direction: "Direction",
+      beaufort: "Beaufort scale",
+      force: "Force",
+      waveHeight: "Wave height",
+      wavePeriod: "Wave period",
+      seaTemp: "Sea temperature",
+      noMarine: "No marine data: this location is far from the sea.",
+      animationNote: "Animation based on the current wind speed and direction at this location."
+    },
+    route: {
+      originPlaceholder: "Departure city",
+      destPlaceholder: "Destination city",
+      start: "Departure",
+      end: "Arrival",
+      waypoint: "Waypoint",
+      calculating: "Calculating…",
+      notFound: "Place not found:",
+      error: "Could not calculate the route weather.",
+      straightLineNote: "Current conditions at 5 points along the straight line between the two cities (not the road route).",
+      visibility: "Visibility",
+      advice: {
+        good: "No significant weather along the way.",
+        rain: "Rain on some stretches: slow down and keep a safe distance.",
+        snow: "Snow along the way: check chain or winter tyre requirements.",
+        storm: "Thunderstorms along the way: consider delaying your trip.",
+        wind: "Strong gusts: take care with high-sided vehicles and on bridges.",
+        fog: "Reduced visibility due to fog on some stretches."
+      }
+    },
+    info: {
+      globeTitle: "3D globe",
+      globeText: "Drag to rotate the globe and use the mouse wheel or the + and − buttons to zoom. The pin marks the selected location.",
+      skyTitle: "Sky simulator",
+      skyText: "Use the slider to see the sky at different times of day, with the current weather at this location."
     }
   },
-
   es: {
     appName: "AETHERIA 3D",
     tagline: "Pronóstico Meteorológico Ultra Detallado y Globo 3D Fotorrealista",
@@ -390,25 +534,19 @@ export const translations = {
       globe: "Globo 3D",
       sky: "Simulador de Cielo 3D",
       dashboard: "Panel Detallado",
-      radar: "Radar y Viento en Vivo",
+      radar: "Viento y mar",
       route: "Clima de Ruta / Viaje"
     },
     geo: {
       country: "País",
       region: "Región / Estado",
       city: "Ciudad / Localidad",
-      allCountries: "Todos los Países",
-      selectCountry: "Seleccionar País...",
-      selectRegion: "Seleccionar Región...",
-      selectCity: "Seleccionar Ciudad...",
       currentLocation: "Ubicación Actual (GPS)",
-      favorites: "Ciudades Favoritas",
       elevation: "Altitud",
-      coordinates: "Coordenadas"
+      otherPlaces: "Otros lugares"
     },
     current: {
       feelsLike: "Sensación Térmica",
-      feelsLikeShade: "Sensación a la Sombra",
       highLow: "Máx / Mín",
       humidity: "Humedad",
       dewPoint: "Punto de Rocío",
@@ -417,27 +555,19 @@ export const translations = {
       windGusts: "Ráfagas hasta",
       visibility: "Visibilidad",
       uvIndex: "Índice UV",
-      cloudCover: "Nubosidad",
-      solarRadiation: "Radiación Solar",
-      precipitation: "Precipitación",
-      rainProbability: "Probabilidad de Lluvia",
-      airQuality: "Calidad del Aire"
+      cloudCover: "Nubosidad"
     },
     minuteCast: {
-      subtitle: "Precipitación minuto a minuto en los próximos 120 min",
+      subtitle: "Previsión en intervalos de 15 minutos",
       noPrecip: "Sin precipitaciones en las próximas 2 horas",
       lightRainSoon: "Lluvia ligera esperada en",
       moderateRain: "Lluvia moderada en camino en",
       heavyRain: "Chubascos fuertes previstos en",
       endingSoon: "Precipitaciones cesando en",
       minutes: "minutos",
-      intensity: {
-        none: "Seco",
-        light: "Ligera",
-        moderate: "Moderada",
-        heavy: "Fuerte",
-        extreme: "Torrencial"
-      }
+      title: "Lluvia en las próximas 2 horas",
+      continuing: "Precipitación durante al menos 2 horas",
+      unavailable: "Previsión a corto plazo no disponible para esta ubicación"
     },
     hourly: {
       title: "Pronóstico Horario Detallado (48 Horas)",
@@ -447,39 +577,54 @@ export const translations = {
     daily: {
       title: "Pronóstico a 14 Días",
       today: "Hoy",
-      tomorrow: "Mañana",
-      rainAmount: "Acumulación de lluvia",
-      windMax: "Viento máx"
+      tomorrow: "Mañana"
     },
     models: {
-      title: "Comparación Multi-Modelo Meteorológico",
-      subtitle: "Análisis comparativo de los superordenadores climáticos globales",
-      consensus: "Consenso Multi-Modelo",
+      title: "Comparación de modelos meteorológicos",
+      subtitle: "Previsión de hoy según los principales centros meteorológicos",
+      consensus: "Media de los modelos",
       confidence: "Confianza del Pronóstico",
-      spread: "Dispersión Térmica"
+      spread: "Diferencia entre modelos",
+      agreement: "Acuerdo entre modelos",
+      agreementHigh: "Alto",
+      agreementMedium: "Medio",
+      agreementLow: "Bajo",
+      colModel: "Modelo",
+      colResolution: "Resolución",
+      colMaxMin: "Máx / Mín",
+      colRain: "Lluvia",
+      colWind: "Viento máx"
     },
     biometeo: {
-      title: "Bio-Meteorología, Salud y Bienestar",
-      headacheAlert: "Alerta de Migraña Barométrica",
+      title: "Salud y bienestar",
+      headacheAlert: "Sensibilidad barométrica",
       headacheLow: "Riesgo Bajo - Presión estable",
       headacheModerate: "Riesgo Moderado - Descenso de presión",
-      headacheHigh: "Alerta Alta - Caída barométrica rápida (>3 hPa/3h)",
-      skinType: "Fototipo Cutáneo (Fitzpatrick)",
-      maxSunExposure: "Tiempo máximo seguro bajo el sol",
+      headacheHigh: "Cambio rápido de presión (>3 hPa en 3 horas)",
+      maxSunExposure: "Tiempo aproximado hasta quemarse",
       sunMinutes: "minutos",
-      arthritisIndex: "Índice Reumático / Articulaciones",
-      thermalStress: "Estrés Térmico Corporal",
-      pollenTitle: "Monitor de Polen y Alérgenos",
-      pollenGraminacee: "Gramíneas",
-      pollenBetulla: "Abedul",
-      pollenAmbrosia: "Ambrosía",
-      pollenOlivo: "Olivo",
-      pollenLow: "Bajo",
-      pollenMedium: "Moderado",
-      pollenHigh: "Muy Alto"
+      pollenTitle: "Polen (granos/m³)",
+      subtitle: "Cambios de presión, exposición al sol y polen",
+      skinTypeIII: "Piel clara-media (fototipo III)",
+      noUv: "Sin UV: sin riesgo de quemaduras",
+      pollenNames: {
+        alder: "Aliso",
+        birch: "Abedul",
+        grass: "Gramíneas",
+        mugwort: "Artemisa",
+        olive: "Olivo",
+        ragweed: "Ambrosía"
+      },
+      pollenLevels: {
+        low: "Bajo",
+        medium: "Moderado",
+        high: "Alto",
+        veryHigh: "Muy alto"
+      },
+      pollenUnavailable: "Datos de polen disponibles solo para Europa"
     },
     aqi: {
-      title: "Calidad del Aire Avanzada (AQI)",
+      title: "Calidad del aire",
       good: "Excelente",
       fair: "Buena",
       moderate: "Moderada",
@@ -487,34 +632,45 @@ export const translations = {
       veryPoor: "Muy Mala",
       hazardous: "Peligrosa",
       healthAdvice: "Consejo de Salud",
-      advisoryGood: "Aire puro. Perfecto para deporte al aire libre.",
-      advisoryModerate: "Personas sensibles deberían reducir ejercicios intensos prolongados.",
-      advisoryPoor: "Evitar ejercicios cardiovasculares intensos al aire libre."
+      noData: "Datos de calidad del aire no disponibles",
+      pollutants: {
+        o3: "Ozono (O₃)",
+        no2: "Dióxido de nitrógeno (NO₂)",
+        so2: "Dióxido de azufre (SO₂)",
+        co: "Monóxido de carbono (CO)"
+      },
+      advice: {
+        good: "Aire limpio: ideal para cualquier actividad al aire libre.",
+        fair: "Buena calidad: sin precauciones especiales.",
+        moderate: "Las personas sensibles deberían limitar los esfuerzos prolongados al aire libre.",
+        poor: "Evita el ejercicio intenso al aire libre.",
+        veryPoor: "Limita el tiempo al aire libre, sobre todo niños, mayores y asmáticos.",
+        hazardous: "Permanece en interiores lo máximo posible con las ventanas cerradas."
+      }
     },
     lifestyle: {
-      title: "Planificador de Actividades y Ropa Inteligente",
-      outfitTitle: "¿Qué Me Pongo Hoy? (Asesor IA)",
+      title: "Actividades y ropa",
+      outfitTitle: "¿Qué me pongo hoy?",
       laundry: "Tender la Ropa",
       running: "Running y Deporte",
       carWash: "Lavado de Coche",
-      photography: "Fotografía y Hora Dorada",
       stargazing: "Astronomía y Cielo Nocturno",
       bbq: "Barbacoa y Picnic",
-      gardening: "Riego de Jardín",
-      scoreExcellent: "Excelente",
-      scoreGood: "Favorable",
-      scoreModerate: "Aceptable",
-      scorePoor: "Desaconsejado"
+      outfit: {
+        umbrellaNeeded: "Lleva paraguas o chubasquero",
+        heavyCoat: "Abrigo grueso, bufanda y guantes",
+        jacketSweater: "Chaqueta ligera y jersey",
+        lightLayers: "Capas ligeras: camisa o sudadera",
+        summerClothes: "Ropa de verano ligera y transpirable",
+        windbreaker: "Cortavientos",
+        sunglassesUv: "Gafas de sol y protector solar"
+      }
     },
     sunMoon: {
-      title: "Ciclo Solar y Lunar",
       sunrise: "Amanecer",
       sunset: "Atardecer",
       daylight: "Horas de Luz",
-      solarNoon: "Mediodía Solar",
-      goldenHour: "Hora Dorada",
       moonPhase: "Fase Lunar",
-      illumination: "Iluminación",
       moonPhases: {
         new: "Luna Nueva",
         waxingCrescent: "Luna Creciente",
@@ -529,26 +685,28 @@ export const translations = {
     routeWeather: {
       title: "Clima para Rutas y Viajes",
       subtitle: "Consulta las condiciones climáticas a lo largo de tu viaje",
-      origin: "Ciudad de Origen",
-      destination: "Ciudad de Destino",
       calcRoute: "Calcular Clima de Ruta",
       checkPoints: "Puntos de Ruta",
       routeAdvice: "Consejo de Viaje"
     },
     audio: {
       ambientSounds: "Audio Atmosférico 3D",
-      rainSound: "Lluvia",
-      windSound: "Viento",
-      thunderSound: "Trueno",
-      mute: "Silenciar",
-      unmute: "Activar Sonido Atmosférico"
+      rainSound: "Lluvia"
     },
     alerts: {
-      severeWeather: "Alertas Meteorológicas Oficiales",
-      noAlerts: "No hay avisos meteorológicos graves activos",
-      yellowWarning: "Aviso Amarillo - Fenómenos localmente intensos",
-      orangeWarning: "Alerta Naranja - Tormentas severas o riesgo de inundación",
-      redWarning: "Alerta Roja - Fenómenos extremos, máxima precaución"
+      yellowWarning: "Atención: fenómenos localmente intensos",
+      orangeWarning: "Se prevén fenómenos intensos",
+      redWarning: "Se prevén fenómenos extremos",
+      notOfficial: "Aviso calculado a partir de la previsión de las próximas 24 horas, no es una alerta oficial. Consulta el servicio meteorológico nacional.",
+      reasons: {
+        thunder: "tormentas",
+        gusts: "rachas fuertes",
+        heavyRain: "lluvias abundantes",
+        heavySnow: "nevadas intensas",
+        fog: "niebla"
+      },
+      maxGust: "Racha máx",
+      totalRain: "Lluvia 24 h"
     },
     conditions: {
       clearSky: "Cielo Despejado",
@@ -569,9 +727,68 @@ export const translations = {
       thunderstorm: "Tormenta Eléctrica",
       thunderstormHail: "Tormenta con Granizo",
       windy: "Vientos Fuertes"
+    },
+    status: {
+      updatedAt: "Actualizado a las",
+      offlineCached: "Sin conexión: se muestran los datos de la última actualización.",
+      loadError: "No se pudo cargar el tiempo. Comprueba la conexión.",
+      retry: "Reintentar",
+      loading: "Cargando el tiempo…",
+      slowLoading: "Primera vez para esta zona: la carga puede tardar hasta 30 segundos.",
+      myLocation: "Mi ubicación",
+      gpsUnsupported: "La geolocalización no es compatible con este dispositivo.",
+      gpsError: "No se pudo obtener tu ubicación. Busca una ciudad manualmente.",
+      dataSource: "Datos meteorológicos: Open-Meteo.com (CC BY 4.0) · Lugares: GeoNames"
+    },
+    comparison: {
+      vsYesterday: "Respecto a ayer a esta hora",
+      warmer: "más cálido",
+      colder: "más frío",
+      same: "igual que ayer"
+    },
+    meteogram: {
+      title: "Meteograma de 24 horas",
+      subtitle: "Temperatura, punto de rocío, presión y lluvia"
+    },
+    windSea: {
+      title: "Viento y mar",
+      currentWind: "Viento actual",
+      direction: "Dirección",
+      beaufort: "Escala de Beaufort",
+      force: "Fuerza",
+      waveHeight: "Altura de las olas",
+      wavePeriod: "Periodo de las olas",
+      seaTemp: "Temperatura del mar",
+      noMarine: "Sin datos marinos: ubicación alejada del mar.",
+      animationNote: "Animación basada en la velocidad y dirección actuales del viento en esta ubicación."
+    },
+    route: {
+      originPlaceholder: "Ciudad de salida",
+      destPlaceholder: "Ciudad de llegada",
+      start: "Salida",
+      end: "Llegada",
+      waypoint: "Punto intermedio",
+      calculating: "Calculando…",
+      notFound: "Lugar no encontrado:",
+      error: "No se pudo calcular el tiempo de la ruta.",
+      straightLineNote: "Condiciones actuales en 5 puntos de la línea recta entre las dos ciudades (no la ruta por carretera).",
+      visibility: "Visibilidad",
+      advice: {
+        good: "Sin fenómenos significativos en el trayecto.",
+        rain: "Lluvia en algunos tramos: reduce la velocidad y aumenta la distancia de seguridad.",
+        snow: "Nieve en el trayecto: comprueba la obligación de cadenas o neumáticos de invierno.",
+        storm: "Tormentas en el trayecto: considera retrasar la salida.",
+        wind: "Rachas fuertes: precaución con vehículos altos y en viaductos.",
+        fog: "Visibilidad reducida por niebla en algunos tramos."
+      }
+    },
+    info: {
+      globeTitle: "Globo 3D",
+      globeText: "Arrastra para girar el globo y usa la rueda del ratón o los botones + y − para hacer zoom. El marcador indica la ubicación seleccionada.",
+      skyTitle: "Simulador del cielo",
+      skyText: "Usa el control deslizante para ver el cielo a distintas horas del día, con el tiempo actual de esta ubicación."
     }
   },
-
   fr: {
     appName: "AETHERIA 3D",
     tagline: "Prévisions Météo Ultra Détaillées & Globe 3D Photoréaliste",
@@ -580,25 +797,19 @@ export const translations = {
       globe: "Globe 3D",
       sky: "Simulateur Ciel 3D",
       dashboard: "Tableau de Bord",
-      radar: "Radar & Vent Live",
+      radar: "Vent et mer",
       route: "Météo Itinéraire / Voyage"
     },
     geo: {
       country: "Pays",
       region: "Région / État",
       city: "Ville / Quartier",
-      allCountries: "Tous les Pays",
-      selectCountry: "Sélectionner le Pays...",
-      selectRegion: "Sélectionner la Région...",
-      selectCity: "Sélectionner la Ville...",
       currentLocation: "Position Actuelle (GPS)",
-      favorites: "Villes Favorites",
       elevation: "Altitude",
-      coordinates: "Coordonnées"
+      otherPlaces: "Autres lieux"
     },
     current: {
       feelsLike: "Ressentie",
-      feelsLikeShade: "Ressentie à l'Ombre",
       highLow: "Max / Min",
       humidity: "Humidité",
       dewPoint: "Point de Rosée",
@@ -607,27 +818,19 @@ export const translations = {
       windGusts: "Rafales jusqu'à",
       visibility: "Visibilité",
       uvIndex: "Indice UV",
-      cloudCover: "Couverture Nuageuse",
-      solarRadiation: "Rayonnement Solaire",
-      precipitation: "Précipitations",
-      rainProbability: "Probabilité de Pluie",
-      airQuality: "Qualité de l'Air"
+      cloudCover: "Couverture Nuageuse"
     },
     minuteCast: {
-      subtitle: "Précipitations minute par minute sur 120 min",
+      subtitle: "Prévision par pas de 15 minutes",
       noPrecip: "Aucune précipitation prévue pendant les 2 prochaines heures",
       lightRainSoon: "Pluie légère attendue dans",
       moderateRain: "Pluie modérée imminente dans",
       heavyRain: "Fortes averses attendues dans",
       endingSoon: "Fin des précipitations d'ici",
       minutes: "minutes",
-      intensity: {
-        none: "Sec",
-        light: "Légère",
-        moderate: "Modérée",
-        heavy: "Forte",
-        extreme: "Torrentielle"
-      }
+      title: "Pluie dans les 2 prochaines heures",
+      continuing: "Précipitations pendant au moins 2 heures",
+      unavailable: "Prévision à court terme indisponible pour ce lieu"
     },
     hourly: {
       title: "Prévisions Horaires Détaillées (48 Heures)",
@@ -637,39 +840,54 @@ export const translations = {
     daily: {
       title: "Prévisions à 14 Jours",
       today: "Aujourd'hui",
-      tomorrow: "Demain",
-      rainAmount: "Cumul de pluie",
-      windMax: "Vent max"
+      tomorrow: "Demain"
     },
     models: {
-      title: "Comparateur Multi-Modèles Météo",
-      subtitle: "Analyse croisée des supercalculateurs mondiaux",
-      consensus: "Consensus Multi-Modèles",
+      title: "Comparaison des modèles météo",
+      subtitle: "Prévision du jour selon les principaux centres météorologiques",
+      consensus: "Moyenne des modèles",
       confidence: "Indice de Confiance",
-      spread: "Écart de Température"
+      spread: "Écart entre modèles",
+      agreement: "Accord entre modèles",
+      agreementHigh: "Élevé",
+      agreementMedium: "Moyen",
+      agreementLow: "Faible",
+      colModel: "Modèle",
+      colResolution: "Résolution",
+      colMaxMin: "Max / Min",
+      colRain: "Pluie",
+      colWind: "Vent max"
     },
     biometeo: {
-      title: "Bio-Météorologie, Santé & Bien-être",
-      headacheAlert: "Alerte Migraine Barométrique",
+      title: "Santé et bien-être",
+      headacheAlert: "Sensibilité barométrique",
       headacheLow: "Risque Faible - Pression stable",
       headacheModerate: "Risque Modéré - Baisse de pression en cours",
-      headacheHigh: "Alerte Élevée - Chute barométrique brutale (>3 hPa/3h)",
-      skinType: "Phototype Cutané (Fitzpatrick)",
-      maxSunExposure: "Temps d'exposition sûr au soleil",
+      headacheHigh: "Variation rapide de pression (>3 hPa en 3 heures)",
+      maxSunExposure: "Temps indicatif avant un coup de soleil",
       sunMinutes: "minutes",
-      arthritisIndex: "Indice Rhumatismes / Articulations",
-      thermalStress: "Stress Thermique Corporel",
-      pollenTitle: "Suivi des Pollens & Allergènes",
-      pollenGraminacee: "Graminées",
-      pollenBetulla: "Bouleau / Aulne",
-      pollenAmbrosia: "Ambroisie",
-      pollenOlivo: "Olivier",
-      pollenLow: "Faible",
-      pollenMedium: "Modéré",
-      pollenHigh: "Très Élevé"
+      pollenTitle: "Pollens (grains/m³)",
+      subtitle: "Variations de pression, exposition au soleil et pollens",
+      skinTypeIII: "Peau claire à mate (phototype III)",
+      noUv: "Pas d’UV : aucun risque de coup de soleil",
+      pollenNames: {
+        alder: "Aulne",
+        birch: "Bouleau",
+        grass: "Graminées",
+        mugwort: "Armoise",
+        olive: "Olivier",
+        ragweed: "Ambroisie"
+      },
+      pollenLevels: {
+        low: "Faible",
+        medium: "Modéré",
+        high: "Élevé",
+        veryHigh: "Très élevé"
+      },
+      pollenUnavailable: "Données polliniques disponibles uniquement pour l’Europe"
     },
     aqi: {
-      title: "Indice de Qualité de l'Air (AQI)",
+      title: "Qualité de l’air",
       good: "Excellent",
       fair: "Bon",
       moderate: "Moyen",
@@ -677,34 +895,45 @@ export const translations = {
       veryPoor: "Très Mauvais",
       hazardous: "Dangereux",
       healthAdvice: "Conseil Santé",
-      advisoryGood: "Air pur. Parfait pour les activités extérieures.",
-      advisoryModerate: "Personnes sensibles : limiter les efforts prolongés en extérieur.",
-      advisoryPoor: "Éviter le sport intensif en extérieur."
+      noData: "Données de qualité de l’air indisponibles",
+      pollutants: {
+        o3: "Ozone (O₃)",
+        no2: "Dioxyde d’azote (NO₂)",
+        so2: "Dioxyde de soufre (SO₂)",
+        co: "Monoxyde de carbone (CO)"
+      },
+      advice: {
+        good: "Air pur : idéal pour toutes les activités en plein air.",
+        fair: "Bonne qualité : aucune précaution particulière.",
+        moderate: "Les personnes sensibles devraient limiter les efforts prolongés en extérieur.",
+        poor: "Évitez le sport intense en extérieur.",
+        veryPoor: "Limitez le temps passé dehors, surtout enfants, seniors et asthmatiques.",
+        hazardous: "Restez à l’intérieur autant que possible, fenêtres fermées."
+      }
     },
     lifestyle: {
-      title: "Planificateur d'Activités & Tenue Intelligente",
-      outfitTitle: "Que Porter Aujourd'hui ? (Conseiller IA)",
+      title: "Activités et tenue",
+      outfitTitle: "Que porter aujourd’hui ?",
       laundry: "Séchage Linge Extérieur",
       running: "Course & Sport Outdoor",
       carWash: "Lavage Voiture",
-      photography: "Photo & Heure Dorée",
       stargazing: "Astronomie & Ciel Étoilé",
       bbq: "Barbecue & Pique-nique",
-      gardening: "Arrosage Jardin",
-      scoreExcellent: "Idéal",
-      scoreGood: "Favorable",
-      scoreModerate: "Acceptable",
-      scorePoor: "Déconseillé"
+      outfit: {
+        umbrellaNeeded: "Prenez un parapluie ou un imperméable",
+        heavyCoat: "Manteau chaud, écharpe et gants",
+        jacketSweater: "Veste légère et pull",
+        lightLayers: "Couches légères : chemise ou sweat",
+        summerClothes: "Vêtements d’été légers et respirants",
+        windbreaker: "Coupe-vent",
+        sunglassesUv: "Lunettes de soleil et crème solaire"
+      }
     },
     sunMoon: {
-      title: "Éphéméride Solaire & Lunaire",
       sunrise: "Lever du Soleil",
       sunset: "Coucher du Soleil",
       daylight: "Heures de Jour",
-      solarNoon: "Midi Solaire",
-      goldenHour: "Heure Dorée",
       moonPhase: "Phase Lunaire",
-      illumination: "Illumination",
       moonPhases: {
         new: "Nouvelle Lune",
         waxingCrescent: "Premier Croissant",
@@ -719,26 +948,28 @@ export const translations = {
     routeWeather: {
       title: "Météo d'Itinéraire & Voyage",
       subtitle: "Vérifiez les conditions météo tout au long de votre trajet",
-      origin: "Ville de Départ",
-      destination: "Ville d'Arrivée",
       calcRoute: "Analyser l'Itinéraire",
       checkPoints: "Étapes",
       routeAdvice: "Conseil Trajet"
     },
     audio: {
       ambientSounds: "Ambiance Sonore 3D",
-      rainSound: "Pluie",
-      windSound: "Vent",
-      thunderSound: "Tonnerre",
-      mute: "Couper le Son",
-      unmute: "Activer l'Audio Réaliste"
+      rainSound: "Pluie"
     },
     alerts: {
-      severeWeather: "Alertes Météorologiques Officielles",
-      noAlerts: "Aucune vigilance météo majeure en cours",
-      yellowWarning: "Vigilance Jaune - Phénomènes localement intenses",
-      orangeWarning: "Vigilance Orange - Orages violents ou inondations",
-      redWarning: "Vigilance Rouge - Événements extrêmes, prudence absolue"
+      yellowWarning: "Attention : phénomènes localement intenses",
+      orangeWarning: "Phénomènes intenses prévus",
+      redWarning: "Phénomènes extrêmes prévus",
+      notOfficial: "Avis calculé d’après la prévision des prochaines 24 heures, ce n’est pas une vigilance officielle. Consultez le service météo national.",
+      reasons: {
+        thunder: "orages",
+        gusts: "fortes rafales",
+        heavyRain: "fortes pluies",
+        heavySnow: "fortes chutes de neige",
+        fog: "brouillard"
+      },
+      maxGust: "Rafale max",
+      totalRain: "Pluie 24 h"
     },
     conditions: {
       clearSky: "Ciel Dégagé",
@@ -759,9 +990,68 @@ export const translations = {
       thunderstorm: "Orage avec Éclairs",
       thunderstormHail: "Orage avec Grêle",
       windy: "Vents Forts"
+    },
+    status: {
+      updatedAt: "Mis à jour à",
+      offlineCached: "Pas de connexion : affichage des données de la dernière mise à jour.",
+      loadError: "Impossible de charger la météo. Vérifiez votre connexion.",
+      retry: "Réessayer",
+      loading: "Chargement de la météo…",
+      slowLoading: "Première fois pour cette zone : le chargement peut prendre jusqu’à 30 secondes.",
+      myLocation: "Ma position",
+      gpsUnsupported: "La géolocalisation n’est pas prise en charge sur cet appareil.",
+      gpsError: "Impossible d’obtenir votre position. Recherchez une ville.",
+      dataSource: "Données météo : Open-Meteo.com (CC BY 4.0) · Lieux : GeoNames"
+    },
+    comparison: {
+      vsYesterday: "Par rapport à hier à la même heure",
+      warmer: "plus chaud",
+      colder: "plus froid",
+      same: "comme hier"
+    },
+    meteogram: {
+      title: "Météogramme 24 heures",
+      subtitle: "Température, point de rosée, pression et pluie"
+    },
+    windSea: {
+      title: "Vent et mer",
+      currentWind: "Vent actuel",
+      direction: "Direction",
+      beaufort: "Échelle de Beaufort",
+      force: "Force",
+      waveHeight: "Hauteur des vagues",
+      wavePeriod: "Période des vagues",
+      seaTemp: "Température de la mer",
+      noMarine: "Pas de données marines : lieu éloigné de la mer.",
+      animationNote: "Animation basée sur la vitesse et la direction actuelles du vent à cet endroit."
+    },
+    route: {
+      originPlaceholder: "Ville de départ",
+      destPlaceholder: "Ville d’arrivée",
+      start: "Départ",
+      end: "Arrivée",
+      waypoint: "Point intermédiaire",
+      calculating: "Calcul en cours…",
+      notFound: "Lieu introuvable :",
+      error: "Impossible de calculer la météo du trajet.",
+      straightLineNote: "Conditions actuelles en 5 points sur la ligne droite entre les deux villes (pas l’itinéraire routier).",
+      visibility: "Visibilité",
+      advice: {
+        good: "Aucun phénomène notable sur le trajet.",
+        rain: "Pluie sur certains tronçons : ralentissez et augmentez les distances de sécurité.",
+        snow: "Neige sur le trajet : vérifiez l’obligation de chaînes ou de pneus hiver.",
+        storm: "Orages sur le trajet : envisagez de reporter le départ.",
+        wind: "Fortes rafales : prudence avec les véhicules hauts et sur les viaducs.",
+        fog: "Visibilité réduite par le brouillard sur certains tronçons."
+      }
+    },
+    info: {
+      globeTitle: "Globe 3D",
+      globeText: "Faites glisser pour tourner le globe et utilisez la molette ou les boutons + et − pour zoomer. Le repère indique le lieu sélectionné.",
+      skyTitle: "Simulateur de ciel",
+      skyText: "Utilisez le curseur pour voir le ciel à différentes heures, avec la météo actuelle de ce lieu."
     }
   },
-
   de: {
     appName: "AETHERIA 3D",
     tagline: "Hochdetaillierte Wettervorhersage & Fotorealistischer 3D-Globus",
@@ -770,25 +1060,19 @@ export const translations = {
       globe: "3D-Globus",
       sky: "3D-Himmelssimulator",
       dashboard: "Detail-Dashboard",
-      radar: "Live-Radar & Wind",
+      radar: "Wind & Meer",
       route: "Routen- & Reisewetter"
     },
     geo: {
       country: "Land",
       region: "Region / Bundesland",
       city: "Stadt / Ort",
-      allCountries: "Alle Länder",
-      selectCountry: "Land auswählen...",
-      selectRegion: "Region auswählen...",
-      selectCity: "Stadt auswählen...",
       currentLocation: "Aktueller Standort (GPS)",
-      favorites: "Favoriten",
       elevation: "Höhe",
-      coordinates: "Koordinaten"
+      otherPlaces: "Weitere Orte"
     },
     current: {
       feelsLike: "Gefühlt",
-      feelsLikeShade: "Gefühlt im Schatten",
       highLow: "Max / Min",
       humidity: "Luftfeuchtigkeit",
       dewPoint: "Taupunkt",
@@ -797,27 +1081,19 @@ export const translations = {
       windGusts: "Böen bis zu",
       visibility: "Sichtweite",
       uvIndex: "UV-Index",
-      cloudCover: "Bewölkung",
-      solarRadiation: "Solarstrahlung",
-      precipitation: "Niederschlag",
-      rainProbability: "Regenwahrscheinlichkeit",
-      airQuality: "Luftqualität"
+      cloudCover: "Bewölkung"
     },
     minuteCast: {
-      subtitle: "Minutengenauer Niederschlag für die nächsten 120 Min",
+      subtitle: "Vorhersage in 15-Minuten-Schritten",
       noPrecip: "Kein Niederschlag in den nächsten 2 Stunden erwartet",
       lightRainSoon: "Leichter Regen erwartet in",
       moderateRain: "Mäßiger Regen naht in",
       heavyRain: "Starker Schauer erwartet in",
       endingSoon: "Niederschlag lässt nach in",
       minutes: "Minuten",
-      intensity: {
-        none: "Trocken",
-        light: "Leicht",
-        moderate: "Mäßig",
-        heavy: "Stark",
-        extreme: "Sintflutartig"
-      }
+      title: "Regen in den nächsten 2 Stunden",
+      continuing: "Niederschlag für mindestens 2 Stunden",
+      unavailable: "Kurzfristvorhersage für diesen Ort nicht verfügbar"
     },
     hourly: {
       title: "Detaillierte Stundenvorhersage (48 Stunden)",
@@ -827,39 +1103,54 @@ export const translations = {
     daily: {
       title: "14-Tage-Trend",
       today: "Heute",
-      tomorrow: "Morgen",
-      rainAmount: "Regenmenge",
-      windMax: "Max. Wind"
+      tomorrow: "Morgen"
     },
     models: {
-      title: "Wettermodell-Vergleich",
-      subtitle: "Direkter Vergleich globaler meteorologischer Supercomputer",
-      consensus: "Modell-Konsens",
+      title: "Vergleich der Wettermodelle",
+      subtitle: "Heutige Vorhersage der wichtigsten Wetterzentren",
+      consensus: "Modellmittel",
       confidence: "Vorhersage-Sicherheit",
-      spread: "Temperatur-Streuung"
+      spread: "Modellstreuung",
+      agreement: "Modellübereinstimmung",
+      agreementHigh: "Hoch",
+      agreementMedium: "Mittel",
+      agreementLow: "Niedrig",
+      colModel: "Modell",
+      colResolution: "Auflösung",
+      colMaxMin: "Max / Min",
+      colRain: "Regen",
+      colWind: "Max. Wind"
     },
     biometeo: {
-      title: "Biometeorologie, Gesundheit & Wohlbefinden",
-      headacheAlert: "Barometrische Migräne-Warnung",
+      title: "Gesundheit & Wohlbefinden",
+      headacheAlert: "Wetterfühligkeit",
       headacheLow: "Geringes Risiko - Stabiler Luftdruck",
       headacheModerate: "Mäßiges Risiko - Sinkender Luftdruck",
-      headacheHigh: "Hohe Warnung - Schneller Druckabfall (>3 hPa/3h)",
-      skinType: "Haut-Phototyp (Fitzpatrick)",
-      maxSunExposure: "Maximale Sonnenzeit",
+      headacheHigh: "Schnelle Luftdruckänderung (>3 hPa in 3 Stunden)",
+      maxSunExposure: "Ungefähre Zeit bis zum Sonnenbrand",
       sunMinutes: "Minuten",
-      arthritisIndex: "Gelenk- & Rheuma-Index",
-      thermalStress: "Thermischer Körperstress",
-      pollenTitle: "Pollenflug & Allergie-Monitor",
-      pollenGraminacee: "Gräser",
-      pollenBetulla: "Birke / Erle",
-      pollenAmbrosia: "Ambrosia",
-      pollenOlivo: "Olivenbaum",
-      pollenLow: "Gering",
-      pollenMedium: "Mäßig",
-      pollenHigh: "Sehr Hoch"
+      pollenTitle: "Pollen (Körner/m³)",
+      subtitle: "Luftdruckänderung, Sonnenexposition und Pollen",
+      skinTypeIII: "Hell-mittlere Haut (Hauttyp III)",
+      noUv: "Kein UV: kein Sonnenbrandrisiko",
+      pollenNames: {
+        alder: "Erle",
+        birch: "Birke",
+        grass: "Gräser",
+        mugwort: "Beifuß",
+        olive: "Olive",
+        ragweed: "Ambrosia"
+      },
+      pollenLevels: {
+        low: "Gering",
+        medium: "Mäßig",
+        high: "Hoch",
+        veryHigh: "Sehr hoch"
+      },
+      pollenUnavailable: "Pollendaten nur für Europa verfügbar"
     },
     aqi: {
-      title: "Luftqualitäts-Index (AQI)",
+      title: "Luftqualität",
       good: "Sehr gut",
       fair: "Gut",
       moderate: "Mäßig",
@@ -867,34 +1158,45 @@ export const translations = {
       veryPoor: "Sehr schlecht",
       hazardous: "Gefährlich",
       healthAdvice: "Gesundheitshinweis",
-      advisoryGood: "Reine Luft. Perfekt für Sport und Freizeit im Freien.",
-      advisoryModerate: "Empfindliche Personen sollten anstrengenden Outdoorsport drosseln.",
-      advisoryPoor: "Auf intensiven Ausdauersport im Freien verzichten."
+      noData: "Keine Daten zur Luftqualität verfügbar",
+      pollutants: {
+        o3: "Ozon (O₃)",
+        no2: "Stickstoffdioxid (NO₂)",
+        so2: "Schwefeldioxid (SO₂)",
+        co: "Kohlenmonoxid (CO)"
+      },
+      advice: {
+        good: "Saubere Luft: ideal für alle Aktivitäten im Freien.",
+        fair: "Gute Luftqualität: keine besonderen Vorkehrungen nötig.",
+        moderate: "Empfindliche Personen sollten längere Anstrengungen im Freien begrenzen.",
+        poor: "Intensiven Sport im Freien vermeiden.",
+        veryPoor: "Zeit im Freien begrenzen, besonders Kinder, Ältere und Asthmatiker.",
+        hazardous: "Möglichst drinnen bleiben und Fenster geschlossen halten."
+      }
     },
     lifestyle: {
-      title: "Aktivitätsplaner & KI-Outfitberater",
-      outfitTitle: "Was ziehe ich heute an? (KI-Assistent)",
+      title: "Aktivitäten & Kleidung",
+      outfitTitle: "Was ziehe ich heute an?",
       laundry: "Wäsche im Freien trocknen",
       running: "Laufen & Outdoorsport",
       carWash: "Autowäsche",
-      photography: "Fotografie & Goldene Stunde",
       stargazing: "Sternenbeobachtung",
       bbq: "Grillen & Picknick",
-      gardening: "Gartenbewässerung",
-      scoreExcellent: "Perfekt",
-      scoreGood: "Günstig",
-      scoreModerate: "Akzeptabel",
-      scorePoor: "Ungünstig"
+      outfit: {
+        umbrellaNeeded: "Regenschirm oder Regenjacke mitnehmen",
+        heavyCoat: "Warmer Mantel, Schal und Handschuhe",
+        jacketSweater: "Leichte Jacke und Pullover",
+        lightLayers: "Leichte Schichten: Hemd oder Pulli",
+        summerClothes: "Leichte, atmungsaktive Sommerkleidung",
+        windbreaker: "Windjacke",
+        sunglassesUv: "Sonnenbrille und Sonnencreme"
+      }
     },
     sunMoon: {
-      title: "Sonnen- & Mondstand",
       sunrise: "Sonnenaufgang",
       sunset: "Sonnenuntergang",
       daylight: "Tageslichtstunden",
-      solarNoon: "Solarer Mittag",
-      goldenHour: "Goldene Stunde",
       moonPhase: "Mondphase",
-      illumination: "Beleuchtung",
       moonPhases: {
         new: "Neumond",
         waxingCrescent: "Zunehmende Sichel",
@@ -909,26 +1211,28 @@ export const translations = {
     routeWeather: {
       title: "Routen- & Reisewetter-Planer",
       subtitle: "Wetterbedingungen entlang Ihrer Fahr- oder Flugstrecke prüfen",
-      origin: "Startstadt",
-      destination: "Zielstadt",
       calcRoute: "Routenwetter analysieren",
       checkPoints: "Wegpunkte",
       routeAdvice: "Reiseempfehlung"
     },
     audio: {
       ambientSounds: "3D-Atmosphären-Audio",
-      rainSound: "Regen",
-      windSound: "Wind",
-      thunderSound: "Donner",
-      mute: "Ton aus",
-      unmute: "Realistische Klanglandschaft an"
+      rainSound: "Regen"
     },
     alerts: {
-      severeWeather: "Offizielle Wetterwarnungen",
-      noAlerts: "Keine akuten Unwetterwarnungen",
-      yellowWarning: "Gelbe Warnung - Örtlich markantes Wetter",
-      orangeWarning: "Orange Warnung - Schwere Gewitter oder Unwettergefahr",
-      redWarning: "Rote Warnung - Extreme Wetterlage, höchste Vorsicht"
+      yellowWarning: "Achtung: örtlich intensives Wetter",
+      orangeWarning: "Unwetter erwartet",
+      redWarning: "Extremes Unwetter erwartet",
+      notOfficial: "Hinweis aus der Vorhersage der nächsten 24 Stunden, keine amtliche Unwetterwarnung. Bitte den nationalen Wetterdienst prüfen.",
+      reasons: {
+        thunder: "Gewitter",
+        gusts: "starke Böen",
+        heavyRain: "Starkregen",
+        heavySnow: "starker Schneefall",
+        fog: "Nebel"
+      },
+      maxGust: "Max. Böe",
+      totalRain: "Regen 24 h"
     },
     conditions: {
       clearSky: "Klarer Himmel",
@@ -949,9 +1253,68 @@ export const translations = {
       thunderstorm: "Gewitter mit Blitzschlag",
       thunderstormHail: "Schweres Gewitter mit Hagel",
       windy: "Stürmischer Wind"
+    },
+    status: {
+      updatedAt: "Aktualisiert um",
+      offlineCached: "Keine Verbindung: Daten der letzten Aktualisierung werden angezeigt.",
+      loadError: "Wetter konnte nicht geladen werden. Bitte Verbindung prüfen.",
+      retry: "Erneut versuchen",
+      loading: "Wetter wird geladen…",
+      slowLoading: "Erstes Mal für dieses Gebiet: Das Laden kann bis zu 30 Sekunden dauern.",
+      myLocation: "Mein Standort",
+      gpsUnsupported: "Standortbestimmung wird auf diesem Gerät nicht unterstützt.",
+      gpsError: "Standort nicht verfügbar. Bitte eine Stadt suchen.",
+      dataSource: "Wetterdaten: Open-Meteo.com (CC BY 4.0) · Orte: GeoNames"
+    },
+    comparison: {
+      vsYesterday: "Im Vergleich zu gestern um diese Zeit",
+      warmer: "wärmer",
+      colder: "kälter",
+      same: "wie gestern"
+    },
+    meteogram: {
+      title: "24-Stunden-Meteogramm",
+      subtitle: "Temperatur, Taupunkt, Luftdruck und Regen"
+    },
+    windSea: {
+      title: "Wind & Meer",
+      currentWind: "Aktueller Wind",
+      direction: "Richtung",
+      beaufort: "Beaufort-Skala",
+      force: "Stärke",
+      waveHeight: "Wellenhöhe",
+      wavePeriod: "Wellenperiode",
+      seaTemp: "Wassertemperatur",
+      noMarine: "Keine Meeresdaten: Ort liegt nicht am Meer.",
+      animationNote: "Animation basierend auf aktueller Windgeschwindigkeit und -richtung an diesem Ort."
+    },
+    route: {
+      originPlaceholder: "Abfahrtsort",
+      destPlaceholder: "Zielort",
+      start: "Abfahrt",
+      end: "Ankunft",
+      waypoint: "Zwischenpunkt",
+      calculating: "Wird berechnet…",
+      notFound: "Ort nicht gefunden:",
+      error: "Routenwetter konnte nicht berechnet werden.",
+      straightLineNote: "Aktuelle Bedingungen an 5 Punkten auf der Luftlinie zwischen beiden Städten (nicht die Straßenroute).",
+      visibility: "Sichtweite",
+      advice: {
+        good: "Kein nennenswertes Wetter auf der Strecke.",
+        rain: "Regen auf einigen Abschnitten: langsamer fahren und Abstand halten.",
+        snow: "Schnee auf der Strecke: Ketten- oder Winterreifenpflicht prüfen.",
+        storm: "Gewitter auf der Strecke: Abfahrt eventuell verschieben.",
+        wind: "Starke Böen: Vorsicht mit hohen Fahrzeugen und auf Brücken.",
+        fog: "Eingeschränkte Sicht durch Nebel auf einigen Abschnitten."
+      }
+    },
+    info: {
+      globeTitle: "3D-Globus",
+      globeText: "Ziehen, um den Globus zu drehen; Mausrad oder + und − zum Zoomen. Die Markierung zeigt den gewählten Ort.",
+      skyTitle: "Himmelssimulator",
+      skyText: "Mit dem Regler den Himmel zu verschiedenen Tageszeiten sehen, mit dem aktuellen Wetter an diesem Ort."
     }
   },
-
   ja: {
     appName: "AETHERIA 3D",
     tagline: "超高精度気象予報＆写実的3D地球儀シミュレーター",
@@ -960,25 +1323,19 @@ export const translations = {
       globe: "3D地球儀",
       sky: "3D天空シミュレーター",
       dashboard: "詳細ダッシュボード",
-      radar: "リアルタイムレーダー＆風",
+      radar: "風と海",
       route: "移動ルート気象"
     },
     geo: {
       country: "国",
       region: "都道府県 / 州",
       city: "都市 / 市区町村",
-      allCountries: "すべての国",
-      selectCountry: "国を選択...",
-      selectRegion: "地域を選択...",
-      selectCity: "都市を選択...",
       currentLocation: "現在地 (GPS)",
-      favorites: "お気に入り都市",
       elevation: "標高",
-      coordinates: "座標"
+      otherPlaces: "その他の地域"
     },
     current: {
       feelsLike: "体感温度",
-      feelsLikeShade: "日陰の体感温度",
       highLow: "最高 / 最低",
       humidity: "湿度",
       dewPoint: "露点温度",
@@ -987,28 +1344,19 @@ export const translations = {
       windGusts: "最大瞬間風速",
       visibility: "視程",
       uvIndex: "UVインデックス",
-      cloudCover: "雲量",
-      solarRadiation: "日射量",
-      precipitation: "降水量",
-      rainProbability: "降水確率",
-      airQuality: "大気質"
+      cloudCover: "雲量"
     },
     minuteCast: {
-      title: "MinuteCast® 分単位降水予測",
-      subtitle: "今後120分間の分刻み降雨シミュレーション",
+      title: "今後2時間の雨",
+      subtitle: "15分ごとの予報",
       noPrecip: "今後2時間降水の心配はありません",
       lightRainSoon: "まもなく小雨が降り始めます:",
       moderateRain: "本降りの雨が近づいています:",
       heavyRain: "激しい雨が予想されます:",
       endingSoon: "雨が止む見込み:",
       minutes: "分後",
-      intensity: {
-        none: "乾燥",
-        light: "弱雨",
-        moderate: "中雨",
-        heavy: "強雨",
-        extreme: "猛烈な雨"
-      }
+      continuing: "少なくとも2時間は降水が続きます",
+      unavailable: "この地点の短時間予報はありません"
     },
     hourly: {
       title: "48時間詳細予報",
@@ -1018,39 +1366,54 @@ export const translations = {
     daily: {
       title: "14日間週間予報",
       today: "今日",
-      tomorrow: "明日",
-      rainAmount: "総雨量",
-      windMax: "最大風速"
+      tomorrow: "明日"
     },
     models: {
-      title: "グローバル気象モデル比較",
-      subtitle: "世界最高峰スーパーコンピューターの予測比較",
-      consensus: "アンサンブル平均",
+      title: "気象モデルの比較",
+      subtitle: "主要気象機関による今日の予報",
+      consensus: "モデル平均",
       confidence: "予測信頼度",
-      spread: "気温予測ブレ幅"
+      spread: "モデル間の差",
+      agreement: "モデルの一致度",
+      agreementHigh: "高",
+      agreementMedium: "中",
+      agreementLow: "低",
+      colModel: "モデル",
+      colResolution: "解像度",
+      colMaxMin: "最高 / 最低",
+      colRain: "降水量",
+      colWind: "最大風速"
     },
     biometeo: {
-      title: "生人気象学・健康＆バイオリズム",
-      headacheAlert: "気圧頭痛警戒アラート",
+      title: "健康",
+      headacheAlert: "気圧変化による体調への影響",
       headacheLow: "低リスク - 気圧は安定",
       headacheModerate: "注意 - 気圧低下中",
-      headacheHigh: "警戒 - 急激な気圧変動 (>3 hPa/3h)",
-      skinType: "肌タイプ (フィッツパトリック)",
-      maxSunExposure: "日焼け安全時間",
+      headacheHigh: "急な気圧変化（3時間で3hPa超）",
+      maxSunExposure: "日焼けまでのおおよその時間",
       sunMinutes: "分",
-      arthritisIndex: "関節痛・神経痛指数",
-      thermalStress: "熱ストレス指数",
-      pollenTitle: "花粉＆アレルゲン情報",
-      pollenGraminacee: "イネ科花粉",
-      pollenBetulla: "シラカバ・ハンノキ",
-      pollenAmbrosia: "ブタクサ",
-      pollenOlivo: "オリーブ",
-      pollenLow: "少ない",
-      pollenMedium: "やや多い",
-      pollenHigh: "極めて多い"
+      pollenTitle: "花粉（個/m³）",
+      subtitle: "気圧変化・日差し・花粉",
+      skinTypeIII: "標準的な肌（スキンタイプIII）",
+      noUv: "紫外線なし：日焼けの心配はありません",
+      pollenNames: {
+        alder: "ハンノキ",
+        birch: "シラカバ",
+        grass: "イネ科",
+        mugwort: "ヨモギ",
+        olive: "オリーブ",
+        ragweed: "ブタクサ"
+      },
+      pollenLevels: {
+        low: "少ない",
+        medium: "やや多い",
+        high: "多い",
+        veryHigh: "非常に多い"
+      },
+      pollenUnavailable: "花粉データはヨーロッパのみ対応しています"
     },
     aqi: {
-      title: "大気汚染指数 (AQI)",
+      title: "大気質",
       good: "極めて良好",
       fair: "良好",
       moderate: "普通",
@@ -1058,34 +1421,45 @@ export const translations = {
       veryPoor: "悪化",
       hazardous: "極めて危険",
       healthAdvice: "健康アドバイス",
-      advisoryGood: "空気が澄んでいます。屋外スポーツに最適です。",
-      advisoryModerate: "呼吸器疾患をお持ちの方は長時間の屋外運動をお控えください。",
-      advisoryPoor: "屋外での激しい運動はお避けください。"
+      noData: "大気質データはありません",
+      pollutants: {
+        o3: "オゾン (O₃)",
+        no2: "二酸化窒素 (NO₂)",
+        so2: "二酸化硫黄 (SO₂)",
+        co: "一酸化炭素 (CO)"
+      },
+      advice: {
+        good: "きれいな空気：屋外活動に最適です。",
+        fair: "良好：特別な注意は不要です。",
+        moderate: "敏感な方は長時間の屋外での運動を控えてください。",
+        poor: "屋外での激しい運動は避けてください。",
+        veryPoor: "外出を控えてください。特に子ども・高齢者・ぜんそくの方。",
+        hazardous: "できるだけ屋内で過ごし、窓を閉めてください。"
+      }
     },
     lifestyle: {
-      title: "生活行動指数＆AI服装アドバイザー",
-      outfitTitle: "今日のコーディネート提案 (AI)",
+      title: "アクティビティと服装",
+      outfitTitle: "今日の服装",
       laundry: "洗濯物干し指数",
       running: "ランニング＆運動",
       carWash: "洗車指数",
-      photography: "写真・ゴールデンアワー",
       stargazing: "天体観測・星空",
       bbq: "バーベキュー",
-      gardening: "庭の水やり",
-      scoreExcellent: "絶好",
-      scoreGood: "良好",
-      scoreModerate: "普通",
-      scorePoor: "不向き"
+      outfit: {
+        umbrellaNeeded: "傘かレインコートを持って行きましょう",
+        heavyCoat: "厚手のコート・マフラー・手袋",
+        jacketSweater: "薄手のジャケットとセーター",
+        lightLayers: "軽い重ね着：シャツやパーカー",
+        summerClothes: "軽くて通気性のよい夏服",
+        windbreaker: "ウインドブレーカー",
+        sunglassesUv: "サングラスと日焼け止め"
+      }
     },
     sunMoon: {
-      title: "太陽と月の暦",
       sunrise: "日の出",
       sunset: "日の入り",
       daylight: "昼間の長さ",
-      solarNoon: "南中高度時",
-      goldenHour: "マジックアワー",
       moonPhase: "月齢・月相",
-      illumination: "輝面比",
       moonPhases: {
         new: "新月",
         waxingCrescent: "三日月",
@@ -1100,26 +1474,28 @@ export const translations = {
     routeWeather: {
       title: "移動ルート・旅先ウェザー",
       subtitle: "出発地から目的地までの天候変化をリアルタイム分析",
-      origin: "出発地",
-      destination: "目的地",
       calcRoute: "ルート気象を解析",
       checkPoints: "中継地点",
       routeAdvice: "旅のワンポイント助言"
     },
     audio: {
       ambientSounds: "3D自然環境サウンド",
-      rainSound: "雨音",
-      windSound: "風音",
-      thunderSound: "雷鳴",
-      mute: "消音",
-      unmute: "臨場感あふれる音声を有効化"
+      rainSound: "雨音"
     },
     alerts: {
-      severeWeather: "気象警報・注意報",
-      noAlerts: "現在発表されている重大な気象警報はありません",
-      yellowWarning: "注意報 - 局地的な天候急変に注意",
-      orangeWarning: "警報 - 激しい雷雨や土砂災害警戒",
-      redWarning: "特別警報 - 直ちに命を守る行動を"
+      yellowWarning: "注意：局地的に激しい天気",
+      orangeWarning: "荒れた天気の見込み",
+      redWarning: "非常に激しい天気の見込み",
+      notOfficial: "今後24時間の予報から算出した注意情報で、公式の警報ではありません。各国の気象機関の情報を確認してください。",
+      reasons: {
+        thunder: "雷雨",
+        gusts: "強い突風",
+        heavyRain: "大雨",
+        heavySnow: "大雪",
+        fog: "霧"
+      },
+      maxGust: "最大瞬間風速",
+      totalRain: "24時間降水量"
     },
     conditions: {
       clearSky: "快晴",
@@ -1140,9 +1516,68 @@ export const translations = {
       thunderstorm: "雷雨",
       thunderstormHail: "雹（ひょう）を伴う雷雨",
       windy: "強風"
+    },
+    status: {
+      updatedAt: "更新時刻",
+      offlineCached: "オフライン：前回更新時のデータを表示しています。",
+      loadError: "天気を読み込めませんでした。接続を確認してください。",
+      retry: "再試行",
+      loading: "天気を読み込み中…",
+      slowLoading: "この地域は初めてのため、読み込みに最大30秒かかることがあります。",
+      myLocation: "現在地",
+      gpsUnsupported: "この端末は位置情報に対応していません。",
+      gpsError: "現在地を取得できません。都市を検索してください。",
+      dataSource: "気象データ：Open-Meteo.com (CC BY 4.0) · 地名：GeoNames"
+    },
+    comparison: {
+      vsYesterday: "昨日の同時刻との比較",
+      warmer: "暖かい",
+      colder: "寒い",
+      same: "昨日と同じ"
+    },
+    meteogram: {
+      title: "24時間メテオグラム",
+      subtitle: "気温・露点・気圧・降水量"
+    },
+    windSea: {
+      title: "風と海",
+      currentWind: "現在の風",
+      direction: "風向",
+      beaufort: "ビューフォート風力階級",
+      force: "風力",
+      waveHeight: "波の高さ",
+      wavePeriod: "波の周期",
+      seaTemp: "海水温",
+      noMarine: "海洋データなし：海から離れた地点です。",
+      animationNote: "この地点の現在の風速と風向に基づくアニメーションです。"
+    },
+    route: {
+      originPlaceholder: "出発地",
+      destPlaceholder: "目的地",
+      start: "出発",
+      end: "到着",
+      waypoint: "中間地点",
+      calculating: "計算中…",
+      notFound: "見つかりません：",
+      error: "ルートの天気を計算できませんでした。",
+      straightLineNote: "2都市間の直線上の5地点の現在の天気です（道路ルートではありません）。",
+      visibility: "視程",
+      advice: {
+        good: "経路上に目立った気象現象はありません。",
+        rain: "一部で雨：速度を落とし、車間距離を広げてください。",
+        snow: "経路上で雪：チェーンや冬用タイヤの規制を確認してください。",
+        storm: "経路上で雷雨：出発の延期を検討してください。",
+        wind: "強い突風：背の高い車両や橋の上では注意してください。",
+        fog: "一部で霧による視界不良があります。"
+      }
+    },
+    info: {
+      globeTitle: "3D地球儀",
+      globeText: "ドラッグで地球儀を回転、ホイールまたは＋/−ボタンで拡大縮小できます。ピンは選択中の地点です。",
+      skyTitle: "空のシミュレーター",
+      skyText: "スライダーで時間帯ごとの空を表示します。この地点の現在の天気を反映しています。"
     }
   },
-
   zh: {
     appName: "AETHERIA 3D",
     tagline: "超高精度天气预报与逼真3D地球气象模拟系统",
@@ -1151,25 +1586,19 @@ export const translations = {
       globe: "3D地球仪",
       sky: "3D天空模拟器",
       dashboard: "综合仪表盘",
-      radar: "雷达与风场动态",
+      radar: "风与海",
       route: "行程与路线气象"
     },
     geo: {
       country: "国家",
       region: "省份 / 地区",
       city: "城市 / 区县",
-      allCountries: "所有国家",
-      selectCountry: "选择国家...",
-      selectRegion: "选择省份...",
-      selectCity: "选择城市...",
       currentLocation: "当前位置 (GPS)",
-      favorites: "收藏城市",
       elevation: "海拔高度",
-      coordinates: "经纬度"
+      otherPlaces: "其他地点"
     },
     current: {
       feelsLike: "体感温度",
-      feelsLikeShade: "阴凉处体感",
       highLow: "最高 / 最低",
       humidity: "相对湿度",
       dewPoint: "露点温度",
@@ -1178,28 +1607,19 @@ export const translations = {
       windGusts: "阵风达",
       visibility: "能见度",
       uvIndex: "紫外线指数",
-      cloudCover: "云量覆盖",
-      solarRadiation: "太阳辐射",
-      precipitation: "降水量",
-      rainProbability: "降水概率",
-      airQuality: "空气质量"
+      cloudCover: "云量覆盖"
     },
     minuteCast: {
-      title: "MinuteCast® 分钟级降水雷达",
-      subtitle: "未来120分钟逐分钟超本地精准降水",
+      title: "未来2小时降水",
+      subtitle: "每15分钟预报",
       noPrecip: "未来2小时内无降水",
       lightRainSoon: "小雨预计在",
       moderateRain: "中雨预计在",
       heavyRain: "强降雨预计在",
       endingSoon: "降水减弱在",
       minutes: "分钟后",
-      intensity: {
-        none: "干燥",
-        light: "微量",
-        moderate: "中度",
-        heavy: "大雨",
-        extreme: "特大暴雨"
-      }
+      continuing: "降水将持续至少2小时",
+      unavailable: "该地点暂无短时预报"
     },
     hourly: {
       title: "逐小时天气预报 (48小时)",
@@ -1209,39 +1629,54 @@ export const translations = {
     daily: {
       title: "14天趋势预报",
       today: "今天",
-      tomorrow: "明天",
-      rainAmount: "累计降水量",
-      windMax: "最大风速"
+      tomorrow: "明天"
     },
     models: {
-      title: "多数值天气预报模型对比",
-      subtitle: "全球顶尖超级计算机气象模型同台对比",
-      consensus: "多模型综合共识",
+      title: "气象模式对比",
+      subtitle: "主要气象中心的今日预报",
+      consensus: "模式平均",
       confidence: "预报置信度",
-      spread: "温度离散度"
+      spread: "模式差异",
+      agreement: "模式一致性",
+      agreementHigh: "高",
+      agreementMedium: "中",
+      agreementLow: "低",
+      colModel: "模式",
+      colResolution: "分辨率",
+      colMaxMin: "最高 / 最低",
+      colRain: "降水",
+      colWind: "最大风速"
     },
     biometeo: {
-      title: "生物气象学、健康与体感指数",
-      headacheAlert: "气压偏头痛风险预警",
+      title: "健康",
+      headacheAlert: "气压敏感度",
       headacheLow: "低风险 - 气压平稳",
       headacheModerate: "中等风险 - 气压正在下降",
-      headacheHigh: "高预警 - 气压急剧骤降 (>3 hPa/3小时)",
-      skinType: "皮肤光敏类型 (Fitzpatrick)",
-      maxSunExposure: "安全日光暴露时长",
+      headacheHigh: "气压快速变化（3小时内超过3百帕）",
+      maxSunExposure: "大约多久会晒伤",
       sunMinutes: "分钟",
-      arthritisIndex: "关节与风湿易感度",
-      thermalStress: "人体热应激指数",
-      pollenTitle: "花粉与过敏原监控",
-      pollenGraminacee: "禾本科草花粉",
-      pollenBetulla: "桦木 / 桤木",
-      pollenAmbrosia: "豚草",
-      pollenOlivo: "油橄榄",
-      pollenLow: "极少",
-      pollenMedium: "中等",
-      pollenHigh: "极高"
+      pollenTitle: "花粉（粒/立方米）",
+      subtitle: "气压变化、日晒与花粉",
+      skinTypeIII: "中等肤色（III型）",
+      noUv: "无紫外线：没有晒伤风险",
+      pollenNames: {
+        alder: "桤木",
+        birch: "桦树",
+        grass: "禾本科",
+        mugwort: "艾草",
+        olive: "橄榄",
+        ragweed: "豚草"
+      },
+      pollenLevels: {
+        low: "低",
+        medium: "中等",
+        high: "高",
+        veryHigh: "很高"
+      },
+      pollenUnavailable: "花粉数据仅覆盖欧洲"
     },
     aqi: {
-      title: "空气质量指数 (AQI) 深度解析",
+      title: "空气质量",
       good: "优",
       fair: "良",
       moderate: "轻度污染",
@@ -1249,34 +1684,45 @@ export const translations = {
       veryPoor: "重度污染",
       hazardous: "严重污染",
       healthAdvice: "健康建议",
-      advisoryGood: "空气清新，极适宜开展各类户外体育活动。",
-      advisoryModerate: "敏感体质及哮喘人群应适当减少长时间高强度户外活动。",
-      advisoryPoor: "尽量避免剧烈户外运动，外出建议佩戴防护口罩。"
+      noData: "暂无空气质量数据",
+      pollutants: {
+        o3: "臭氧 (O₃)",
+        no2: "二氧化氮 (NO₂)",
+        so2: "二氧化硫 (SO₂)",
+        co: "一氧化碳 (CO)"
+      },
+      advice: {
+        good: "空气清新：适合所有户外活动。",
+        fair: "空气良好：无需特别防护。",
+        moderate: "敏感人群应减少长时间户外运动。",
+        poor: "避免剧烈户外运动。",
+        veryPoor: "减少外出，尤其是儿童、老人和哮喘患者。",
+        hazardous: "尽量留在室内并关闭门窗。"
+      }
     },
     lifestyle: {
-      title: "生活出行指南与AI智能穿衣顾问",
-      outfitTitle: "今日穿衣指南 (AI)",
+      title: "活动与穿衣",
+      outfitTitle: "今天穿什么？",
       laundry: "晾晒指数",
       running: "晨练与跑步",
       carWash: "洗车指数",
-      photography: "摄影黄金光线",
       stargazing: "夜空天文观测",
       bbq: "露营烧烤",
-      gardening: "植物浇灌",
-      scoreExcellent: "极佳",
-      scoreGood: "良好",
-      scoreModerate: "尚可",
-      scorePoor: "不适宜"
+      outfit: {
+        umbrellaNeeded: "带上雨伞或雨衣",
+        heavyCoat: "厚外套、围巾和手套",
+        jacketSweater: "薄外套加毛衣",
+        lightLayers: "轻薄叠穿：衬衫或卫衣",
+        summerClothes: "轻薄透气的夏装",
+        windbreaker: "防风外套",
+        sunglassesUv: "太阳镜和防晒霜"
+      }
     },
     sunMoon: {
-      title: "日月天文星历",
       sunrise: "日出时刻",
       sunset: "日落时刻",
       daylight: "昼长",
-      solarNoon: "正午中天",
-      goldenHour: "黄金时刻",
       moonPhase: "月相状态",
-      illumination: "月面照度",
       moonPhases: {
         new: "新月 / 朔月",
         waxingCrescent: "蛾眉月",
@@ -1291,26 +1737,28 @@ export const translations = {
     routeWeather: {
       title: "行程路线气象研判",
       subtitle: "可视化分析您自驾或飞行沿途各个节点的气象变化",
-      origin: "出发地",
-      destination: "目的地",
       calcRoute: "分析路线天气",
       checkPoints: "沿途检查点",
       routeAdvice: "行车安全建议"
     },
     audio: {
       ambientSounds: "3D自然白噪音",
-      rainSound: "雨声",
-      windSound: "微风",
-      thunderSound: "远雷",
-      mute: "静音",
-      unmute: "开启身临其境环境音"
+      rainSound: "雨声"
     },
     alerts: {
-      severeWeather: "官方气象预警信号",
-      noAlerts: "当前无严重气象灾害预警",
-      yellowWarning: "黄色预警 - 局部强对流或强降水",
-      orangeWarning: "橙色预警 - 暴雨、雷暴大风等高风险",
-      redWarning: "红色预警 - 极端灾害天气，停止户外活动"
+      yellowWarning: "注意：局部天气较强",
+      orangeWarning: "预计有强天气",
+      redWarning: "预计有极端天气",
+      notOfficial: "根据未来24小时预报计算的提示，并非官方预警。请查看本国气象部门的信息。",
+      reasons: {
+        thunder: "雷暴",
+        gusts: "强阵风",
+        heavyRain: "强降雨",
+        heavySnow: "大雪",
+        fog: "雾"
+      },
+      maxGust: "最大阵风",
+      totalRain: "24小时降水"
     },
     conditions: {
       clearSky: "晴朗少云",
@@ -1331,9 +1779,68 @@ export const translations = {
       thunderstorm: "雷暴天气",
       thunderstormHail: "冰雹强雷暴",
       windy: "大风"
+    },
+    status: {
+      updatedAt: "更新于",
+      offlineCached: "无网络：显示上次更新的数据。",
+      loadError: "无法加载天气，请检查网络连接。",
+      retry: "重试",
+      loading: "正在加载天气…",
+      slowLoading: "首次加载该地区，可能需要最多30秒。",
+      myLocation: "我的位置",
+      gpsUnsupported: "此设备不支持定位。",
+      gpsError: "无法获取位置，请手动搜索城市。",
+      dataSource: "气象数据：Open-Meteo.com (CC BY 4.0) · 地名：GeoNames"
+    },
+    comparison: {
+      vsYesterday: "与昨天同一时间相比",
+      warmer: "更暖",
+      colder: "更冷",
+      same: "与昨天相同"
+    },
+    meteogram: {
+      title: "24小时气象图",
+      subtitle: "气温、露点、气压和降水"
+    },
+    windSea: {
+      title: "风与海",
+      currentWind: "当前风",
+      direction: "风向",
+      beaufort: "蒲福风级",
+      force: "级",
+      waveHeight: "浪高",
+      wavePeriod: "波浪周期",
+      seaTemp: "海水温度",
+      noMarine: "无海洋数据：该地点远离海洋。",
+      animationNote: "动画基于该地点当前的风速和风向。"
+    },
+    route: {
+      originPlaceholder: "出发城市",
+      destPlaceholder: "目的城市",
+      start: "出发",
+      end: "到达",
+      waypoint: "途经点",
+      calculating: "正在计算…",
+      notFound: "未找到地点：",
+      error: "无法计算路线天气。",
+      straightLineNote: "两城市之间直线上5个点的当前天气（非道路路线）。",
+      visibility: "能见度",
+      advice: {
+        good: "沿途无明显天气现象。",
+        rain: "部分路段有雨：请减速并保持车距。",
+        snow: "沿途有雪：请确认防滑链或冬季轮胎要求。",
+        storm: "沿途有雷暴：建议推迟出发。",
+        wind: "强阵风：高大车辆及桥梁路段请注意。",
+        fog: "部分路段有雾，能见度较低。"
+      }
+    },
+    info: {
+      globeTitle: "3D地球",
+      globeText: "拖动旋转地球，使用滚轮或＋/−按钮缩放。标记显示所选地点。",
+      skyTitle: "天空模拟器",
+      skyText: "拖动滑块查看一天中不同时间的天空，并反映该地点的当前天气。"
     }
   },
-
   ar: {
     appName: "AETHERIA 3D",
     tagline: "توقعات جوية فائقة الدقة ومحاكاة ثلاثية الأبعاد واقعية للأرض",
@@ -1342,25 +1849,19 @@ export const translations = {
       globe: "الكرة الأرضية 3D",
       sky: "محاكي السماء 3D",
       dashboard: "لوحة التحكم المفصلة",
-      radar: "الرادار والرياح الحية",
+      radar: "الرياح والبحر",
       route: "طقس المسار والسفر"
     },
     geo: {
       country: "الدولة",
       region: "المنطقة / المحافظة",
       city: "المدينة / الحي",
-      allCountries: "كل الدول",
-      selectCountry: "اختر الدولة...",
-      selectRegion: "اختر المنطقة...",
-      selectCity: "اختر المدينة...",
       currentLocation: "الموقع الحالي (GPS)",
-      favorites: "المدن المفضلة",
       elevation: "الارتفاع",
-      coordinates: "الإحداثيات"
+      otherPlaces: "أماكن أخرى"
     },
     current: {
       feelsLike: "الحرارة المحسوسة",
-      feelsLikeShade: "المحسوسة في الظل",
       highLow: "العظمى / الصغرى",
       humidity: "الرطوبة",
       dewPoint: "نقطة الندى",
@@ -1369,28 +1870,19 @@ export const translations = {
       windGusts: "الهبات حتى",
       visibility: "مدى الرؤية",
       uvIndex: "مؤشر الأشعة فوق البنفسجية",
-      cloudCover: "الغطاء السحابي",
-      solarRadiation: "الإشعاع الشمسي",
-      precipitation: "الهطول",
-      rainProbability: "فرصة هطول المطر",
-      airQuality: "جودة الهواء"
+      cloudCover: "الغطاء السحابي"
     },
     minuteCast: {
-      title: "توقعات الدقيقة MinuteCast®",
-      subtitle: "توقعات دقيقة بدقيقة للأمطار خلال الـ 120 دقيقة القادمة",
+      title: "المطر خلال الساعتين القادمتين",
+      subtitle: "توقعات كل 15 دقيقة",
       noPrecip: "لا أمطار متوقعة خلال الساعتين القادمتين",
       lightRainSoon: "مطر خفيف متوقع بعد",
       moderateRain: "مطر معتدل قادم بعد",
       heavyRain: "أمطار غزيرة متوقعة بعد",
       endingSoon: "تراجع الأمطار خلال",
       minutes: "دقيقة",
-      intensity: {
-        none: "جاف",
-        light: "خفيف",
-        moderate: "معتدل",
-        heavy: "غزير",
-        extreme: "طوفاني"
-      }
+      continuing: "هطول لمدة ساعتين على الأقل",
+      unavailable: "التوقعات القصيرة المدى غير متاحة لهذا الموقع"
     },
     hourly: {
       title: "التوقعات الساعية المفصلة (48 ساعة)",
@@ -1400,39 +1892,54 @@ export const translations = {
     daily: {
       title: "توقعات 14 يوماً",
       today: "اليوم",
-      tomorrow: "غداً",
-      rainAmount: "تراكم الأمطار",
-      windMax: "أقصى سرعة للرياح"
+      tomorrow: "غداً"
     },
     models: {
-      title: "مقارنة النماذج المناخية المتعددة",
-      subtitle: "تحليل مقارن لأقوى الحواسيب الخارقة العالمية للتنبؤ بالطقس",
-      consensus: "الإجماع المناخي",
+      title: "مقارنة نماذج الطقس",
+      subtitle: "توقعات اليوم من أهم مراكز الأرصاد",
+      consensus: "متوسط النماذج",
       confidence: "نسبة الثقة",
-      spread: "تفاوت درجات الحرارة"
+      spread: "الفرق بين النماذج",
+      agreement: "توافق النماذج",
+      agreementHigh: "مرتفع",
+      agreementMedium: "متوسط",
+      agreementLow: "منخفض",
+      colModel: "النموذج",
+      colResolution: "الدقة",
+      colMaxMin: "العظمى / الصغرى",
+      colRain: "المطر",
+      colWind: "أقصى رياح"
     },
     biometeo: {
-      title: "الأرصاد الحيوية، الصحة والعافية",
-      headacheAlert: "إنذار الصداع النصفي البارومتري",
+      title: "الصحة والعافية",
+      headacheAlert: "الحساسية لتغيّر الضغط",
       headacheLow: "خطر منخفض - ضغط مستقر",
       headacheModerate: "خطر معتدل - انخفاض الضغط الجوي",
-      headacheHigh: "تنبيه مرتفع - هبوط بارومتري مفاجئ (>3 hPa/3h)",
-      skinType: "نوع البشرة (Fitzpatrick)",
-      maxSunExposure: "وقت التعرض الآمن للشمس",
+      headacheHigh: "تغيّر سريع في الضغط (أكثر من 3 هكتوباسكال خلال 3 ساعات)",
+      maxSunExposure: "الوقت التقريبي قبل حروق الشمس",
       sunMinutes: "دقيقة",
-      arthritisIndex: "مؤشر آلام المفاصل والروماتيزم",
-      thermalStress: "الإجهاد الحراري للجسم",
-      pollenTitle: "متتبع حبوب اللقاح والحساسية",
-      pollenGraminacee: "حبوب الأعشاب",
-      pollenBetulla: "البتولا",
-      pollenAmbrosia: "الدمسيسة",
-      pollenOlivo: "الزيتون",
-      pollenLow: "منخفض",
-      pollenMedium: "متوسط",
-      pollenHigh: "مرتفع جداً"
+      pollenTitle: "حبوب اللقاح (حبة/م³)",
+      subtitle: "تغيّر الضغط والتعرض للشمس وحبوب اللقاح",
+      skinTypeIII: "بشرة فاتحة إلى متوسطة (النوع III)",
+      noUv: "لا أشعة فوق بنفسجية: لا خطر من حروق الشمس",
+      pollenNames: {
+        alder: "الجار المائي",
+        birch: "البتولا",
+        grass: "الأعشاب",
+        mugwort: "الشيح",
+        olive: "الزيتون",
+        ragweed: "الرجيد"
+      },
+      pollenLevels: {
+        low: "منخفض",
+        medium: "متوسط",
+        high: "مرتفع",
+        veryHigh: "مرتفع جدًا"
+      },
+      pollenUnavailable: "بيانات حبوب اللقاح متاحة لأوروبا فقط"
     },
     aqi: {
-      title: "مؤشر جودة الهواء (AQI)",
+      title: "جودة الهواء",
       good: "ممتاز",
       fair: "جيد",
       moderate: "متوسط",
@@ -1440,34 +1947,45 @@ export const translations = {
       veryPoor: "رديء جداً",
       hazardous: "خطير",
       healthAdvice: "نصيحة صحية",
-      advisoryGood: "هواء نقي تماماً، مثالي للأنشطة والرياضة بالخارج.",
-      advisoryModerate: "على المصابين بالحساسية تقليل المجهود الشاق بالخارج.",
-      advisoryPoor: "تجنب التمارين الشاقة في الهواء الطلق."
+      noData: "بيانات جودة الهواء غير متاحة",
+      pollutants: {
+        o3: "الأوزون (O₃)",
+        no2: "ثاني أكسيد النيتروجين (NO₂)",
+        so2: "ثاني أكسيد الكبريت (SO₂)",
+        co: "أول أكسيد الكربون (CO)"
+      },
+      advice: {
+        good: "هواء نقي: مثالي لجميع الأنشطة الخارجية.",
+        fair: "جودة جيدة: لا حاجة لاحتياطات خاصة.",
+        moderate: "على الأشخاص الحساسين تقليل المجهود الطويل في الخارج.",
+        poor: "تجنب الرياضة الشاقة في الخارج.",
+        veryPoor: "قلّل الوقت في الخارج، خاصة للأطفال وكبار السن ومرضى الربو.",
+        hazardous: "ابقَ في الداخل قدر الإمكان وأغلق النوافذ."
+      }
     },
     lifestyle: {
-      title: "مخطط الأنشطة والملابس الذكية",
-      outfitTitle: "ماذا أرتدي اليوم؟ (المستشار الذكي)",
+      title: "الأنشطة والملابس",
+      outfitTitle: "ماذا أرتدي اليوم؟",
       laundry: "تجفيف الغسيل",
       running: "الجري والرياضة",
       carWash: "غسيل السيارة",
-      photography: "التصوير والساعة الذهبية",
       stargazing: "رصد النجوم والفلك",
       bbq: "الشواء والنزهات",
-      gardening: "ري الحدائق",
-      scoreExcellent: "ممتاز",
-      scoreGood: "مناسب",
-      scoreModerate: "مقبول",
-      scorePoor: "غير مناسب"
+      outfit: {
+        umbrellaNeeded: "خذ مظلة أو معطفًا واقيًا من المطر",
+        heavyCoat: "معطف ثقيل ووشاح وقفازات",
+        jacketSweater: "سترة خفيفة وكنزة",
+        lightLayers: "طبقات خفيفة: قميص أو سترة رياضية",
+        summerClothes: "ملابس صيفية خفيفة ومريحة",
+        windbreaker: "سترة واقية من الرياح",
+        sunglassesUv: "نظارات شمسية وواقي شمس"
+      }
     },
     sunMoon: {
-      title: "دورة الشمس والقمر",
       sunrise: "الشروق",
       sunset: "الغروب",
       daylight: "ساعات النهار",
-      solarNoon: "الظهيرة الشمسية",
-      goldenHour: "الساعة الذهبية",
       moonPhase: "طور القمر",
-      illumination: "نسبة الإضاءة",
       moonPhases: {
         new: "محاق",
         waxingCrescent: "هلال متزايد",
@@ -1482,26 +2000,28 @@ export const translations = {
     routeWeather: {
       title: "طقس مسار الرحلة والسفر",
       subtitle: "تحليل الأحوال الجوية على طول مسار قيادتك أو رحلتك الجوية",
-      origin: "مدينة الانطلاق",
-      destination: "مدينة الوصول",
       calcRoute: "تحليل طقس الطريق",
       checkPoints: "محطات المسار",
       routeAdvice: "إرشادات السفر"
     },
     audio: {
       ambientSounds: "صوتيات الطبيعة ثلاثية الأبعاد",
-      rainSound: "المطر",
-      windSound: "الرياح",
-      thunderSound: "الرعد",
-      mute: "كتم الصوت",
-      unmute: "تشغيل الصوت الطبيعي"
+      rainSound: "المطر"
     },
     alerts: {
-      severeWeather: "التحذيرات الجوية الرسمية",
-      noAlerts: "لا توجد تحذيرات جوية خطيرة حالياً",
-      yellowWarning: "تنبيه أصفر - ظواهر موضعية ملحوظة",
-      orangeWarning: "تحذير برتقالي - عواصف رعدية أو خطر سيول",
-      redWarning: "إنذار أحمر - طقس متطرف، يرجى الحذر التام"
+      yellowWarning: "تنبيه: ظواهر جوية قوية محليًا",
+      orangeWarning: "يُتوقع طقس شديد",
+      redWarning: "يُتوقع طقس متطرف",
+      notOfficial: "تنبيه محسوب من توقعات الساعات الـ24 القادمة، وليس تحذيرًا رسميًا. راجع هيئة الأرصاد الوطنية.",
+      reasons: {
+        thunder: "عواصف رعدية",
+        gusts: "هبات رياح قوية",
+        heavyRain: "أمطار غزيرة",
+        heavySnow: "ثلوج كثيفة",
+        fog: "ضباب"
+      },
+      maxGust: "أقصى هبة",
+      totalRain: "مطر 24 ساعة"
     },
     conditions: {
       clearSky: "سماء صافية",
@@ -1522,9 +2042,68 @@ export const translations = {
       thunderstorm: "عاصفة رعدية مع برق",
       thunderstormHail: "عاصفة رعدية مع برد",
       windy: "رياح قوية"
+    },
+    status: {
+      updatedAt: "آخر تحديث",
+      offlineCached: "لا يوجد اتصال: يتم عرض بيانات آخر تحديث.",
+      loadError: "تعذّر تحميل الطقس. تحقق من الاتصال.",
+      retry: "إعادة المحاولة",
+      loading: "جارٍ تحميل الطقس…",
+      slowLoading: "أول مرة لهذه المنطقة: قد يستغرق التحميل حتى 30 ثانية.",
+      myLocation: "موقعي",
+      gpsUnsupported: "تحديد الموقع غير مدعوم على هذا الجهاز.",
+      gpsError: "تعذّر تحديد موقعك. ابحث عن مدينة يدويًا.",
+      dataSource: "بيانات الطقس: Open-Meteo.com (CC BY 4.0) · الأماكن: GeoNames"
+    },
+    comparison: {
+      vsYesterday: "مقارنة بالأمس في الوقت نفسه",
+      warmer: "أدفأ",
+      colder: "أبرد",
+      same: "مثل الأمس"
+    },
+    meteogram: {
+      title: "مخطط الطقس لـ24 ساعة",
+      subtitle: "الحرارة ونقطة الندى والضغط والمطر"
+    },
+    windSea: {
+      title: "الرياح والبحر",
+      currentWind: "الرياح الحالية",
+      direction: "الاتجاه",
+      beaufort: "مقياس بوفورت",
+      force: "القوة",
+      waveHeight: "ارتفاع الموج",
+      wavePeriod: "دورة الموج",
+      seaTemp: "حرارة البحر",
+      noMarine: "لا توجد بيانات بحرية: الموقع بعيد عن البحر.",
+      animationNote: "رسوم متحركة مبنية على سرعة الرياح واتجاهها الحاليين في هذا الموقع."
+    },
+    route: {
+      originPlaceholder: "مدينة الانطلاق",
+      destPlaceholder: "مدينة الوصول",
+      start: "الانطلاق",
+      end: "الوصول",
+      waypoint: "نقطة وسيطة",
+      calculating: "جارٍ الحساب…",
+      notFound: "لم يتم العثور على المكان:",
+      error: "تعذّر حساب طقس المسار.",
+      straightLineNote: "الأحوال الحالية في 5 نقاط على الخط المستقيم بين المدينتين (وليس الطريق البري).",
+      visibility: "مدى الرؤية",
+      advice: {
+        good: "لا ظواهر جوية مهمة على الطريق.",
+        rain: "أمطار في بعض المقاطع: خفّف السرعة وزد مسافة الأمان.",
+        snow: "ثلوج على الطريق: تحقق من إلزامية السلاسل أو الإطارات الشتوية.",
+        storm: "عواصف رعدية على الطريق: فكّر في تأجيل الرحلة.",
+        wind: "هبات قوية: انتبه مع المركبات العالية وعلى الجسور.",
+        fog: "رؤية منخفضة بسبب الضباب في بعض المقاطع."
+      }
+    },
+    info: {
+      globeTitle: "الكرة الأرضية ثلاثية الأبعاد",
+      globeText: "اسحب لتدوير الكرة واستخدم عجلة الفأرة أو زرّي + و − للتكبير. يشير الدبوس إلى الموقع المحدد.",
+      skyTitle: "محاكي السماء",
+      skyText: "استخدم شريط التمرير لرؤية السماء في أوقات مختلفة من اليوم، مع الطقس الحالي لهذا الموقع."
     }
   },
-
   pt: {
     appName: "AETHERIA 3D",
     tagline: "Previsões Meteorológicas Hiperdetalhadas & Globo 3D Fotorrealista",
@@ -1533,25 +2112,19 @@ export const translations = {
       globe: "Globo 3D",
       sky: "Simulador de Céu 3D",
       dashboard: "Painel Detalhado",
-      radar: "Radar & Vento ao Vivo",
+      radar: "Vento e mar",
       route: "Clima na Rota / Viagem"
     },
     geo: {
       country: "País",
       region: "Região / Estado",
       city: "Cidade / Bairro",
-      allCountries: "Todos os Países",
-      selectCountry: "Selecionar País...",
-      selectRegion: "Selecionar Região...",
-      selectCity: "Selecionar Cidade...",
       currentLocation: "Localização Atual (GPS)",
-      favorites: "Cidades Favoritas",
       elevation: "Altitude",
-      coordinates: "Coordenadas"
+      otherPlaces: "Outros locais"
     },
     current: {
       feelsLike: "Sensação Térmica",
-      feelsLikeShade: "Sensação na Sombra",
       highLow: "Máx / Mín",
       humidity: "Umidade",
       dewPoint: "Ponto de Orvalho",
@@ -1560,27 +2133,19 @@ export const translations = {
       windGusts: "Rajadas até",
       visibility: "Visibilidade",
       uvIndex: "Índice UV",
-      cloudCover: "Cobertura de Nuvens",
-      solarRadiation: "Radiação Solar",
-      precipitation: "Precipitação",
-      rainProbability: "Probabilidade de Chuva",
-      airQuality: "Qualidade do Ar"
+      cloudCover: "Cobertura de Nuvens"
     },
     minuteCast: {
-      subtitle: "Precipitação minuto a minuto nos próximos 120 min",
+      subtitle: "Previsão em intervalos de 15 minutos",
       noPrecip: "Sem chuvas previstas para as próximas 2 horas",
       lightRainSoon: "Chuva fraca prevista em",
       moderateRain: "Chuva moderada a caminho em",
       heavyRain: "Pancadas fortes previstas em",
       endingSoon: "Precipitações diminuindo em",
       minutes: "minutos",
-      intensity: {
-        none: "Seco",
-        light: "Fraca",
-        moderate: "Moderada",
-        heavy: "Forte",
-        extreme: "Torrencial"
-      }
+      title: "Chuva nas próximas 2 horas",
+      continuing: "Precipitação por pelo menos 2 horas",
+      unavailable: "Previsão de curto prazo indisponível para este local"
     },
     hourly: {
       title: "Previsão Horária Detalhada (48 Horas)",
@@ -1590,39 +2155,54 @@ export const translations = {
     daily: {
       title: "Tendência para 14 Dias",
       today: "Hoje",
-      tomorrow: "Amanhã",
-      rainAmount: "Volume de chuva",
-      windMax: "Vento máx"
+      tomorrow: "Amanhã"
     },
     models: {
-      title: "Comparação de Modelos Meteorológicos",
-      subtitle: "Análise comparativa direta dos supercomputadores globais",
-      consensus: "Consenso Multi-Modelo",
+      title: "Comparação de modelos meteorológicos",
+      subtitle: "Previsão de hoje dos principais centros meteorológicos",
+      consensus: "Média dos modelos",
       confidence: "Confiabilidade",
-      spread: "Dispersão Térmica"
+      spread: "Diferença entre modelos",
+      agreement: "Concordância entre modelos",
+      agreementHigh: "Alta",
+      agreementMedium: "Média",
+      agreementLow: "Baixa",
+      colModel: "Modelo",
+      colResolution: "Resolução",
+      colMaxMin: "Máx / Mín",
+      colRain: "Chuva",
+      colWind: "Vento máx"
     },
     biometeo: {
-      title: "Biometeorologia, Saúde e Bem-Estar",
-      headacheAlert: "Alerta de Enxaqueca Barométrica",
+      title: "Saúde e bem-estar",
+      headacheAlert: "Sensibilidade barométrica",
       headacheLow: "Risco Baixo - Pressão estável",
       headacheModerate: "Risco Moderado - Queda de pressão em andamento",
-      headacheHigh: "Alerta Alto - Queda barométrica brusca (>3 hPa/3h)",
-      skinType: "Fototipo de Pele (Fitzpatrick)",
-      maxSunExposure: "Tempo máximo seguro ao sol",
+      headacheHigh: "Variação rápida de pressão (>3 hPa em 3 horas)",
+      maxSunExposure: "Tempo aproximado até queimar",
       sunMinutes: "minutos",
-      arthritisIndex: "Índice Reumático / Articulações",
-      thermalStress: "Estresse Térmico Corporal",
-      pollenTitle: "Monitor de Pólen e Alérgenos",
-      pollenGraminacee: "Gramíneas",
-      pollenBetulla: "Bétula",
-      pollenAmbrosia: "Ambrósia",
-      pollenOlivo: "Oliveira",
-      pollenLow: "Baixo",
-      pollenMedium: "Moderado",
-      pollenHigh: "Muito Alto"
+      pollenTitle: "Pólen (grãos/m³)",
+      subtitle: "Variação de pressão, exposição ao sol e pólen",
+      skinTypeIII: "Pele clara a média (fototipo III)",
+      noUv: "Sem UV: sem risco de queimaduras",
+      pollenNames: {
+        alder: "Amieiro",
+        birch: "Bétula",
+        grass: "Gramíneas",
+        mugwort: "Artemísia",
+        olive: "Oliveira",
+        ragweed: "Ambrósia"
+      },
+      pollenLevels: {
+        low: "Baixo",
+        medium: "Moderado",
+        high: "Alto",
+        veryHigh: "Muito alto"
+      },
+      pollenUnavailable: "Dados de pólen disponíveis apenas para a Europa"
     },
     aqi: {
-      title: "Índice de Qualidade do Ar (AQI)",
+      title: "Qualidade do ar",
       good: "Excelente",
       fair: "Bom",
       moderate: "Moderado",
@@ -1630,34 +2210,45 @@ export const translations = {
       veryPoor: "Muito Ruim",
       hazardous: "Perigoso",
       healthAdvice: "Recomendação de Saúde",
-      advisoryGood: "Ar puro e limpo. Excelente para atividades ao ar livre.",
-      advisoryModerate: "Pessoas sensíveis devem moderar exercícios extenuantes.",
-      advisoryPoor: "Evitar atividades físicas intensas ao ar livre."
+      noData: "Dados de qualidade do ar indisponíveis",
+      pollutants: {
+        o3: "Ozônio (O₃)",
+        no2: "Dióxido de nitrogênio (NO₂)",
+        so2: "Dióxido de enxofre (SO₂)",
+        co: "Monóxido de carbono (CO)"
+      },
+      advice: {
+        good: "Ar limpo: ideal para todas as atividades ao ar livre.",
+        fair: "Boa qualidade: sem cuidados especiais.",
+        moderate: "Pessoas sensíveis devem limitar esforços prolongados ao ar livre.",
+        poor: "Evite exercícios intensos ao ar livre.",
+        veryPoor: "Limite o tempo ao ar livre, sobretudo crianças, idosos e asmáticos.",
+        hazardous: "Fique em ambientes fechados o máximo possível, com as janelas fechadas."
+      }
     },
     lifestyle: {
-      title: "Planejador de Atividades e Roupas Inteligentes",
-      outfitTitle: "O que Vestir Hoje? (Assistente IA)",
+      title: "Atividades e roupas",
+      outfitTitle: "O que vestir hoje?",
       laundry: "Secar Roupa no Varal",
       running: "Corrida e Esportes",
       carWash: "Lavar o Carro",
-      photography: "Fotografia e Hora de Ouro",
       stargazing: "Observação de Estrelas",
       bbq: "Churrasco e Piquenique",
-      gardening: "Rega de Plantas",
-      scoreExcellent: "Excelente",
-      scoreGood: "Favorável",
-      scoreModerate: "Aceitável",
-      scorePoor: "Desfavorável"
+      outfit: {
+        umbrellaNeeded: "Leve guarda-chuva ou capa de chuva",
+        heavyCoat: "Casaco pesado, cachecol e luvas",
+        jacketSweater: "Jaqueta leve e suéter",
+        lightLayers: "Camadas leves: camisa ou moletom",
+        summerClothes: "Roupas de verão leves e respiráveis",
+        windbreaker: "Corta-vento",
+        sunglassesUv: "Óculos de sol e protetor solar"
+      }
     },
     sunMoon: {
-      title: "Ciclo Solar e Lunar",
       sunrise: "Nascer do Sol",
       sunset: "Pôr do Sol",
       daylight: "Horas de Sol",
-      solarNoon: "Meio-Dia Solar",
-      goldenHour: "Hora de Ouro",
       moonPhase: "Fase da Lua",
-      illumination: "Iluminação",
       moonPhases: {
         new: "Lua Nova",
         waxingCrescent: "Lua Crescente",
@@ -1672,26 +2263,28 @@ export const translations = {
     routeWeather: {
       title: "Clima na Rota de Viagem",
       subtitle: "Consulte o clima ao longo do seu percurso de carro ou voo",
-      origin: "Cidade de Origem",
-      destination: "Cidade de Destino",
       calcRoute: "Calcular Clima da Rota",
       checkPoints: "Pontos de Parada",
       routeAdvice: "Dica de Viagem"
     },
     audio: {
       ambientSounds: "Áudio Atmosférico 3D",
-      rainSound: "Chuva",
-      windSound: "Vento",
-      thunderSound: "Trovão",
-      mute: "Silenciar",
-      unmute: "Ativar Sons Naturais"
+      rainSound: "Chuva"
     },
     alerts: {
-      severeWeather: "Alertas Meteorológicos Oficiais",
-      noAlerts: "Nenhum aviso meteorológico grave em vigor",
-      yellowWarning: "Aviso Amarelo - Fenômenos localmente intensos",
-      orangeWarning: "Alerta Laranja - Tempestades severas ou risco de enchente",
-      redWarning: "Alerta Vermelho - Eventos extremos, máxima cautela"
+      yellowWarning: "Atenção: fenômenos localmente intensos",
+      orangeWarning: "Previsão de fenômenos intensos",
+      redWarning: "Previsão de fenômenos extremos",
+      notOfficial: "Aviso calculado a partir da previsão das próximas 24 horas, não é um alerta oficial. Consulte o serviço meteorológico nacional.",
+      reasons: {
+        thunder: "trovoadas",
+        gusts: "rajadas fortes",
+        heavyRain: "chuva forte",
+        heavySnow: "neve intensa",
+        fog: "nevoeiro"
+      },
+      maxGust: "Rajada máx",
+      totalRain: "Chuva 24 h"
     },
     conditions: {
       clearSky: "Céu Limpo",
@@ -1712,9 +2305,68 @@ export const translations = {
       thunderstorm: "Tempestade com Raios",
       thunderstormHail: "Tempestade com Granizo",
       windy: "Ventos Fortes"
+    },
+    status: {
+      updatedAt: "Atualizado às",
+      offlineCached: "Sem conexão: mostrando os dados da última atualização.",
+      loadError: "Não foi possível carregar o tempo. Verifique a conexão.",
+      retry: "Tentar novamente",
+      loading: "Carregando o tempo…",
+      slowLoading: "Primeira vez para esta área: o carregamento pode levar até 30 segundos.",
+      myLocation: "Minha localização",
+      gpsUnsupported: "A geolocalização não é compatível com este dispositivo.",
+      gpsError: "Não foi possível obter sua localização. Pesquise uma cidade.",
+      dataSource: "Dados meteorológicos: Open-Meteo.com (CC BY 4.0) · Locais: GeoNames"
+    },
+    comparison: {
+      vsYesterday: "Em relação a ontem no mesmo horário",
+      warmer: "mais quente",
+      colder: "mais frio",
+      same: "igual a ontem"
+    },
+    meteogram: {
+      title: "Meteograma de 24 horas",
+      subtitle: "Temperatura, ponto de orvalho, pressão e chuva"
+    },
+    windSea: {
+      title: "Vento e mar",
+      currentWind: "Vento atual",
+      direction: "Direção",
+      beaufort: "Escala de Beaufort",
+      force: "Força",
+      waveHeight: "Altura das ondas",
+      wavePeriod: "Período das ondas",
+      seaTemp: "Temperatura do mar",
+      noMarine: "Sem dados marinhos: local afastado do mar.",
+      animationNote: "Animação baseada na velocidade e direção atuais do vento neste local."
+    },
+    route: {
+      originPlaceholder: "Cidade de partida",
+      destPlaceholder: "Cidade de chegada",
+      start: "Partida",
+      end: "Chegada",
+      waypoint: "Ponto intermediário",
+      calculating: "Calculando…",
+      notFound: "Local não encontrado:",
+      error: "Não foi possível calcular o tempo da rota.",
+      straightLineNote: "Condições atuais em 5 pontos na linha reta entre as duas cidades (não a rota rodoviária).",
+      visibility: "Visibilidade",
+      advice: {
+        good: "Nenhum fenômeno significativo no trajeto.",
+        rain: "Chuva em alguns trechos: reduza a velocidade e aumente a distância de segurança.",
+        snow: "Neve no trajeto: verifique a obrigatoriedade de correntes ou pneus de inverno.",
+        storm: "Trovoadas no trajeto: considere adiar a partida.",
+        wind: "Rajadas fortes: cuidado com veículos altos e em viadutos.",
+        fog: "Visibilidade reduzida por nevoeiro em alguns trechos."
+      }
+    },
+    info: {
+      globeTitle: "Globo 3D",
+      globeText: "Arraste para girar o globo e use a roda do mouse ou os botões + e − para ampliar. O marcador indica o local selecionado.",
+      skyTitle: "Simulador do céu",
+      skyText: "Use o controle deslizante para ver o céu em diferentes horas do dia, com o tempo atual deste local."
     }
   },
-
   ru: {
     appName: "AETHERIA 3D",
     tagline: "Сверхдетальный прогноз погоды и фотореалистичный 3D глобус",
@@ -1723,25 +2375,19 @@ export const translations = {
       globe: "3D Глобус",
       sky: "3D Симулятор Неба",
       dashboard: "Детальная панель",
-      radar: "Радар и Ветер Live",
+      radar: "Ветер и море",
       route: "Погода по маршруту"
     },
     geo: {
       country: "Страна",
       region: "Регион / Область",
       city: "Город / Район",
-      allCountries: "Все страны",
-      selectCountry: "Выберите страну...",
-      selectRegion: "Выберите регион...",
-      selectCity: "Выберите город...",
       currentLocation: "Текущее местоположение (GPS)",
-      favorites: "Избранные города",
       elevation: "Высота",
-      coordinates: "Координаты"
+      otherPlaces: "Другие места"
     },
     current: {
       feelsLike: "Ощущается как",
-      feelsLikeShade: "Ощущается в тени",
       highLow: "Макс / Мин",
       humidity: "Влажность",
       dewPoint: "Точка росы",
@@ -1750,27 +2396,19 @@ export const translations = {
       windGusts: "Порывы до",
       visibility: "Видимость",
       uvIndex: "УФ-индекс",
-      cloudCover: "Облачность",
-      solarRadiation: "Солнечная радиация",
-      precipitation: "Осадки",
-      rainProbability: "Вероятность дождя",
-      airQuality: "Качество воздуха"
+      cloudCover: "Облачность"
     },
     minuteCast: {
-      subtitle: "Поминутный прогноз осадков на ближайшие 120 мин",
+      subtitle: "Прогноз с шагом 15 минут",
       noPrecip: "Осадков в ближайшие 2 часа не ожидается",
       lightRainSoon: "Небольшой дождь начнется через",
       moderateRain: "Умеренный дождь начнется через",
       heavyRain: "Сильный ливень ожидается через",
       endingSoon: "Осадки прекратятся в течение",
       minutes: "минут",
-      intensity: {
-        none: "Сухо",
-        light: "Слабый",
-        moderate: "Умеренный",
-        heavy: "Сильный",
-        extreme: "Ливень"
-      }
+      title: "Осадки в ближайшие 2 часа",
+      continuing: "Осадки не менее 2 часов",
+      unavailable: "Краткосрочный прогноз для этого места недоступен"
     },
     hourly: {
       title: "Почасовой прогноз (48 часов)",
@@ -1780,39 +2418,54 @@ export const translations = {
     daily: {
       title: "Прогноз на 14 дней",
       today: "Сегодня",
-      tomorrow: "Завтра",
-      rainAmount: "Количество осадков",
-      windMax: "Макс. ветер"
+      tomorrow: "Завтра"
     },
     models: {
-      title: "Сравнение глобальных моделей погоды",
-      subtitle: "Сравнительный анализ ведущих мировых суперкомпьютеров",
-      consensus: "Консенсус моделей",
+      title: "Сравнение погодных моделей",
+      subtitle: "Прогноз на сегодня от ведущих метеоцентров",
+      consensus: "Среднее моделей",
       confidence: "Надежность прогноза",
-      spread: "Разброс температур"
+      spread: "Разброс моделей",
+      agreement: "Согласованность моделей",
+      agreementHigh: "Высокая",
+      agreementMedium: "Средняя",
+      agreementLow: "Низкая",
+      colModel: "Модель",
+      colResolution: "Разрешение",
+      colMaxMin: "Макс / Мин",
+      colRain: "Осадки",
+      colWind: "Макс. ветер"
     },
     biometeo: {
-      title: "Биометеорология, Здоровье и Самочувствие",
-      headacheAlert: "Барометрическое предупреждение (Мигрень)",
+      title: "Здоровье и самочувствие",
+      headacheAlert: "Метеочувствительность",
       headacheLow: "Низкий риск - Давление стабильно",
       headacheModerate: "Умеренный риск - Давление падает",
-      headacheHigh: "Высокая тревога - Резкий спад давления (>3 гПа/3ч)",
-      skinType: "Фототип кожи (Фитцпатрик)",
-      maxSunExposure: "Безопасное время на солнце",
+      headacheHigh: "Резкое изменение давления (>3 гПа за 3 часа)",
+      maxSunExposure: "Примерное время до солнечного ожога",
       sunMinutes: "минут",
-      arthritisIndex: "Суставной индекс (Ревматизм)",
-      thermalStress: "Тепловой стресс организма",
-      pollenTitle: "Мониторинг пыльцы и аллергенов",
-      pollenGraminacee: "Злаковые травы",
-      pollenBetulla: "Береза / Ольха",
-      pollenAmbrosia: "Амброзия",
-      pollenOlivo: "Олива",
-      pollenLow: "Низкий",
-      pollenMedium: "Умеренный",
-      pollenHigh: "Очень высокий"
+      pollenTitle: "Пыльца (зёрен/м³)",
+      subtitle: "Изменение давления, солнце и пыльца",
+      skinTypeIII: "Светлая или средняя кожа (тип III)",
+      noUv: "УФ отсутствует: риска ожога нет",
+      pollenNames: {
+        alder: "Ольха",
+        birch: "Берёза",
+        grass: "Злаки",
+        mugwort: "Полынь",
+        olive: "Олива",
+        ragweed: "Амброзия"
+      },
+      pollenLevels: {
+        low: "Низкий",
+        medium: "Умеренный",
+        high: "Высокий",
+        veryHigh: "Очень высокий"
+      },
+      pollenUnavailable: "Данные о пыльце доступны только для Европы"
     },
     aqi: {
-      title: "Индекс качества воздуха (AQI)",
+      title: "Качество воздуха",
       good: "Отличное",
       fair: "Хорошее",
       moderate: "Умеренное",
@@ -1820,34 +2473,45 @@ export const translations = {
       veryPoor: "Очень плохое",
       hazardous: "Опасное",
       healthAdvice: "Совет по здоровью",
-      advisoryGood: "Чистый воздух. Идеально для прогулок и спорта на улице.",
-      advisoryModerate: "Чувствительным людям стоит снизить нагрузку на улице.",
-      advisoryPoor: "Избегайте интенсивных тренировок на открытом воздухе."
+      noData: "Данные о качестве воздуха недоступны",
+      pollutants: {
+        o3: "Озон (O₃)",
+        no2: "Диоксид азота (NO₂)",
+        so2: "Диоксид серы (SO₂)",
+        co: "Угарный газ (CO)"
+      },
+      advice: {
+        good: "Чистый воздух: идеально для любых занятий на улице.",
+        fair: "Хорошее качество: особых мер не требуется.",
+        moderate: "Чувствительным людям стоит ограничить длительные нагрузки на улице.",
+        poor: "Избегайте интенсивных тренировок на улице.",
+        veryPoor: "Сократите время на улице, особенно детям, пожилым и астматикам.",
+        hazardous: "По возможности оставайтесь в помещении с закрытыми окнами."
+      }
     },
     lifestyle: {
-      title: "Планировщик активностей и Умный гардероб",
-      outfitTitle: "Что надеть сегодня? (Советник ИИ)",
+      title: "Занятия и одежда",
+      outfitTitle: "Что надеть сегодня?",
       laundry: "Сушка белья на улице",
       running: "Бег и спорт на воздухе",
       carWash: "Мойка автомобиля",
-      photography: "Фотография и Золотой час",
       stargazing: "Наблюдение за звездами",
       bbq: "Барбекю и пикник",
-      gardening: "Полив сада",
-      scoreExcellent: "Идеально",
-      scoreGood: "Благоприятно",
-      scoreModerate: "Приемлемо",
-      scorePoor: "Не рекомендуется"
+      outfit: {
+        umbrellaNeeded: "Возьмите зонт или дождевик",
+        heavyCoat: "Тёплое пальто, шарф и перчатки",
+        jacketSweater: "Лёгкая куртка и свитер",
+        lightLayers: "Лёгкие слои: рубашка или толстовка",
+        summerClothes: "Лёгкая дышащая летняя одежда",
+        windbreaker: "Ветровка",
+        sunglassesUv: "Солнцезащитные очки и крем"
+      }
     },
     sunMoon: {
-      title: "Солнце и Луна",
       sunrise: "Восход солнца",
       sunset: "Закат солнца",
       daylight: "Световой день",
-      solarNoon: "Солнечный полдень",
-      goldenHour: "Золотой час",
       moonPhase: "Фаза Луны",
-      illumination: "Освещенность",
       moonPhases: {
         new: "Новолуние",
         waxingCrescent: "Молодая луна",
@@ -1862,26 +2526,28 @@ export const translations = {
     routeWeather: {
       title: "Погода в пути и маршруте",
       subtitle: "Анализ погодных условий на протяжении вашей поездки или полета",
-      origin: "Город отправления",
-      destination: "Город назначения",
       calcRoute: "Рассчитать погоду пути",
       checkPoints: "Контрольные точки",
       routeAdvice: "Совет путешественнику"
     },
     audio: {
       ambientSounds: "3D Звуки природы",
-      rainSound: "Шум дождя",
-      windSound: "Порывы ветра",
-      thunderSound: "Раскаты грома",
-      mute: "Выключить звук",
-      unmute: "Включить реалистичный звук"
+      rainSound: "Шум дождя"
     },
     alerts: {
-      severeWeather: "Официальные предупреждения",
-      noAlerts: "Опасных метеорологических явлений не ожидается",
-      yellowWarning: "Желтый уровень - Потенциально опасные явления",
-      orangeWarning: "Оранжевый уровень - Опасные бури или риск паводков",
-      redWarning: "Красный уровень - Экстремальная погода, максимальная бдительность"
+      yellowWarning: "Внимание: местами сильные явления",
+      orangeWarning: "Ожидается опасная погода",
+      redWarning: "Ожидается чрезвычайно опасная погода",
+      notOfficial: "Уведомление рассчитано по прогнозу на ближайшие 24 часа и не является официальным предупреждением. Сверьтесь с национальной метеослужбой.",
+      reasons: {
+        thunder: "грозы",
+        gusts: "сильные порывы",
+        heavyRain: "сильный дождь",
+        heavySnow: "сильный снег",
+        fog: "туман"
+      },
+      maxGust: "Макс. порыв",
+      totalRain: "Осадки 24 ч"
     },
     conditions: {
       clearSky: "Ясно",
@@ -1902,8 +2568,66 @@ export const translations = {
       thunderstorm: "Гроза с молниями",
       thunderstormHail: "Гроза с градом",
       windy: "Штормовой ветер"
+    },
+    status: {
+      updatedAt: "Обновлено в",
+      offlineCached: "Нет соединения: показаны данные последнего обновления.",
+      loadError: "Не удалось загрузить погоду. Проверьте подключение.",
+      retry: "Повторить",
+      loading: "Загрузка погоды…",
+      slowLoading: "Первая загрузка для этого района может занять до 30 секунд.",
+      myLocation: "Моё местоположение",
+      gpsUnsupported: "Геолокация не поддерживается на этом устройстве.",
+      gpsError: "Не удалось определить местоположение. Найдите город вручную.",
+      dataSource: "Данные о погоде: Open-Meteo.com (CC BY 4.0) · Места: GeoNames"
+    },
+    comparison: {
+      vsYesterday: "По сравнению со вчерашним днём в это же время",
+      warmer: "теплее",
+      colder: "холоднее",
+      same: "как вчера"
+    },
+    meteogram: {
+      title: "Метеограмма на 24 часа",
+      subtitle: "Температура, точка росы, давление и осадки"
+    },
+    windSea: {
+      title: "Ветер и море",
+      currentWind: "Текущий ветер",
+      direction: "Направление",
+      beaufort: "Шкала Бофорта",
+      force: "Баллы",
+      waveHeight: "Высота волн",
+      wavePeriod: "Период волн",
+      seaTemp: "Температура моря",
+      noMarine: "Нет морских данных: место далеко от моря.",
+      animationNote: "Анимация основана на текущей скорости и направлении ветра в этом месте."
+    },
+    route: {
+      originPlaceholder: "Город отправления",
+      destPlaceholder: "Город прибытия",
+      start: "Отправление",
+      end: "Прибытие",
+      waypoint: "Промежуточная точка",
+      calculating: "Расчёт…",
+      notFound: "Место не найдено:",
+      error: "Не удалось рассчитать погоду на маршруте.",
+      straightLineNote: "Текущие условия в 5 точках на прямой между двумя городами (не автомобильный маршрут).",
+      visibility: "Видимость",
+      advice: {
+        good: "Значимых погодных явлений на пути нет.",
+        rain: "Дождь на отдельных участках: снизьте скорость и увеличьте дистанцию.",
+        snow: "Снег на пути: проверьте требования к цепям или зимней резине.",
+        storm: "Грозы на пути: рассмотрите перенос поездки.",
+        wind: "Сильные порывы: осторожно на высоких автомобилях и на мостах.",
+        fog: "Ухудшение видимости из-за тумана на отдельных участках."
+      }
+    },
+    info: {
+      globeTitle: "3D-глобус",
+      globeText: "Перетаскивайте, чтобы вращать глобус; колесо мыши или кнопки + и − для масштаба. Метка показывает выбранное место.",
+      skyTitle: "Симулятор неба",
+      skyText: "Используйте ползунок, чтобы увидеть небо в разное время суток с текущей погодой в этом месте."
     }
   }
 };
-
-applyDataStrings(translations);

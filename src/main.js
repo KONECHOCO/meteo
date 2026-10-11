@@ -11,6 +11,34 @@ import { getIconSvg } from "./utils/icons.js";
 
 const LOCALES = { it: "it-IT", en: "en-GB", es: "es-ES", fr: "fr-FR", de: "de-DE", ja: "ja-JP", zh: "zh-CN", ar: "ar", pt: "pt-BR", ru: "ru-RU" };
 const CACHE_PREFIX = "aetheria_wx_";
+const LOCATION_KEY = "aetheria_location";
+// Countries that use Fahrenheit by default
+const FAHRENHEIT_REGIONS = new Set(["US", "LR", "MM", "BS", "BZ", "KY", "PW", "FM", "MH"]);
+
+const deviceLocale = (navigator.languages && navigator.languages[0]) || navigator.language || "en";
+const deviceRegion = (() => {
+  try {
+    return new Intl.Locale(deviceLocale).maximize().region || "";
+  } catch (e) {
+    return "";
+  }
+})();
+
+function readStorage(key) {
+  try {
+    return localStorage.getItem(key);
+  } catch (e) {
+    return null;
+  }
+}
+
+function writeStorage(key, value) {
+  try {
+    localStorage.setItem(key, value);
+  } catch (e) {
+    // Storage unavailable (private mode): preferences are not remembered
+  }
+}
 
 // Escape text coming from APIs or user input before putting it into innerHTML
 function esc(value) {
@@ -20,8 +48,10 @@ function esc(value) {
 // Global App State
 class AetheriaApp {
   constructor() {
-    this.currentLang = localStorage.getItem("aetheria_lang") || "it";
-    this.currentUnit = localStorage.getItem("aetheria_unit") || "C";
+    // First launch follows the phone: its language (if supported) and its region's temperature unit
+    const deviceLang = deviceLocale.slice(0, 2).toLowerCase();
+    this.currentLang = readStorage("aetheria_lang") || (translations[deviceLang] ? deviceLang : "en");
+    this.currentUnit = readStorage("aetheria_unit") || (FAHRENHEIT_REGIONS.has(deviceRegion) ? "F" : "C");
     this.currentView = "dashboard"; // "dashboard" | "globe" | "sky" | "radar" | "route"
 
     // Default Location: Milano, Lombardia, Italia (the selectors are filled from the offline GeoNames data)
@@ -31,6 +61,7 @@ class AetheriaApp {
     this.selectedRegionCode = "09";
     this.selectedCity = { name: "Milano", lat: 45.4643, lon: 9.1895, timezone: "auto" };
     this.locationLabel = { region: "Lombardia", countryCode: "IT" };
+    this.hasSavedLocation = this.restoreLocation();
 
     this.weatherData = null;
     this.isOfflineData = false;
@@ -47,8 +78,50 @@ class AetheriaApp {
     return translations[this.currentLang] || translations.en;
   }
 
+  // Formatting locale: the phone's own locale when it matches the app language (e.g. en-US → 12-hour clock)
   get locale() {
-    return LOCALES[this.currentLang] || "en-GB";
+    return deviceLocale.toLowerCase().startsWith(this.currentLang) ? deviceLocale : LOCALES[this.currentLang] || "en-GB";
+  }
+
+  restoreLocation() {
+    try {
+      const saved = JSON.parse(readStorage(LOCATION_KEY));
+      if (!saved || typeof saved.city?.lat !== "number" || typeof saved.city?.lon !== "number") return false;
+      this.selectedCity = saved.city;
+      this.selectedCountryCode = saved.countryCode || "IT";
+      this.selectedRegionCode = saved.regionCode ?? "";
+      this.locationLabel = saved.label || null;
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  saveLocation() {
+    writeStorage(LOCATION_KEY, JSON.stringify({
+      city: this.selectedCity,
+      countryCode: this.selectedCountryCode,
+      regionCode: this.selectedRegionCode,
+      label: this.locationLabel
+    }));
+  }
+
+  // First launch: the largest place in the phone's country (falls back to Milano)
+  async pickDeviceCountryLocation() {
+    if (!deviceRegion) return;
+    try {
+      const regions = await loadCountryRegions(deviceRegion, this.currentLang);
+      let best = null;
+      for (const r of regions) for (const c of r.cities) if (!best || c.population > best.city.population) best = { city: c, region: r };
+      if (!best) return;
+      this.regions = regions;
+      this.selectedCountryCode = deviceRegion;
+      this.selectedRegionCode = best.region.code;
+      this.selectedCity = best.city;
+      this.locationLabel = { region: best.region.code ? best.region.name : "", countryCode: deviceRegion };
+    } catch (e) {
+      // Unknown region code: keep the default place
+    }
   }
 
   async init() {
@@ -56,6 +129,7 @@ class AetheriaApp {
     this.bindDomElements();
     this.bindEventListeners();
 
+    if (!this.hasSavedLocation) await this.pickDeviceCountryLocation();
     await Promise.all([this.populateGeoSelectors(), this.loadWeatherForCurrentLocation()]);
   }
 
@@ -63,6 +137,7 @@ class AetheriaApp {
     const t = this.t;
     const appEl = document.getElementById("app");
     document.documentElement.lang = this.currentLang;
+    document.title = `${t.appName} – ${t.tagline}`;
     document.documentElement.dir = this.currentLang === "ar" ? "rtl" : "ltr";
 
     appEl.innerHTML = `
@@ -252,6 +327,8 @@ class AetheriaApp {
     } catch (err) {
       console.warn("Place data unavailable:", err);
     }
+    // Store the place again now that its country and region are known
+    this.saveLocation();
   }
 
   setHierarchyLocation() {
@@ -305,7 +382,7 @@ class AetheriaApp {
     // Language Selector
     this.dom.selectLanguage.addEventListener("change", (e) => {
       this.currentLang = e.target.value;
-      localStorage.setItem("aetheria_lang", this.currentLang);
+      writeStorage("aetheria_lang", this.currentLang);
       this.destroyScenes();
       this.renderShell();
       this.bindDomElements();
@@ -317,7 +394,7 @@ class AetheriaApp {
     // Unit Toggle
     this.dom.btnUnit.addEventListener("click", () => {
       this.currentUnit = this.currentUnit === "C" ? "F" : "C";
-      localStorage.setItem("aetheria_unit", this.currentUnit);
+      writeStorage("aetheria_unit", this.currentUnit);
       this.dom.unitLabel.textContent = `°${this.currentUnit}`;
       this.renderCurrentView();
     });
@@ -442,6 +519,7 @@ class AetheriaApp {
     const { lat, lon } = this.selectedCity;
     const timezone = this.selectedCity.timezone || "auto";
     const requestId = (this.requestId = (this.requestId || 0) + 1);
+    this.saveLocation();
 
     if (!this.weatherData) {
       this.dom.dynamicContentHolder.innerHTML = `<div class="glass-panel" style="padding: 24px;">${this.t.status.loading}</div>`;
@@ -616,6 +694,11 @@ class AetheriaApp {
 
   formatCoords(lat, lon) {
     return `${Math.abs(lat).toFixed(2)}°${lat >= 0 ? "N" : "S"}, ${Math.abs(lon).toFixed(2)}°${lon >= 0 ? "E" : "W"}`;
+  }
+
+  // Local wall-clock hour of the forecast slot, in the user's clock format (14:00 or 2 PM)
+  formatHour(timeStr) {
+    return new Date(timeStr).toLocaleTimeString(this.locale, { hour: "numeric", minute: "2-digit" });
   }
 
   formatDayName(dateStr, index) {
@@ -926,7 +1009,7 @@ class AetheriaApp {
         <div class="hourly-scroll-container">
           ${data.hourly.map((h, i) => `
             <div class="hourly-item-box" data-hour="${h.hour}">
-              <span class="time">${i === 0 ? t.hourly.now : String(h.hour).padStart(2, "0") + ":00"}</span>
+              <span class="time">${i === 0 ? t.hourly.now : this.formatHour(h.time)}</span>
               ${getIconSvg(h.meta.icon, 24)}
               <span class="temp">${this.formatTemp(h.temp)}</span>
               <div class="rain-prob">
