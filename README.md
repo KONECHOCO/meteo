@@ -76,8 +76,8 @@ npm run build
 - **Audio**: Web Audio API (procedural synthesis).
 - **APIs**: [Open-Meteo](https://open-meteo.com/) (Forecast, Multi-Model, Air Quality/Pollen, Marine, Geocoding). Dati CC BY 4.0, località GeoNames.
 
-## 🔑 Chiave API (obbligatoria in produzione)
+## 🖥️ Server meteo (obbligatorio in produzione)
 
-L'API gratuita di Open-Meteo è solo per uso **non commerciale**. Con pubblicità e versione Pro serve un
-[piano commerciale](https://open-meteo.com/en/pricing): copia `.env.example` in `.env.production` e imposta
-`VITE_OPEN_METEO_API_KEY`. Con la chiave l'app usa automaticamente gli endpoint `customer-*.open-meteo.com`.
+L'API pubblica di Open-Meteo è solo per uso **non commerciale**. Per la versione negli store l'app usa un
+server Open-Meteo proprio (circa 7–10 €/mese, dati CC BY 4.0): istruzioni in [server/README.md](server/README.md).
+Poi imposta `VITE_WEATHER_API_BASE` in `.env.production` (vedi `.env.example`).

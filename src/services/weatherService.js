@@ -3,16 +3,19 @@
 // Derived indices (lifestyle scores, sun exposure, barometric trend) are computed from those real values.
 // No simulated or random data: when the network fails the caller gets an error (and may show cached data).
 
-const API_KEY = import.meta.env.VITE_OPEN_METEO_API_KEY || "";
+// Production: our own self-hosted Open-Meteo server (data CC BY 4.0, commercial use allowed),
+// e.g. VITE_WEATHER_API_BASE=https://meteo-api.example.com — it serves /v1/forecast, /v1/air-quality
+// and /v1/marine on one host. Without it, the free Open-Meteo endpoints are used (development only:
+// the public API is non-commercial).
+const SELF_HOSTED_BASE = (import.meta.env.VITE_WEATHER_API_BASE || "").replace(/\/+$/, "");
 
-// Commercial plan uses the customer-* hosts with an API key; without a key the free
-// (non-commercial, development only) endpoints are used.
 export function apiUrl(service, path, params) {
-  const host = API_KEY ? `https://customer-${service}.open-meteo.com` : `https://${service}.open-meteo.com`;
-  const query = new URLSearchParams(params);
-  if (API_KEY) query.set("apikey", API_KEY);
-  return `${host}${path}?${query.toString()}`;
+  const host = SELF_HOSTED_BASE && service !== "geocoding-api" ? SELF_HOSTED_BASE : `https://${service}.open-meteo.com`;
+  return `${host}${path}?${new URLSearchParams(params).toString()}`;
 }
+
+// ~1 km grid: nearby users share the same request, so the server cache is hit more often.
+const gridCoord = (v) => Math.round(v * 100) / 100;
 
 export const COMPARISON_MODELS = [
   { id: "ecmwf_ifs025", name: "ECMWF IFS", origin: "EU", resolution: "25 km" },
@@ -30,8 +33,10 @@ async function getJson(url) {
   return res.json();
 }
 
-export async function fetchCompleteWeather(lat, lon, timezone = "auto") {
+export async function fetchCompleteWeather(rawLat, rawLon, timezone = "auto") {
   const tz = timezone || "auto";
+  const lat = gridCoord(rawLat);
+  const lon = gridCoord(rawLon);
 
   const forecastUrl = apiUrl("api", "/v1/forecast", {
     latitude: lat,
@@ -95,8 +100,8 @@ export async function fetchCompleteWeather(lat, lon, timezone = "auto") {
 // Lightweight current conditions for several points in a single request (route weather).
 export async function fetchPointsWeather(points) {
   const url = apiUrl("api", "/v1/forecast", {
-    latitude: points.map(p => p.lat.toFixed(4)).join(","),
-    longitude: points.map(p => p.lon.toFixed(4)).join(","),
+    latitude: points.map(p => gridCoord(p.lat)).join(","),
+    longitude: points.map(p => gridCoord(p.lon)).join(","),
     timezone: "auto",
     current: "temperature_2m,weather_code,is_day,precipitation,wind_speed_10m,wind_gusts_10m,visibility",
     hourly: "visibility",
