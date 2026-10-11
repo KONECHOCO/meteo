@@ -2,7 +2,7 @@ import "./style.css";
 import { translations } from "./i18n/translations.js";
 import { loadCountries, loadCountryRegions, searchGlobalLocations, findNearestPlace, flagEmoji, countryName } from "./data/geoHierarchy.js";
 import { fetchCompleteWeather, fetchPointsWeather, pollenLevel, aqiBand } from "./services/weatherService.js";
-import { GlobeScene } from "./3d/globeScene.js";
+import { GlobeScene, gibsMapUrl, latestGibsTime } from "./3d/globeScene.js";
 import { SkyScene } from "./3d/skyScene.js";
 import { WeatherAudioEngine } from "./audio/ambientAudio.js";
 import { WindRadarCanvas } from "./components/windRadarCanvas.js";
@@ -1231,13 +1231,55 @@ class AetheriaApp {
         </div>
         ${marine ? "" : `<p class="card-subtitle" style="margin-top: 12px;">${t.windSea.noMarine}</p>`}
       </div>
+
+      <div class="glass-panel" style="padding: 24px;">
+        <div class="card-header-row">
+          <div class="card-title">
+            ${getIconSvg("droplets", 22)}
+            <span>${t.globe.areaRain}</span>
+          </div>
+          <span class="card-subtitle" id="areaRainTime"></span>
+        </div>
+        <div class="area-rain-map">
+          <img id="areaRainBase" alt="" />
+          <img id="areaRainOverlay" alt="" />
+          <span class="area-rain-dot"></span>
+        </div>
+        <p class="card-subtitle" style="margin-top: 10px;">${t.globe.areaRainHint} · ${t.globe.source}</p>
+      </div>
     `;
+    this.loadAreaRainMap();
 
     const canvas = document.getElementById("windRadarCanvas");
     if (this.windRadar) this.windRadar.destroy();
     this.windRadar = new WindRadarCanvas(canvas);
     this.windRadar.setMode("wind");
     this.windRadar.setWind(curr.windSpeed, curr.windDirection);
+  }
+
+  // Satellite precipitation (NASA IMERG) around the selected place, on a Blue Marble background
+  async loadAreaRainMap() {
+    const { lat, lon } = this.selectedCity;
+    const latSpan = 4;
+    const lonSpan = 6;
+    const south = Math.max(-90, lat - latSpan);
+    const north = Math.min(90, lat + latSpan);
+    // WMS 1.3.0 with EPSG:4326 uses lat,lon axis order
+    const bbox = `${south},${lon - lonSpan},${north},${lon + lonSpan}`;
+    const base = document.getElementById("areaRainBase");
+    if (!base) return;
+    base.src = gibsMapUrl("BlueMarble_ShadedRelief_Bathymetry", { bbox, width: 720, height: 480 });
+    try {
+      const time = await latestGibsTime("IMERG_Precipitation_Rate_30min", "2km");
+      const overlay = document.getElementById("areaRainOverlay");
+      const label = document.getElementById("areaRainTime");
+      if (!overlay || !time) return;
+      overlay.src = gibsMapUrl("IMERG_Precipitation_Rate_30min", { bbox, width: 720, height: 480, format: "image/png", transparent: true, time });
+      label.textContent = `${this.t.globe.rainTime} ${new Date(time).toLocaleString(this.locale, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}`;
+    } catch (err) {
+      const label = document.getElementById("areaRainTime");
+      if (label) label.textContent = this.t.globe.rainError;
+    }
   }
 
   getCompassDir(deg) {

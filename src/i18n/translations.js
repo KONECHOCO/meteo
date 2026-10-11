@@ -257,6 +257,8 @@ export const translations = {
       }
     },
     globe: {
+      areaRain: "Pioggia nella zona (stima satellitare)",
+      areaRainHint: "Le aree colorate indicano pioggia, dal verde (debole) al rosso (forte). Il punto azzurro è la località scelta. Le aree azzurre indicano neve.",
       today: "Satellite di oggi",
       relief: "Senza nuvole",
       rain: "Pioggia",
@@ -530,6 +532,8 @@ export const translations = {
       }
     },
     globe: {
+      areaRain: "Rain in the area (satellite estimate)",
+      areaRainHint: "Coloured areas show rain, from green (light) to red (heavy). The blue dot is the selected place. Light-blue areas show snow.",
       today: "Today's satellite",
       relief: "No clouds",
       rain: "Rain",
@@ -803,6 +807,8 @@ export const translations = {
       }
     },
     globe: {
+      areaRain: "Lluvia en la zona (estimación satelital)",
+      areaRainHint: "Las zonas coloreadas indican lluvia, del verde (débil) al rojo (fuerte). El punto azul es el lugar elegido. Las zonas celestes indican nieve.",
       today: "Satélite de hoy",
       relief: "Sin nubes",
       rain: "Lluvia",
@@ -1076,6 +1082,8 @@ export const translations = {
       }
     },
     globe: {
+      areaRain: "Pluie dans la zone (estimation satellite)",
+      areaRainHint: "Les zones colorées indiquent la pluie, du vert (faible) au rouge (forte). Le point bleu est le lieu choisi. Les zones bleu clair indiquent de la neige.",
       today: "Satellite du jour",
       relief: "Sans nuages",
       rain: "Pluie",
@@ -1349,6 +1357,8 @@ export const translations = {
       }
     },
     globe: {
+      areaRain: "Regen in der Umgebung (Satellitenschätzung)",
+      areaRainHint: "Farbige Flächen zeigen Regen, von Grün (leicht) bis Rot (stark). Der blaue Punkt ist der gewählte Ort. Hellblaue Flächen zeigen Schnee.",
       today: "Satellit heute",
       relief: "Ohne Wolken",
       rain: "Regen",
@@ -1622,6 +1632,8 @@ export const translations = {
       }
     },
     globe: {
+      areaRain: "周辺の雨（衛星推定）",
+      areaRainHint: "色の付いた部分が雨を示し、緑（弱い）から赤（強い）まであります。青い点は選択した地点です。水色の部分は雪を示します。",
       today: "今日の衛星画像",
       relief: "雲なし",
       rain: "雨",
@@ -1895,6 +1907,8 @@ export const translations = {
       }
     },
     globe: {
+      areaRain: "周边降雨（卫星估算）",
+      areaRainHint: "彩色区域表示降雨，从绿色（弱）到红色（强）。蓝点为所选地点。浅蓝色区域表示降雪。",
       today: "今日卫星图",
       relief: "无云",
       rain: "降雨",
@@ -2168,6 +2182,8 @@ export const translations = {
       }
     },
     globe: {
+      areaRain: "المطر في المنطقة (تقدير بالأقمار الصناعية)",
+      areaRainHint: "المناطق الملونة تشير إلى المطر، من الأخضر (خفيف) إلى الأحمر (غزير). النقطة الزرقاء هي الموقع المختار. المناطق الزرقاء الفاتحة تشير إلى الثلج.",
       today: "صورة الأقمار الصناعية اليوم",
       relief: "بدون غيوم",
       rain: "المطر",
@@ -2441,6 +2457,8 @@ export const translations = {
       }
     },
     globe: {
+      areaRain: "Chuva na região (estimativa por satélite)",
+      areaRainHint: "As áreas coloridas indicam chuva, do verde (fraca) ao vermelho (forte). O ponto azul é o local escolhido. As áreas azul-claras indicam neve.",
       today: "Satélite de hoje",
       relief: "Sem nuvens",
       rain: "Chuva",
@@ -2714,6 +2732,8 @@ export const translations = {
       }
     },
     globe: {
+      areaRain: "Осадки в районе (спутниковая оценка)",
+      areaRainHint: "Цветные области — осадки, от зелёного (слабые) до красного (сильные). Синяя точка — выбранное место. Голубые области — снег.",
       today: "Спутник сегодня",
       relief: "Без облаков",
       rain: "Осадки",

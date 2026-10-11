@@ -10,14 +10,14 @@ const GIBS_WMS = "https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi";
 const GIBS_WMTS = "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/wmts.cgi";
 const TEXTURES = `${import.meta.env.BASE_URL}textures/`;
 
-function gibsMapUrl(layer, { time, width, height, format = "image/jpeg", transparent = false }) {
+export function gibsMapUrl(layer, { time, width, height, format = "image/jpeg", transparent = false, bbox = "-90,-180,90,180" }) {
   const params = new URLSearchParams({
     SERVICE: "WMS",
     REQUEST: "GetMap",
     VERSION: "1.3.0",
     LAYERS: layer,
     CRS: "EPSG:4326",
-    BBOX: "-90,-180,90,180",
+    BBOX: bbox,
     WIDTH: String(width),
     HEIGHT: String(height),
     FORMAT: format
@@ -28,7 +28,7 @@ function gibsMapUrl(layer, { time, width, height, format = "image/jpeg", transpa
 }
 
 // Latest available time of a GIBS layer (e.g. "2026-10-11T10:30:00Z"), or null
-async function latestGibsTime(layer, tileMatrixSet) {
+export async function latestGibsTime(layer, tileMatrixSet) {
   const now = new Date();
   const from = new Date(now.getTime() - 3 * 86400000).toISOString().slice(0, 10);
   const to = new Date(now.getTime() + 86400000).toISOString().slice(0, 10);

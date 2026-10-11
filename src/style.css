@@ -958,3 +958,36 @@ body {
     border-radius: 16px;
   }
 }
+
+/* Regional satellite rain map (Wind & Sea view) */
+.area-rain-map {
+  position: relative;
+  aspect-ratio: 3 / 2;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--border-glass);
+  background: #0b1a2e;
+}
+
+.area-rain-map img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.area-rain-map img:not([src]) {
+  visibility: hidden;
+}
+
+.area-rain-dot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  border-radius: 50%;
+  background: #00f0ff;
+  box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.35);
+}
