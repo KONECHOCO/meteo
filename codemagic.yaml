@@ -1,23 +1,22 @@
-# Aetheria Weather 3D — build per App Store e Play Store.
-# Gli ID AdMob (non segreti) sono in .env.production e ios/App/App/Info.plist.
+# Aetheria Weather 3D — build per App Store e Play Store (modello: OmniTransit).
+# iOS: profilo App Store "aetheria_appstore" in ios/profiles (creato via API App Store Connect).
+# Android: keystore "aetheria_android" da caricare su Codemagic (Code signing identities).
+# Nessun trigger automatico: la build si avvia a mano finché l'app non è pronta.
 workflows:
   ios-app-store:
     name: Aetheria iOS App Store
     max_build_duration: 90
     instance_type: mac_mini_m4
-    triggering:
-      events:
-        - push
-      branch_patterns:
-        - pattern: main
-          include: true
-      cancel_previous_builds: true
     integrations:
       app_store_connect: Ikonet Solutions
     environment:
       ios_signing:
+        # Il certificato (con chiave privata) è su Codemagic; il profilo App Store di Aetheria è nel repo
+        # (ios/profiles) e viene installato da uno script. Codemagic richiede almeno un profilo qui: quello di
+        # FuelSaver serve solo a questo, `xcode-project use-profiles` sceglie il profilo con bundle id corrispondente.
+        # Quando "aetheria_appstore" sarà importato su Codemagic, sostituirlo qui e togliere lo script.
         provisioning_profiles:
-          - aetheria_appstore
+          - fuelsaver_appstore
         certificates:
           - ithelpdesk_distribution_20260916
       vars:
@@ -32,6 +31,11 @@ workflows:
         script: |
           npm run build
           npx cap sync ios
+      - name: Install App Store provisioning profile
+        script: |
+          PROFILES_DIR="$HOME/Library/MobileDevice/Provisioning Profiles"
+          mkdir -p "$PROFILES_DIR"
+          cp ios/profiles/aetheria_appstore.mobileprovision "$PROFILES_DIR/254c85fa-cce6-4817-a39d-7452808d2225.mobileprovision"
       - name: Set up signing profiles
         script: xcode-project use-profiles
       - name: Apply Codemagic build number

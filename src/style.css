@@ -41,7 +41,7 @@ body {
   background: var(--bg-space);
   color: var(--text-main);
   min-height: 100vh;
-  overflow-x: hidden;
+  overflow-x: clip;
   background-image: 
     radial-gradient(circle at 15% 15%, rgba(14, 165, 233, 0.12) 0%, transparent 40%),
     radial-gradient(circle at 85% 30%, rgba(99, 102, 241, 0.12) 0%, transparent 45%),
@@ -1252,5 +1252,40 @@ body {
   .route-input {
     width: 100%;
     min-width: 0;
+  }
+}
+
+/* Ad diagnostics (test builds only) */
+.ad-diagnostics {
+  position: fixed;
+  left: 8px;
+  right: 8px;
+  bottom: 96px;
+  z-index: 900;
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 6px 8px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.85);
+  border: 1px solid rgba(245, 158, 11, 0.6);
+  color: #fef3c7;
+  font: 10px/1.4 var(--font-mono, monospace);
+}
+
+.ad-diagnostics strong {
+  display: block;
+  color: #fcd34d;
+}
+
+.ad-diagnostics.collapsed {
+  max-height: 22px;
+  overflow: hidden;
+}
+
+/* Phones: the model table drops the resolution column so it fits without sideways scrolling */
+@media (max-width: 640px) {
+  .models-table th:nth-child(2),
+  .models-table td:nth-child(2) {
+    display: none;
   }
 }

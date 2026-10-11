@@ -6,7 +6,7 @@
  * - Real AdMob IDs come from the VITE_ADMOB_* variables (.env.production). Without them, or in
  *   development, Google's official test IDs are used: never publish with test ads.
  * - In the browser there are no ads and no purchases.
- * Same flow as FuelSaver (src/services/monetization.js in that project).
+ * Same flow as OmniTransit (TRASPORTO/src/services/monetization.js), the latest Ikonet reference.
  */
 import { Capacitor } from "@capacitor/core";
 import { App as CapApp } from "@capacitor/app";
@@ -46,17 +46,15 @@ const REAL_IDS = {
   appOpen: env[`VITE_ADMOB_${P}_APP_OPEN`],
   interstitial: env[`VITE_ADMOB_${P}_INTERSTITIAL`]
 };
-// Development always uses test ads: clicking your own real ads violates AdMob policy
-const USE_TEST_ADS = env.DEV || !REAL_IDS.banner;
-const AD_IDS = USE_TEST_ADS ? TEST_IDS[platform] || TEST_IDS.android : REAL_IDS;
-
-// Frequencies inside AdMob rules: no bursts and never during active use
-const INTERSTITIAL_EVERY_N_ACTIONS = 4;
-const MIN_GAP_BETWEEN_FULLSCREEN_MS = 90 * 1000;
-const APP_OPEN_MIN_BACKGROUND_MS = 30 * 1000;
+// Frequencies of the Ikonet standard: more full-screen ads, but only at transition points and never
+// in bursts (AdMob interstitial policy). Do not go below these values.
+const INTERSTITIAL_EVERY_N_ACTIONS = 2;
+const MIN_GAP_BETWEEN_FULLSCREEN_MS = 45 * 1000;
+const APP_OPEN_MIN_BACKGROUND_MS = 20 * 1000;
 const APP_OPEN_LOAD_TIMEOUT_MS = 8000;
 
 const PRO_KEY = "aetheria.pro";
+const TEST_ADS_KEY = "aetheria.testAds";
 
 function readStorage(key, fallback) {
   try {
@@ -74,6 +72,11 @@ function writeStorage(key, value) {
   }
 }
 
+// Development always uses test ads: clicking your own real ads violates AdMob policy.
+// In test builds (TestFlight / internal testing) they are switched on with 7 taps on the logo: see toggleTestAds().
+const USE_TEST_ADS = env.DEV || !REAL_IDS.banner || readStorage(TEST_ADS_KEY, false);
+const AD_IDS = USE_TEST_ADS ? TEST_IDS[platform] || TEST_IDS.android : REAL_IDS;
+
 // ---------- Observable state ----------
 // Development only: ?storeshot shows the purchase UI as in the native app, for store screenshots
 const previewNative = env.DEV && typeof location !== "undefined" && location.search.includes("storeshot");
@@ -83,7 +86,9 @@ let state = {
   isPro: readStorage(PRO_KEY, false),
   proPrice: null,
   adsReady: false,
-  bannerHeight: 0
+  bannerHeight: 0,
+  testAds: USE_TEST_ADS,
+  diag: []
 };
 const listeners = new Set();
 
@@ -113,12 +118,21 @@ function adsAllowed() {
   return native && state.adsReady && !state.isPro;
 }
 
+// Diagnostic log (visible in the app when test ads are on): what happens on the phone, step by step
+export function diag(msg) {
+  const line = `${new Date().toLocaleTimeString()} ${msg}`;
+  console.info("[ads]", line);
+  setState({ diag: [...(state.diag || []).slice(-30), line] });
+}
+
 async function prepareInterstitial() {
   try {
     await AdMob.prepareInterstitial({ adId: AD_IDS.interstitial, isTesting: USE_TEST_ADS });
     interstitialLoaded = true;
-  } catch {
+    diag("interstitial loaded");
+  } catch (err) {
     interstitialLoaded = false;
+    diag(`interstitial unavailable: ${err?.message || err}`);
   }
 }
 
@@ -126,8 +140,10 @@ async function loadAppOpen() {
   try {
     await AdMob.loadAppOpen({ adId: AD_IDS.appOpen });
     appOpenLoaded = true;
-  } catch {
+    diag("app open loaded");
+  } catch (err) {
     appOpenLoaded = false;
+    diag(`app open unavailable: ${err?.message || err}`);
   }
 }
 
@@ -158,8 +174,9 @@ async function showBanner() {
       margin: 0,
       isTesting: USE_TEST_ADS
     });
+    diag("banner requested");
   } catch (err) {
-    console.info("Banner unavailable", err);
+    diag(`banner error: ${err?.message || err}`);
   }
 }
 
@@ -196,26 +213,32 @@ async function waitUntilActive() {
 }
 
 // App Tracking Transparency (iOS): the prompt is shown by native code (SceneDelegate.swift) as soon as
-// the app is active. Here we wait for the answer before initializing AdMob, so no tracking data is
-// collected before consent. After 6 s without a prompt we also ask from the plugin as a fallback.
+// the app is active; after 3 s we also ask from the plugin as a fallback. We wait at most 10 s: if the
+// prompt never appears (e.g. tracking disabled in Settings) we go on with non-personalised ads instead
+// of blocking everything.
 async function requestTrackingPermission() {
   if (platform !== "ios") return;
   try {
     await waitUntilActive();
-    for (let waited = 0; waited < 60000; waited += 1000) {
+    for (let waited = 0; waited <= 10000; waited += 1000) {
       const { status } = await AdMob.trackingAuthorizationStatus();
-      if (status !== "notDetermined") return;
-      if (waited === 6000) AdMob.requestTrackingAuthorization().catch(() => {});
+      if (status !== "notDetermined") {
+        diag(`ATT: ${status}`);
+        return;
+      }
+      if (waited === 3000) AdMob.requestTrackingAuthorization().catch(() => {});
       await sleep(1000);
     }
+    diag("ATT: no answer in 10 s, continuing");
   } catch (err) {
-    console.info("ATT unavailable", err);
+    diag(`ATT error: ${err?.message || err}`);
   }
 }
 
-// GDPR consent (UMP, required in the EU/UK for AdMob). A failure here must not block ATT or ads.
+// GDPR consent (UMP, required in the EU/UK for AdMob), BEFORE the ATT prompt as Google recommends.
+// Returns whether ads may be requested. A failure must not block the app.
 async function gatherConsent() {
-  await requestTrackingPermission();
+  let canRequestAds = true;
   try {
     let info = await Promise.race([
       AdMob.requestConsentInfo(),
@@ -223,14 +246,17 @@ async function gatherConsent() {
         throw new Error("UMP timeout");
       })
     ]);
+    diag(`UMP: status=${info.status} form=${info.isConsentFormAvailable} canRequestAds=${info.canRequestAds}`);
     if (info.isConsentFormAvailable && info.status === AdmobConsentStatus.REQUIRED) {
       info = await AdMob.showConsentForm();
+      diag(`UMP after form: status=${info.status} canRequestAds=${info.canRequestAds}`);
     }
-    return info.canRequestAds !== false;
+    canRequestAds = info.canRequestAds !== false;
   } catch (err) {
-    console.info("UMP consent unavailable", err);
-    return true;
+    diag(`UMP error: ${err?.message || err}`);
   }
+  await requestTrackingPermission();
+  return canRequestAds;
 }
 
 /** Call once at app start. */
@@ -240,25 +266,38 @@ export async function initMonetization() {
     return;
   }
   // StoreKit may never answer (e.g. TestFlight before the product is approved):
-  // the Pro check must not block the ATT prompt, so it has a time limit
+  // the Pro check must not block the consent prompts, so it has a time limit
   await Promise.race([refreshProStatus(), sleep(4000)]);
   if (state.isPro) {
     resolveConsentDone();
     return;
   }
 
+  diag(`start: test=${USE_TEST_ADS} platform=${platform}`);
   let canRequestAds = true;
   try {
     canRequestAds = await gatherConsent();
   } finally {
     resolveConsentDone();
   }
-  if (!canRequestAds) return;
+  // Without consent Google does not allow real ads; test ads still show for testing
+  if (!canRequestAds && !USE_TEST_ADS) {
+    diag("ads not allowed (no GDPR consent)");
+    return;
+  }
 
-  await AdMob.initialize({ initializeForTesting: USE_TEST_ADS });
+  try {
+    await AdMob.initialize({ initializeForTesting: USE_TEST_ADS });
+  } catch (err) {
+    diag(`AdMob initialize error: ${err?.message || err}`);
+    return;
+  }
   setState({ adsReady: true });
+  diag("AdMob ready");
 
   AdMob.addListener(BannerAdPluginEvents.SizeChanged, size => setState({ bannerHeight: size.height || 0 }));
+  AdMob.addListener(BannerAdPluginEvents.Loaded, () => diag("banner loaded"));
+  AdMob.addListener(BannerAdPluginEvents.FailedToLoad, err => diag(`banner failed: ${err?.message || err?.code || JSON.stringify(err)}`));
   AdMob.addListener(AppOpenAdPluginEvents.Closed, () => {
     fullscreenShowing = false;
     lastFullscreenAt = Date.now();
@@ -269,10 +308,24 @@ export async function initMonetization() {
     loadAppOpen();
   });
 
-  // 1) ad when the app opens, 2) fixed banner, 3) preload the interstitial
-  await showAppOpen();
+  // 1) full-screen ad at launch (app open; if unavailable, an interstitial), 2) fixed banner,
+  // 3) preload the interstitial
   showBanner();
-  prepareInterstitial();
+  await prepareInterstitial();
+  await showAppOpen();
+  if (!fullscreenShowing && Date.now() - lastFullscreenAt > MIN_GAP_BETWEEN_FULLSCREEN_MS && interstitialLoaded) {
+    try {
+      fullscreenShowing = true;
+      interstitialLoaded = false;
+      await AdMob.showInterstitial();
+      lastFullscreenAt = Date.now();
+    } catch {
+      // no ad available
+    } finally {
+      fullscreenShowing = false;
+      prepareInterstitial();
+    }
+  }
 
   // App-open ad also when the user comes back after leaving the app in the background
   CapApp.addListener("appStateChange", ({ isActive }) => {
@@ -363,4 +416,11 @@ export async function restorePro() {
   }
   await refreshProStatus();
   return state.isPro;
+}
+
+/** Hidden switch for test builds: turns test ads on/off (the app must be restarted). */
+export function toggleTestAds() {
+  const next = !readStorage(TEST_ADS_KEY, false);
+  writeStorage(TEST_ADS_KEY, next);
+  return next;
 }

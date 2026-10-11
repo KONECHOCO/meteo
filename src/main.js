@@ -10,7 +10,7 @@ import { renderMeteogramSvg } from "./components/meteogramChart.js";
 import { getIconSvg } from "./utils/icons.js";
 import { Capacitor } from "@capacitor/core";
 import { Geolocation } from "@capacitor/geolocation";
-import { initMonetization, trackAdAction, subscribeMonetization, getMonetizationState } from "./services/monetization.js";
+import { initMonetization, trackAdAction, subscribeMonetization, getMonetizationState, toggleTestAds, consentDone } from "./services/monetization.js";
 import { openProModal } from "./components/proModal.js";
 
 const LOCALES = { it: "it-IT", en: "en-GB", es: "es-ES", fr: "fr-FR", de: "de-DE", ja: "ja-JP", zh: "zh-CN", ar: "ar", pt: "pt-BR", ru: "ru-RU" };
@@ -96,7 +96,7 @@ class AetheriaApp {
       if (!saved || typeof saved.city?.lat !== "number" || typeof saved.city?.lon !== "number") return false;
       this.selectedCity = saved.city;
       this.selectedCountryCode = saved.countryCode || "IT";
-      this.selectedRegionCode = saved.regionCode ?? "";
+      this.selectedRegionCode = saved.regionCode ?? null;
       this.locationLabel = saved.label || null;
       return true;
     } catch (e) {
@@ -137,10 +137,11 @@ class AetheriaApp {
     this.bindEventListeners();
 
     // Ads and Pro: keep the page clear of the bottom banner and show the Pro state in the header
-    subscribeMonetization(({ bannerHeight, isPro }) => {
-      document.body.style.paddingBottom = bannerHeight ? `${bannerHeight}px` : "";
+    subscribeMonetization((state) => {
+      document.body.style.paddingBottom = state.bannerHeight ? `${state.bannerHeight}px` : "";
       const btn = document.getElementById("btnPro");
-      if (btn) btn.classList.toggle("is-pro", isPro);
+      if (btn) btn.classList.toggle("is-pro", state.isPro);
+      this.renderAdDiagnostics(state);
     });
     initMonetization();
 
@@ -312,6 +313,15 @@ class AetheriaApp {
   async loadRegions(countryCode) {
     this.regions = await loadCountryRegions(countryCode, this.currentLang);
     this.selectedCountryCode = countryCode;
+    if (this.selectedRegionCode == null) {
+      const near = (c) => Math.abs(c.lat - this.selectedCity.lat) < 0.05 && Math.abs(c.lon - this.selectedCity.lon) < 0.05;
+      const region = this.regions.find(r => r.cities.some(near));
+      if (region) {
+        this.selectedRegionCode = region.code;
+        const city = region.cities.find(near);
+        if (city) this.selectedCity = { ...this.selectedCity, name: city.name };
+      }
+    }
     this.dom.selectCountry.value = countryCode;
     this.updateRegionSelector();
   }
@@ -433,6 +443,8 @@ class AetheriaApp {
       }
       this.dom.btnGps.classList.add("active");
       try {
+        // iOS shows one system prompt at a time: wait until the GDPR/ATT prompts are done
+        if (native) await Promise.race([consentDone, new Promise(r => setTimeout(r, 15000))]);
         const options = { enableHighAccuracy: false, timeout: 15000, maximumAge: 600000 };
         const pos = native
           ? await Geolocation.getCurrentPosition(options)
@@ -454,6 +466,18 @@ class AetheriaApp {
     });
 
     document.getElementById("btnPro").addEventListener("click", () => openProModal(this.t));
+
+    // Hidden switch for test builds: 7 quick taps on the logo turn test ads on/off
+    let taps = { n: 0, at: 0 };
+    document.getElementById("btnHomeBrand").addEventListener("click", () => {
+      const now = Date.now();
+      taps = now - taps.at < 1500 ? { n: taps.n + 1, at: now } : { n: 1, at: now };
+      if (taps.n >= 7) {
+        taps = { n: 0, at: 0 };
+        const on = toggleTestAds();
+        alert(`Test ads: ${on ? "ON" : "OFF"}. Close and reopen the app.`);
+      }
+    });
 
     // Audio Engine Toggle
     this.dom.btnAudio.addEventListener("click", () => {
@@ -720,6 +744,23 @@ class AetheriaApp {
       this.globeScene.setRainVisible(this.globeRain);
     }
     this.globeScene.setLocation(this.selectedCity.lat, this.selectedCity.lon, this.selectedCity.name);
+  }
+
+  // Ad diagnostics panel: only in the native app with test ads on (7 taps on the logo)
+  renderAdDiagnostics({ testAds, native, diag, adsReady, isPro }) {
+    let panel = document.getElementById("adDiagnostics");
+    if (!testAds || !native) {
+      if (panel) panel.remove();
+      return;
+    }
+    if (!panel) {
+      panel = document.createElement("div");
+      panel.id = "adDiagnostics";
+      panel.className = "ad-diagnostics";
+      panel.addEventListener("click", () => panel.classList.toggle("collapsed"));
+      document.body.appendChild(panel);
+    }
+    panel.innerHTML = `<strong>ADS DEBUG · ready=${adsReady} pro=${isPro}</strong>${(diag || []).map(l => `<div>${esc(l)}</div>`).join("")}`;
   }
 
   // Source and freshness of the satellite imagery shown on the globe
@@ -1451,4 +1492,5 @@ class AetheriaApp {
 window.addEventListener("DOMContentLoaded", () => {
   const app = new AetheriaApp();
   app.init();
+  if (import.meta.env.DEV) window.__aetheria = app;
 });
