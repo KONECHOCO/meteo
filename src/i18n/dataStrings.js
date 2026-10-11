@@ -4,6 +4,7 @@
 export const dataStrings = {
   it: {
     views: { radar: "Vento & Mare" },
+    geo: { otherPlaces: "Altre località" },
     minuteCast: {
       title: "Pioggia nelle prossime 2 ore",
       subtitle: "Previsione a intervalli di 15 minuti",
@@ -128,6 +129,7 @@ export const dataStrings = {
 
   en: {
     views: { radar: "Wind & Sea" },
+    geo: { otherPlaces: "Other places" },
     minuteCast: {
       title: "Rain in the next 2 hours",
       subtitle: "Forecast in 15-minute steps",
@@ -252,6 +254,7 @@ export const dataStrings = {
 
   es: {
     views: { radar: "Viento y mar" },
+    geo: { otherPlaces: "Otros lugares" },
     minuteCast: {
       title: "Lluvia en las próximas 2 horas",
       subtitle: "Previsión en intervalos de 15 minutos",
@@ -376,6 +379,7 @@ export const dataStrings = {
 
   fr: {
     views: { radar: "Vent et mer" },
+    geo: { otherPlaces: "Autres lieux" },
     minuteCast: {
       title: "Pluie dans les 2 prochaines heures",
       subtitle: "Prévision par pas de 15 minutes",
@@ -500,6 +504,7 @@ export const dataStrings = {
 
   de: {
     views: { radar: "Wind & Meer" },
+    geo: { otherPlaces: "Weitere Orte" },
     minuteCast: {
       title: "Regen in den nächsten 2 Stunden",
       subtitle: "Vorhersage in 15-Minuten-Schritten",
@@ -624,6 +629,7 @@ export const dataStrings = {
 
   ja: {
     views: { radar: "風と海" },
+    geo: { otherPlaces: "その他の地域" },
     minuteCast: {
       title: "今後2時間の雨",
       subtitle: "15分ごとの予報",
@@ -748,6 +754,7 @@ export const dataStrings = {
 
   zh: {
     views: { radar: "风与海" },
+    geo: { otherPlaces: "其他地点" },
     minuteCast: {
       title: "未来2小时降水",
       subtitle: "每15分钟预报",
@@ -872,6 +879,7 @@ export const dataStrings = {
 
   ar: {
     views: { radar: "الرياح والبحر" },
+    geo: { otherPlaces: "أماكن أخرى" },
     minuteCast: {
       title: "المطر خلال الساعتين القادمتين",
       subtitle: "توقعات كل 15 دقيقة",
@@ -996,6 +1004,7 @@ export const dataStrings = {
 
   pt: {
     views: { radar: "Vento e mar" },
+    geo: { otherPlaces: "Outros locais" },
     minuteCast: {
       title: "Chuva nas próximas 2 horas",
       subtitle: "Previsão em intervalos de 15 minutos",
@@ -1120,6 +1129,7 @@ export const dataStrings = {
 
   ru: {
     views: { radar: "Ветер и море" },
+    geo: { otherPlaces: "Другие места" },
     minuteCast: {
       title: "Осадки в ближайшие 2 часа",
       subtitle: "Прогноз с шагом 15 минут",

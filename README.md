@@ -12,8 +12,8 @@
 
 ### 1. 🌍 Distribuzione Globale & Navigazione Territoriale
 - **Albero Geografico Gerarchico**: Navigazione a cascata **Paese $\rightarrow$ Regione / Stato $\rightarrow$ Città / Località** (Italia, Francia, Spagna, Germania, USA, Giappone, Cina, Brasile, Australia, Svizzera, UAE, ecc.).
-- **Geocoding Globale Istantaneo**: Ricerca su oltre 200.000 località mondiali tramite Open-Meteo Geocoding.
-- **Geolocalizzazione GPS**: Rilevamento istantaneo della posizione con un solo clic.
+- **225.000 località in 246 paesi** (GeoNames, CC BY 4.0) incluse nell'app: ricerca e menu Paese → Regione → Città funzionano anche offline, con i nomi tradotti nelle 10 lingue per città e regioni principali. Rigenera i dati con `node scripts/build-geo.mjs`.
+- **Geolocalizzazione GPS**: meteo del punto esatto con il nome della località più vicina.
 
 ### 2. 🗣️ Supporto Multi-Lingue (10 Lingue)
 Switch istantaneo senza ricaricamento pagina tra:

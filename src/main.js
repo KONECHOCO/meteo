@@ -1,6 +1,6 @@
 import "./style.css";
 import { translations } from "./i18n/translations.js";
-import { geoHierarchy, searchGlobalLocations } from "./data/geoHierarchy.js";
+import { loadCountries, loadCountryRegions, searchGlobalLocations, findNearestPlace, flagEmoji, countryName } from "./data/geoHierarchy.js";
 import { fetchCompleteWeather, fetchPointsWeather, pollenLevel, aqiBand } from "./services/weatherService.js";
 import { GlobeScene } from "./3d/globeScene.js";
 import { SkyScene } from "./3d/skyScene.js";
@@ -24,11 +24,13 @@ class AetheriaApp {
     this.currentUnit = localStorage.getItem("aetheria_unit") || "C";
     this.currentView = "dashboard"; // "dashboard" | "globe" | "sky" | "radar" | "route"
 
-    // Default Location: Milano, Lombardia, Italia
-    this.selectedCountry = geoHierarchy[0];
-    this.selectedRegion = this.selectedCountry.regions[0];
-    this.selectedCity = this.selectedRegion.cities[0];
-    this.locationLabel = { region: this.selectedRegion.name, country: this.selectedCountry.name };
+    // Default Location: Milano, Lombardia, Italia (the selectors are filled from the offline GeoNames data)
+    this.countries = [];
+    this.selectedCountryCode = "IT";
+    this.regions = [];
+    this.selectedRegionCode = "09";
+    this.selectedCity = { name: "Milano", lat: 45.4643, lon: 9.1895, timezone: "auto" };
+    this.locationLabel = { region: "Lombardia", countryCode: "IT" };
 
     this.weatherData = null;
     this.isOfflineData = false;
@@ -52,10 +54,9 @@ class AetheriaApp {
   async init() {
     this.renderShell();
     this.bindDomElements();
-    this.populateGeoSelectors();
     this.bindEventListeners();
 
-    await this.loadWeatherForCurrentLocation();
+    await Promise.all([this.populateGeoSelectors(), this.loadWeatherForCurrentLocation()]);
   }
 
   renderShell() {
@@ -196,70 +197,106 @@ class AetheriaApp {
     };
   }
 
-  populateGeoSelectors() {
-    const cSelect = this.dom.selectCountry;
-    cSelect.innerHTML = geoHierarchy.map(c => `
-      <option value="${c.code}" ${c.code === this.selectedCountry.code ? "selected" : ""}>
-        ${c.flag} ${esc(c.name)}
-      </option>
-    `).join("");
+  async populateGeoSelectors() {
+    try {
+      this.countries = await loadCountries(this.currentLang);
+      this.dom.selectCountry.innerHTML = this.countries.map(c => `
+        <option value="${c.code}" ${c.code === this.selectedCountryCode ? "selected" : ""}>${flagEmoji(c.code)} ${esc(c.name)}</option>
+      `).join("");
+      await this.loadRegions(this.selectedCountryCode);
+    } catch (err) {
+      console.warn("Place data unavailable:", err);
+    }
+  }
 
+  async loadRegions(countryCode) {
+    this.regions = await loadCountryRegions(countryCode, this.currentLang);
+    this.selectedCountryCode = countryCode;
+    this.dom.selectCountry.value = countryCode;
     this.updateRegionSelector();
   }
 
-  updateRegionSelector() {
-    const rSelect = this.dom.selectRegion;
-    rSelect.innerHTML = this.selectedCountry.regions.map(r => `
-      <option value="${esc(r.name)}" ${this.selectedRegion && r.name === this.selectedRegion.name ? "selected" : ""}>
-        ${esc(r.name)}
-      </option>
-    `).join("");
+  get selectedRegion() {
+    return this.regions.find(r => r.code === this.selectedRegionCode) || this.regions[0] || null;
+  }
 
+  regionLabel(region) {
+    return region.code ? region.name : this.t.geo.otherPlaces;
+  }
+
+  updateRegionSelector() {
+    const current = this.selectedRegion;
+    if (current) this.selectedRegionCode = current.code;
+    this.dom.selectRegion.innerHTML = this.regions.map(r => `
+      <option value="${esc(r.code)}" ${r.code === this.selectedRegionCode ? "selected" : ""}>${esc(this.regionLabel(r))}</option>
+    `).join("");
     this.updateCitySelector();
   }
 
   updateCitySelector() {
-    const citySelect = this.dom.selectCity;
-    citySelect.innerHTML = this.selectedRegion.cities.map(c => `
-      <option value="${esc(c.name)}" ${c.name === this.selectedCity.name ? "selected" : ""}>
-        ${esc(c.name)}
-      </option>
+    const region = this.selectedRegion;
+    const cities = region ? region.cities : [];
+    // Keep the current place selected when it belongs to this region
+    const currentIdx = cities.findIndex(c => c.name === this.selectedCity.name && Math.abs(c.lat - this.selectedCity.lat) < 0.05 && Math.abs(c.lon - this.selectedCity.lon) < 0.05);
+    this.dom.selectCity.innerHTML = (currentIdx < 0 ? `<option value="" selected>—</option>` : "") + cities.map((c, i) => `
+      <option value="${i}" ${i === currentIdx ? "selected" : ""}>${esc(c.name)}</option>
     `).join("");
   }
 
+  // Align the three selectors with a place chosen by search or GPS
+  async syncSelectorsToPlace(countryCode, admin1) {
+    this.selectedRegionCode = admin1 || "";
+    try {
+      if (countryCode !== this.selectedCountryCode || !this.regions.length) await this.loadRegions(countryCode);
+      else this.updateRegionSelector();
+    } catch (err) {
+      console.warn("Place data unavailable:", err);
+    }
+  }
+
   setHierarchyLocation() {
-    this.locationLabel = { region: this.selectedRegion.name, country: this.selectedCountry.name };
+    const region = this.selectedRegion;
+    this.locationLabel = { region: region && region.code ? region.name : "", countryCode: this.selectedCountryCode };
   }
 
   bindEventListeners() {
     // Geo Hierarchy change events
-    this.dom.selectCountry.addEventListener("change", (e) => {
-      const foundCountry = geoHierarchy.find(c => c.code === e.target.value);
-      if (foundCountry) {
-        this.selectedCountry = foundCountry;
-        this.selectedRegion = foundCountry.regions[0];
-        this.selectedCity = this.selectedRegion.cities[0];
-        this.setHierarchyLocation();
+    // Choosing a country or region selects its most populated place
+    const largestCity = (cities) => cities.reduce((best, c) => (!best || c.population > best.population ? c : best), null);
+
+    this.dom.selectCountry.addEventListener("change", async (e) => {
+      try {
+        const code = e.target.value;
+        const regions = await loadCountryRegions(code, this.currentLang);
+        const all = regions.flatMap(r => r.cities.map(c => ({ ...c, regionCode: r.code })));
+        const top = largestCity(all);
+        if (!top) return;
+        this.regions = regions;
+        this.selectedCountryCode = code;
+        this.selectedRegionCode = top.regionCode;
+        this.selectedCity = top;
         this.updateRegionSelector();
+        this.setHierarchyLocation();
         this.loadWeatherForCurrentLocation();
+      } catch (err) {
+        console.warn("Place data unavailable:", err);
       }
     });
 
     this.dom.selectRegion.addEventListener("change", (e) => {
-      const foundRegion = this.selectedCountry.regions.find(r => r.name === e.target.value);
-      if (foundRegion) {
-        this.selectedRegion = foundRegion;
-        this.selectedCity = foundRegion.cities[0];
-        this.setHierarchyLocation();
-        this.updateCitySelector();
-        this.loadWeatherForCurrentLocation();
-      }
+      this.selectedRegionCode = e.target.value;
+      const top = largestCity(this.selectedRegion.cities);
+      if (!top) return;
+      this.selectedCity = top;
+      this.updateCitySelector();
+      this.setHierarchyLocation();
+      this.loadWeatherForCurrentLocation();
     });
 
     this.dom.selectCity.addEventListener("change", (e) => {
-      const foundCity = this.selectedRegion.cities.find(c => c.name === e.target.value);
-      if (foundCity) {
-        this.selectedCity = foundCity;
+      const city = this.selectedRegion && this.selectedRegion.cities[parseInt(e.target.value, 10)];
+      if (city) {
+        this.selectedCity = city;
         this.setHierarchyLocation();
         this.loadWeatherForCurrentLocation();
       }
@@ -293,17 +330,16 @@ class AetheriaApp {
       }
       this.dom.btnGps.classList.add("active");
       navigator.geolocation.getCurrentPosition(
-        (pos) => {
+        async (pos) => {
           this.dom.btnGps.classList.remove("active");
-          this.selectedCity = {
-            name: this.t.status.myLocation,
-            lat: pos.coords.latitude,
-            lon: pos.coords.longitude,
-            timezone: "auto",
-            isGps: true
-          };
-          this.locationLabel = null;
+          const lat = pos.coords.latitude;
+          const lon = pos.coords.longitude;
+          const place = await findNearestPlace(lat, lon, this.currentLang).catch(() => null);
+          // Weather for the exact GPS point, named after the nearest known place
+          this.selectedCity = { name: place ? place.name : this.t.status.myLocation, lat, lon, timezone: "auto", isGps: true };
+          this.locationLabel = place ? { region: place.region, countryCode: place.countryCode } : null;
           this.loadWeatherForCurrentLocation();
+          if (place) this.syncSelectorsToPlace(place.countryCode, place.admin1);
         },
         (err) => {
           this.dom.btnGps.classList.remove("active");
@@ -376,7 +412,7 @@ class AetheriaApp {
     this.dom.suggestionsBox.innerHTML = results.map((r, i) => `
       <div class="search-suggestion-item" data-index="${i}">
         <div>
-          <div class="location-title">${esc(r.name)}</div>
+          <div class="location-title">${flagEmoji(r.countryCode)} ${esc(r.name)}${r.matchedName ? ` <span class="location-meta">(${esc(r.matchedName)})</span>` : ""}</div>
           <div class="location-meta">${r.region ? esc(r.region) + ", " : ""}${esc(r.country)}</div>
         </div>
         <div class="location-meta">${this.formatCoords(r.lat, r.lon)}</div>
@@ -388,11 +424,12 @@ class AetheriaApp {
     this.dom.suggestionsBox.querySelectorAll(".search-suggestion-item").forEach(item => {
       item.addEventListener("click", () => {
         const r = results[parseInt(item.dataset.index, 10)];
-        this.selectedCity = { name: r.name, lat: r.lat, lon: r.lon, timezone: r.timezone || "auto" };
-        this.locationLabel = { region: r.region, country: r.country };
+        this.selectedCity = { name: r.name, lat: r.lat, lon: r.lon, timezone: "auto" };
+        this.locationLabel = { region: r.region, countryCode: r.countryCode };
         this.dom.suggestionsBox.style.display = "none";
         this.dom.searchInput.value = `${r.name}, ${r.country}`;
         this.loadWeatherForCurrentLocation();
+        this.syncSelectorsToPlace(r.countryCode, r.admin1);
       });
     });
   }
@@ -807,7 +844,7 @@ class AetheriaApp {
     const curr = data.current;
     const t = this.t;
     const conditionName = t.conditions[curr.meta.key] || curr.meta.key;
-    const label = this.locationLabel ? [this.locationLabel.region, this.locationLabel.country].filter(Boolean).join(", ") : "";
+    const label = this.locationLabel ? [this.locationLabel.region, countryName(this.locationLabel.countryCode, this.currentLang)].filter(Boolean).join(", ") : "";
     const updated = new Date(data.updatedAt).toLocaleTimeString(this.locale, { hour: "2-digit", minute: "2-digit" });
 
     let comparisonHtml = "";

@@ -27,3 +27,6 @@ dist-ssr
 .env
 .env.local
 .env.*.local
+
+# GeoNames dumps downloaded by scripts/build-geo.mjs
+.geonames-cache/
