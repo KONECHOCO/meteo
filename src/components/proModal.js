@@ -5,6 +5,15 @@ import { buyPro, restorePro, getMonetizationState, subscribeMonetization } from 
 export const PRIVACY_URL = "https://aetheria.ikonetsolutions.com/privacy.html";
 
 let overlay = null;
+
+// Shown only until the store returns the localized price (and in store screenshots)
+function fallbackPrice() {
+  try {
+    return new Intl.NumberFormat(document.documentElement.lang || "en", { style: "currency", currency: "EUR" }).format(2.99);
+  } catch {
+    return "€2.99";
+  }
+}
 let unsubscribe = null;
 
 export function closeProModal() {
@@ -36,7 +45,7 @@ export function openProModal(t) {
     } else {
       actions = `
         <button class="pro-buy-btn" id="proBuyBtn" ${busy ? "disabled" : ""}>
-          ${getIconSvg("crown", 18)} ${t.pro.buy.replace("{price}", proPrice || "2,99 €")}
+          ${getIconSvg("crown", 18)} ${t.pro.buy.replace("{price}", proPrice || fallbackPrice())}
         </button>
         <button class="pro-restore-btn" id="proRestoreBtn" ${busy ? "disabled" : ""}>
           ${getIconSvg("rotate", 14)} ${t.pro.restore}

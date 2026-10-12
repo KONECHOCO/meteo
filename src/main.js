@@ -314,12 +314,21 @@ class AetheriaApp {
     this.regions = await loadCountryRegions(countryCode, this.currentLang);
     this.selectedCountryCode = countryCode;
     if (this.selectedRegionCode == null) {
-      const near = (c) => Math.abs(c.lat - this.selectedCity.lat) < 0.05 && Math.abs(c.lon - this.selectedCity.lon) < 0.05;
-      const region = this.regions.find(r => r.cities.some(near));
-      if (region) {
-        this.selectedRegionCode = region.code;
-        const city = region.cities.find(near);
-        if (city) this.selectedCity = { ...this.selectedCity, name: city.name };
+      // Region of a restored place: the same-named place nearby, otherwise the nearest one.
+      // The saved name is kept (e.g. "New York" must not become a neighbouring town).
+      const { lat, lon, name } = this.selectedCity;
+      let best = null;
+      for (const r of this.regions) {
+        for (const c of r.cities) {
+          const d = Math.hypot(c.lat - lat, c.lon - lon);
+          if (d > 0.3) continue;
+          const score = (c.name.toLowerCase() === String(name).toLowerCase() ? 0 : 1) * 10 + d;
+          if (!best || score < best.score) best = { score, region: r, city: c };
+        }
+      }
+      if (best) {
+        this.selectedRegionCode = best.region.code;
+        if (best.score < 10) this.selectedCity = { ...this.selectedCity, lat: best.city.lat, lon: best.city.lon };
       }
     }
     this.dom.selectCountry.value = countryCode;
